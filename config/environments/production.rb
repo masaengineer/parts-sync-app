@@ -30,7 +30,7 @@ Rails.application.configure do
   config.assets.compile = false
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
-  # config.asset_host = "https://www.parts-sync.site"
+  config.asset_host = "https://www.parts-sync.site"
   Rails.application.routes.default_url_options = {
     host: "www.parts-sync.site",
     protocol: 'https'
