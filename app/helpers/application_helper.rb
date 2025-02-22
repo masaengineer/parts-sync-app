@@ -10,6 +10,7 @@ module ApplicationHelper
     {
       site: "Parts Sync",
       title: "カーパーツ売上管理システム",
+      reverse: true,
       charset: "utf-8",
       description: "カーパーツ売上管理システムで、効率的な在庫管理と売上分析を実現",
       keywords: "カーパーツ,売上管理,システム",
@@ -20,9 +21,9 @@ module ApplicationHelper
         { href: image_url("logo/favicon.png"), rel: "icon", sizes: "90x90", type: "image/png" }
       ],
       og: {
-        site_name: :site,
-        title: :title,
-        description: :description,
+        site_name: "Parts Sync",
+        title: "カーパーツ売上管理システム",
+        description: "カーパーツ売上管理システムで、効率的な在庫管理と売上分析を実現",
         type: "website",
         url: request.original_url,
         image: image_url("ogp.png"),
@@ -31,6 +32,7 @@ module ApplicationHelper
       twitter: {
         card: "summary_large_image",
         site: "@",
+        creator: "@",
         image: image_url("ogp.png")
       }
     }
