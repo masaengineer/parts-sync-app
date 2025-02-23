@@ -1,0 +1,15 @@
+<% metrics.each do |metric| %>
+  <tr class="font-medium cursor-pointer hover:bg-base-200/40">
+    <td><%= metric[:label] %></td>
+    <% @monthly_data.each do |data| %>
+      <% value = data[metric[:key]] %>
+      <td class="text-right">
+        <% if metric[:key] == :contribution_margin_rate %>
+          <%= number_with_precision(value, precision: 2) %>%
+        <% else %>
+          <%= number_to_currency(value, unit: '¥', precision: 0, format: '%u%n') %>
+        <% end %>
+      </td>
+    <% end %>
+  </tr>
+<% end %>
