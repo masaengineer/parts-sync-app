@@ -16696,9 +16696,6 @@ Controller.values = {};
 // app/javascript/controllers/form_submit_controller.js
 var form_submit_controller_default = class extends Controller {
   static targets = ["buttonText", "spinner"];
-  connect() {
-    console.log("Form submit controller connected");
-  }
   submit(event) {
     console.log("Submit button clicked");
     this.buttonTextTarget.classList.add("hidden");
@@ -16805,6 +16802,62 @@ var password_field_controller_default = class extends Controller {
   }
 };
 
+// app/javascript/controllers/tour_controller.js
+var steps = [
+  {
+    title: "\u3054\u767B\u9332\u3042\u308A\u304C\u3068\u3046\u3054\u3056\u3044\u307E\u3059\u{1F389}",
+    content: "PartsSync\u3078\u3088\u3046\u3053\u305D\uFF01<p>\u307E\u305A\u306F\u7C21\u5358\u306B\u4F7F\u3044\u65B9\u3092\u3054\u6848\u5185\u3057\u307E\u3059<br><br>Enter\u30DC\u30BF\u30F3\u3067\u6B21\u306B\u9032\u3081\u307E\u3059\u{1F4A1}",
+    order: 1
+  },
+  {
+    title: "CSV\u30A4\u30F3\u30DD\u30FC\u30C8\u6A5F\u80FD",
+    content: "\u59D4\u8A17\u5148\u306E\u30B9\u30D7\u30EC\u30C3\u30C9\u30B7\u30FC\u30C8\u306ECSV\u30D5\u30A1\u30A4\u30EB\u3092\u30A4\u30F3\u30DD\u30FC\u30C8\u3057\u3066\u3001\u81EA\u52D5\u7684\u306B\u624B\u6570\u6599\u3092\u767B\u9332\u3057\u307E\u3059\u3002",
+    target: "#csv_import",
+    order: 2
+  },
+  {
+    title: "\u6CE8\u6587\u30D5\u30A3\u30EB\u30BF\u6A5F\u80FD",
+    content: "\u4EFB\u610F\u306E\u6CE8\u6587\u3092\u30D5\u30A3\u30EB\u30BF\u30EA\u30F3\u30B0\u3067\u304D\u307E\u3059\u3002",
+    target: "#order_filter",
+    order: 3
+  },
+  {
+    title: "\u6CE8\u6587\u4E00\u89A7\u6A5F\u80FD",
+    content: "1\u6642\u9593\u3054\u3068\u306B\u81EA\u52D5\u30A4\u30F3\u30DD\u30FC\u30C8\u3055\u308C\u308BeBay\u6CE8\u6587\u4E00\u89A7\u3092\u8868\u793A\u3057\u307E\u3059\u3002",
+    target: "#order_table",
+    order: 4
+  },
+  {
+    title: "\u30EC\u30DD\u30FC\u30C8\u5207\u308A\u66FF\u3048\u6A5F\u80FD",
+    content: "\u640D\u76CA\u30EC\u30DD\u30FC\u30C8\u3078\u5207\u308A\u66FF\u3048\u308B\u3068\u3001\u5E74\u9593\u306E\u6708\u5225\u306E\u53CE\u652F\u3092\u78BA\u8A8D\u3059\u308B\u3053\u3068\u304C\u3067\u304D\u307E\u3059\u3002",
+    target: "#report_change",
+    order: 5
+  },
+  {
+    title: "\u30C0\u30FC\u30AF\u30E2\u30FC\u30C9\u5207\u308A\u66FF\u3048\u6A5F\u80FD",
+    content: "\u30A2\u30A4\u30B3\u30F3\u3092\u30AF\u30EA\u30C3\u30AF\u3059\u308B\u3068\u3001\u30C0\u30FC\u30AF\u30E2\u30FC\u30C9\u306E\u30AA\u30F3\u30AA\u30D5\u306E\u5207\u308A\u66FF\u3048\u304C\u3067\u304D\u307E\u3059\u3002",
+    target: "#dark_change",
+    order: 6
+  }
+];
+var tg = new tourguide.TourGuideClient({
+  steps,
+  nextLabel: "\u6B21\u3078",
+  prevLabel: "\u623B\u308B"
+});
+var tour_controller_default = class extends Controller {
+  connect() {
+    if (!tg.isFinished()) {
+      tg.start();
+    }
+  }
+  disconnect() {
+    tg.finish().then(() => {
+      console.log("Tour finished");
+    });
+  }
+};
+
 // app/javascript/controllers/index.js
 function registerControllers(application2) {
   application2.register("form-submit", form_submit_controller_default);
@@ -16812,6 +16865,7 @@ function registerControllers(application2) {
   application2.register("theme", theme_controller_default);
   application2.register("flash", flash_controller_default);
   application2.register("password-field", password_field_controller_default);
+  application2.register("tour", tour_controller_default);
 }
 
 // node_modules/iconify-icon/dist/iconify-icon.mjs
@@ -18893,13 +18947,9 @@ var {
 } = IconifyIconComponent;
 
 // app/javascript/application.js
-console.log("Loading application.js");
 turbo_es2017_esm_exports.start();
-console.log("Starting Stimulus application");
 var application = Application.start();
-console.log("Registering controllers");
 registerControllers(application);
-console.log("Controllers registered");
 /*! Bundled license information:
 
 apexcharts/dist/apexcharts.common.js:
