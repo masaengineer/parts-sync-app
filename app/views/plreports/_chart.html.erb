@@ -1,0 +1,26 @@
+<%# app/views/plreports/_chart.html.erb %>
+<% chart_data = {
+  series: [
+    {
+      name: '売上',
+      data: @monthly_data.map { |d| d[:revenue] }
+    },
+    {
+      name: '粗利',
+      data: @monthly_data.map { |d| d[:gross_profit] }
+    }
+  ],
+  categories: @monthly_data.map { |d| t("pl_reports.index.table.month", month: d[:month]) }
+} %>
+
+<div data-chart-data="<%= chart_data.to_json %>">
+  <div class="card card-bordered bg-base-100 shadow-sm mt-5 overflow-x-auto">
+    <div class="card-body p-6">
+      <div
+        data-controller="chart"
+        data-chart-target="chart"
+        style="height: 350px;"
+      ></div>
+    </div>
+  </div>
+</div>

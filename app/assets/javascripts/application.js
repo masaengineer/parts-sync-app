@@ -16696,9 +16696,6 @@ Controller.values = {};
 // app/javascript/controllers/form_submit_controller.js
 var form_submit_controller_default = class extends Controller {
   static targets = ["buttonText", "spinner"];
-  connect() {
-    console.log("Form submit controller connected");
-  }
   submit(event) {
     console.log("Submit button clicked");
     this.buttonTextTarget.classList.add("hidden");

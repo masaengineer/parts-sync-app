@@ -1,0 +1,8 @@
+<tr class="text-sm font-medium text-base-content/80">
+  <th>項目</th>
+  <% @monthly_data.each do |data| %>
+    <th>
+      <%= t("pl_reports.index.table.month", month: data[:month]) %>
+    </th>
+  <% end %>
+</tr>
