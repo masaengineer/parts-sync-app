@@ -1,5 +1,5 @@
 <div class="card bg-base-100 mb-6">
-  <div class="card-body p-5">
+  <div class="card-body p-5" id = "order_filter" >
     <%= search_form_for @q, url: sales_reports_path, data: { controller: "form-submit" } do |f| %>
       <div class="flex flex-wrap items-end gap-3">
         <% search_form_fields.each do |field| %>

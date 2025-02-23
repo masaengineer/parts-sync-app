@@ -5,6 +5,7 @@ import ChartController from './chart_controller';
 import ThemeController from './theme_controller';
 import FlashController from './flash_controller';
 import PasswordFieldController from './password_field_controller';
+import TourController from './tour_controller';
 
 export function registerControllers(application) {
   application.register('form-submit', FormSubmitController);
@@ -12,4 +13,5 @@ export function registerControllers(application) {
   application.register('theme', ThemeController);
   application.register('flash', FlashController);
   application.register('password-field', PasswordFieldController);
+  application.register('tour', TourController);
 }
