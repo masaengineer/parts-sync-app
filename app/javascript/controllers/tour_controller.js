@@ -45,6 +45,9 @@ export default class extends Controller {
     if (!tg.isFinished()) {
       tg.start();
     }
+    if (tg.isFinished()) {
+      console.log("first tour has already finished")
+    }
   }
 
   disconnect() {

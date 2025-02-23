@@ -2,7 +2,7 @@
 # USD_TO_JPYレートを用いてドル建て→円建ての利益計算なども共通化できるようにする。
 #
 # 例:
-#   result = ReportCalculator.new(order).calculate
+#   result = SalesReportCalculator.new(order).calculate
 #   => {
 #        order: <Order ...>,
 #        revenue: 売上(USD),
@@ -19,7 +19,7 @@
 #        product_names: 商品名（カンマ区切り）
 #      }
 #
-class ReportCalculator
+class SalesReportCalculator
   include ExchangeRateConcern
 
   def initialize(order)
