@@ -1,4 +1,4 @@
-class PlreportsController < ApplicationController
+class PlReportsController < ApplicationController
   include ExchangeRateConcern
 
   def index
