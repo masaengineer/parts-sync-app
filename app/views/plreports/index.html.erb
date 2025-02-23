@@ -1,7 +1,5 @@
 <% content_for(:title, t("pl_reports.index.title")) %>
 
-<%= render 'chart' %>
-
 <% metrics = [
   {key: :revenue, label: t("pl_reports.index.metrics.revenue")},
   {key: :procurement_cost, label: t("pl_reports.index.metrics.procurement_cost")},
@@ -11,4 +9,7 @@
   {key: :contribution_margin_rate, label: t("pl_reports.index.metrics.contribution_margin_rate")}
 ] %>
 
-<%= render 'table', metrics: metrics %>
+<div class="w-full p-6">
+  <%= render 'chart', metrics: metrics %>
+  <%= render 'table', metrics: metrics %>
+</div>
