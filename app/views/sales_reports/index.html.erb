@@ -1,7 +1,21 @@
 <%# app/views/sales_reports/index.html.erb %>
 <% content_for(:title, t("sales_reports.index.title")) %>
 
-<div class="w-full p-6">
-  <%= render 'csv_import_form' %>
-  <%= render 'table', orders_data: @orders_data %>
+<div class="w-full p-6" data-controller="tour">
+  <%# ツアー開始ボタン %>
+  <div class="mb-4">
+    <button class="btn btn-sm btn-outline" data-action="tour#start">
+      <i class="fas fa-question-circle mr-2"></i>
+      機能説明ツアーを開始
+    </button>
+  </div>
+
+  <%# CSVインポートフォーム - ツアーステップ1 %>
+  <div id = "csv_import" data-tour-target = "tour">
+    <%= render 'csv_import_form' %>
+  </div>
+
+  <div data-tg-tour = "welcome">
+    <%= render 'table', orders_data: @orders_data %>
+  </div>
 </div>

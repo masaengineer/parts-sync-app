@@ -12825,8 +12825,8 @@ function canRefreshFrame(frame) {
 var SnapshotCache = class {
   keys = [];
   snapshots = {};
-  constructor(size) {
-    this.size = size;
+  constructor(size2) {
+    this.size = size2;
   }
   has(location2) {
     return toCacheKey(location2) in this.snapshots;
@@ -14300,8 +14300,8 @@ function extendEvent(event) {
   }
 }
 var Dispatcher = class {
-  constructor(application2) {
-    this.application = application2;
+  constructor(application3) {
+    this.application = application3;
     this.eventListenerMaps = /* @__PURE__ */ new Map();
     this.started = false;
   }
@@ -14526,8 +14526,8 @@ var Action = class {
     return this.schema.keyMappings;
   }
   keyFilterDissatisfied(event, filters) {
-    const [meta, ctrl, alt, shift] = allModifiers.map((modifier) => filters.includes(modifier));
-    return event.metaKey !== meta || event.ctrlKey !== ctrl || event.altKey !== alt || event.shiftKey !== shift;
+    const [meta, ctrl, alt, shift3] = allModifiers.map((modifier) => filters.includes(modifier));
+    return event.metaKey !== meta || event.ctrlKey !== ctrl || event.altKey !== alt || event.shiftKey !== shift3;
   }
 };
 var defaultEventNames = {
@@ -14862,7 +14862,7 @@ var Multimap = class {
   }
   get size() {
     const sets = Array.from(this.valuesByKey.values());
-    return sets.reduce((size, set) => size + set.size, 0);
+    return sets.reduce((size2, set) => size2 + set.size, 0);
   }
   add(key, value) {
     add(this.valuesByKey, key, value);
@@ -15805,8 +15805,8 @@ function blessDefinition(definition) {
   };
 }
 var Module = class {
-  constructor(application2, definition) {
-    this.application = application2;
+  constructor(application3, definition) {
+    this.application = application3;
     this.definition = blessDefinition(definition);
     this.contextsByScope = /* @__PURE__ */ new WeakMap();
     this.connectedContexts = /* @__PURE__ */ new Set();
@@ -16126,8 +16126,8 @@ var ScopeObserver = class {
   }
 };
 var Router = class {
-  constructor(application2) {
-    this.application = application2;
+  constructor(application3) {
+    this.application = application3;
     this.scopeObserver = new ScopeObserver(this.element, this.schema, this);
     this.scopesByIdentifier = new Multimap();
     this.modulesByIdentifier = /* @__PURE__ */ new Map();
@@ -16243,9 +16243,9 @@ var Application = class {
     this.actionDescriptorFilters = Object.assign({}, defaultActionDescriptorFilters);
   }
   static start(element, schema) {
-    const application2 = new this(element, schema);
-    application2.start();
-    return application2;
+    const application3 = new this(element, schema);
+    application3.start();
+    return application3;
   }
   async start() {
     await domReady();
@@ -16693,18 +16693,10 @@ Controller.targets = [];
 Controller.outlets = [];
 Controller.values = {};
 
-// app/javascript/controllers/form_submit_controller.js
-var form_submit_controller_default = class extends Controller {
-  static targets = ["buttonText", "spinner"];
-  connect() {
-    console.log("Form submit controller connected");
-  }
-  submit(event) {
-    console.log("Submit button clicked");
-    this.buttonTextTarget.classList.add("hidden");
-    this.spinnerTarget.classList.remove("hidden");
-  }
-};
+// app/javascript/controllers/application.js
+var application = Application.start();
+application.debug = false;
+window.Stimulus = application;
 
 // app/javascript/controllers/chart_controller.js
 var import_apexcharts = __toESM(require_apexcharts_common(), 1);
@@ -16756,6 +16748,46 @@ var chart_controller_default = class extends Controller {
   }
 };
 
+// app/javascript/controllers/flash_controller.js
+var flash_controller_default = class extends Controller {
+  connect() {
+    setTimeout(() => {
+      this.dismiss();
+    }, 5e3);
+  }
+  dismiss() {
+    this.element.classList.add("opacity-0");
+    setTimeout(() => {
+      this.element.remove();
+    }, 300);
+  }
+};
+
+// app/javascript/controllers/form_submit_controller.js
+var form_submit_controller_default = class extends Controller {
+  static targets = ["buttonText", "spinner"];
+  submit(event) {
+    console.log("Submit button clicked");
+    this.buttonTextTarget.classList.add("hidden");
+    this.spinnerTarget.classList.remove("hidden");
+  }
+};
+
+// app/javascript/controllers/password_field_controller.js
+var password_field_controller_default = class extends Controller {
+  static targets = ["field", "toggle"];
+  connect() {
+    this.fieldTarget.type = "password";
+    this.toggleTarget.dataset.slotValue = "hide";
+  }
+  // パスワードの表示/非表示を切り替える
+  toggle() {
+    const isVisible = this.fieldTarget.type === "text";
+    this.fieldTarget.type = isVisible ? "password" : "text";
+    this.toggleTarget.dataset.slotValue = isVisible ? "hide" : "show";
+  }
+};
+
 // app/javascript/controllers/theme_controller.js
 var theme_controller_default = class extends Controller {
   static targets = ["toggle"];
@@ -16775,44 +16807,2130 @@ var theme_controller_default = class extends Controller {
   }
 };
 
-// app/javascript/controllers/flash_controller.js
-var flash_controller_default = class extends Controller {
-  connect() {
-    setTimeout(() => {
-      this.dismiss();
-    }, 5e3);
-  }
-  dismiss() {
-    this.element.classList.add("opacity-0");
-    setTimeout(() => {
-      this.element.remove();
-    }, 300);
-  }
+// node_modules/@sjmc11/tourguidejs/src/core/dots.ts
+function dotsWrapperHtmlString() {
+  const dotsWrapper = document.createElement("div");
+  dotsWrapper.classList.add("tg-dialog-dots");
+  dotsWrapper.id = "tg-dialog-dots";
+  return dotsWrapper.outerHTML;
+}
+var computeDots = (tgInstance) => {
+  let dotsHtml = "";
+  if (tgInstance.tourSteps.length) tgInstance.tourSteps.forEach((_, i) => {
+    const dotSpan = document.createElement("span");
+    dotSpan.classList.add("tg-dot");
+    if (i === tgInstance.activeStep) dotSpan.classList.add("tg-dot-active");
+    dotsHtml += dotSpan.outerHTML;
+  });
+  return dotsHtml;
 };
 
-// app/javascript/controllers/password_field_controller.js
-var password_field_controller_default = class extends Controller {
-  static targets = ["field", "toggle"];
-  connect() {
-    this.fieldTarget.type = "password";
-    this.toggleTarget.dataset.slotValue = "hide";
+// node_modules/@floating-ui/utils/dist/floating-ui.utils.mjs
+var sides = ["top", "right", "bottom", "left"];
+var alignments = ["start", "end"];
+var placements = /* @__PURE__ */ sides.reduce((acc, side) => acc.concat(side, side + "-" + alignments[0], side + "-" + alignments[1]), []);
+var min = Math.min;
+var max = Math.max;
+var round = Math.round;
+var createCoords = (v) => ({
+  x: v,
+  y: v
+});
+var oppositeSideMap = {
+  left: "right",
+  right: "left",
+  bottom: "top",
+  top: "bottom"
+};
+var oppositeAlignmentMap = {
+  start: "end",
+  end: "start"
+};
+function clamp(start2, value, end) {
+  return max(start2, min(value, end));
+}
+function evaluate(value, param) {
+  return typeof value === "function" ? value(param) : value;
+}
+function getSide(placement) {
+  return placement.split("-")[0];
+}
+function getAlignment(placement) {
+  return placement.split("-")[1];
+}
+function getOppositeAxis(axis) {
+  return axis === "x" ? "y" : "x";
+}
+function getAxisLength(axis) {
+  return axis === "y" ? "height" : "width";
+}
+function getSideAxis(placement) {
+  return ["top", "bottom"].includes(getSide(placement)) ? "y" : "x";
+}
+function getAlignmentAxis(placement) {
+  return getOppositeAxis(getSideAxis(placement));
+}
+function getAlignmentSides(placement, rects, rtl) {
+  if (rtl === void 0) {
+    rtl = false;
   }
-  // パスワードの表示/非表示を切り替える
-  toggle() {
-    const isVisible = this.fieldTarget.type === "text";
-    this.fieldTarget.type = isVisible ? "password" : "text";
-    this.toggleTarget.dataset.slotValue = isVisible ? "hide" : "show";
+  const alignment = getAlignment(placement);
+  const alignmentAxis = getAlignmentAxis(placement);
+  const length = getAxisLength(alignmentAxis);
+  let mainAlignmentSide = alignmentAxis === "x" ? alignment === (rtl ? "end" : "start") ? "right" : "left" : alignment === "start" ? "bottom" : "top";
+  if (rects.reference[length] > rects.floating[length]) {
+    mainAlignmentSide = getOppositePlacement(mainAlignmentSide);
+  }
+  return [mainAlignmentSide, getOppositePlacement(mainAlignmentSide)];
+}
+function getOppositeAlignmentPlacement(placement) {
+  return placement.replace(/start|end/g, (alignment) => oppositeAlignmentMap[alignment]);
+}
+function getOppositePlacement(placement) {
+  return placement.replace(/left|right|bottom|top/g, (side) => oppositeSideMap[side]);
+}
+function expandPaddingObject(padding) {
+  return {
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    ...padding
+  };
+}
+function getPaddingObject(padding) {
+  return typeof padding !== "number" ? expandPaddingObject(padding) : {
+    top: padding,
+    right: padding,
+    bottom: padding,
+    left: padding
+  };
+}
+function rectToClientRect(rect) {
+  const {
+    x,
+    y,
+    width,
+    height
+  } = rect;
+  return {
+    width,
+    height,
+    top: y,
+    left: x,
+    right: x + width,
+    bottom: y + height,
+    x,
+    y
+  };
+}
+
+// node_modules/@floating-ui/core/dist/floating-ui.core.mjs
+function computeCoordsFromPlacement(_ref, placement, rtl) {
+  let {
+    reference,
+    floating
+  } = _ref;
+  const sideAxis = getSideAxis(placement);
+  const alignmentAxis = getAlignmentAxis(placement);
+  const alignLength = getAxisLength(alignmentAxis);
+  const side = getSide(placement);
+  const isVertical = sideAxis === "y";
+  const commonX = reference.x + reference.width / 2 - floating.width / 2;
+  const commonY = reference.y + reference.height / 2 - floating.height / 2;
+  const commonAlign = reference[alignLength] / 2 - floating[alignLength] / 2;
+  let coords;
+  switch (side) {
+    case "top":
+      coords = {
+        x: commonX,
+        y: reference.y - floating.height
+      };
+      break;
+    case "bottom":
+      coords = {
+        x: commonX,
+        y: reference.y + reference.height
+      };
+      break;
+    case "right":
+      coords = {
+        x: reference.x + reference.width,
+        y: commonY
+      };
+      break;
+    case "left":
+      coords = {
+        x: reference.x - floating.width,
+        y: commonY
+      };
+      break;
+    default:
+      coords = {
+        x: reference.x,
+        y: reference.y
+      };
+  }
+  switch (getAlignment(placement)) {
+    case "start":
+      coords[alignmentAxis] -= commonAlign * (rtl && isVertical ? -1 : 1);
+      break;
+    case "end":
+      coords[alignmentAxis] += commonAlign * (rtl && isVertical ? -1 : 1);
+      break;
+  }
+  return coords;
+}
+var computePosition = async (reference, floating, config2) => {
+  const {
+    placement = "bottom",
+    strategy = "absolute",
+    middleware = [],
+    platform: platform2
+  } = config2;
+  const validMiddleware = middleware.filter(Boolean);
+  const rtl = await (platform2.isRTL == null ? void 0 : platform2.isRTL(floating));
+  let rects = await platform2.getElementRects({
+    reference,
+    floating,
+    strategy
+  });
+  let {
+    x,
+    y
+  } = computeCoordsFromPlacement(rects, placement, rtl);
+  let statefulPlacement = placement;
+  let middlewareData = {};
+  let resetCount = 0;
+  for (let i = 0; i < validMiddleware.length; i++) {
+    const {
+      name,
+      fn
+    } = validMiddleware[i];
+    const {
+      x: nextX,
+      y: nextY,
+      data,
+      reset
+    } = await fn({
+      x,
+      y,
+      initialPlacement: placement,
+      placement: statefulPlacement,
+      strategy,
+      middlewareData,
+      rects,
+      platform: platform2,
+      elements: {
+        reference,
+        floating
+      }
+    });
+    x = nextX != null ? nextX : x;
+    y = nextY != null ? nextY : y;
+    middlewareData = {
+      ...middlewareData,
+      [name]: {
+        ...middlewareData[name],
+        ...data
+      }
+    };
+    if (reset && resetCount <= 50) {
+      resetCount++;
+      if (typeof reset === "object") {
+        if (reset.placement) {
+          statefulPlacement = reset.placement;
+        }
+        if (reset.rects) {
+          rects = reset.rects === true ? await platform2.getElementRects({
+            reference,
+            floating,
+            strategy
+          }) : reset.rects;
+        }
+        ({
+          x,
+          y
+        } = computeCoordsFromPlacement(rects, statefulPlacement, rtl));
+      }
+      i = -1;
+    }
+  }
+  return {
+    x,
+    y,
+    placement: statefulPlacement,
+    strategy,
+    middlewareData
+  };
+};
+async function detectOverflow(state, options) {
+  var _await$platform$isEle;
+  if (options === void 0) {
+    options = {};
+  }
+  const {
+    x,
+    y,
+    platform: platform2,
+    rects,
+    elements,
+    strategy
+  } = state;
+  const {
+    boundary = "clippingAncestors",
+    rootBoundary = "viewport",
+    elementContext = "floating",
+    altBoundary = false,
+    padding = 0
+  } = evaluate(options, state);
+  const paddingObject = getPaddingObject(padding);
+  const altContext = elementContext === "floating" ? "reference" : "floating";
+  const element = elements[altBoundary ? altContext : elementContext];
+  const clippingClientRect = rectToClientRect(await platform2.getClippingRect({
+    element: ((_await$platform$isEle = await (platform2.isElement == null ? void 0 : platform2.isElement(element))) != null ? _await$platform$isEle : true) ? element : element.contextElement || await (platform2.getDocumentElement == null ? void 0 : platform2.getDocumentElement(elements.floating)),
+    boundary,
+    rootBoundary,
+    strategy
+  }));
+  const rect = elementContext === "floating" ? {
+    x,
+    y,
+    width: rects.floating.width,
+    height: rects.floating.height
+  } : rects.reference;
+  const offsetParent = await (platform2.getOffsetParent == null ? void 0 : platform2.getOffsetParent(elements.floating));
+  const offsetScale = await (platform2.isElement == null ? void 0 : platform2.isElement(offsetParent)) ? await (platform2.getScale == null ? void 0 : platform2.getScale(offsetParent)) || {
+    x: 1,
+    y: 1
+  } : {
+    x: 1,
+    y: 1
+  };
+  const elementClientRect = rectToClientRect(platform2.convertOffsetParentRelativeRectToViewportRelativeRect ? await platform2.convertOffsetParentRelativeRectToViewportRelativeRect({
+    elements,
+    rect,
+    offsetParent,
+    strategy
+  }) : rect);
+  return {
+    top: (clippingClientRect.top - elementClientRect.top + paddingObject.top) / offsetScale.y,
+    bottom: (elementClientRect.bottom - clippingClientRect.bottom + paddingObject.bottom) / offsetScale.y,
+    left: (clippingClientRect.left - elementClientRect.left + paddingObject.left) / offsetScale.x,
+    right: (elementClientRect.right - clippingClientRect.right + paddingObject.right) / offsetScale.x
+  };
+}
+var arrow = (options) => ({
+  name: "arrow",
+  options,
+  async fn(state) {
+    const {
+      x,
+      y,
+      placement,
+      rects,
+      platform: platform2,
+      elements,
+      middlewareData
+    } = state;
+    const {
+      element,
+      padding = 0
+    } = evaluate(options, state) || {};
+    if (element == null) {
+      return {};
+    }
+    const paddingObject = getPaddingObject(padding);
+    const coords = {
+      x,
+      y
+    };
+    const axis = getAlignmentAxis(placement);
+    const length = getAxisLength(axis);
+    const arrowDimensions = await platform2.getDimensions(element);
+    const isYAxis = axis === "y";
+    const minProp = isYAxis ? "top" : "left";
+    const maxProp = isYAxis ? "bottom" : "right";
+    const clientProp = isYAxis ? "clientHeight" : "clientWidth";
+    const endDiff = rects.reference[length] + rects.reference[axis] - coords[axis] - rects.floating[length];
+    const startDiff = coords[axis] - rects.reference[axis];
+    const arrowOffsetParent = await (platform2.getOffsetParent == null ? void 0 : platform2.getOffsetParent(element));
+    let clientSize = arrowOffsetParent ? arrowOffsetParent[clientProp] : 0;
+    if (!clientSize || !await (platform2.isElement == null ? void 0 : platform2.isElement(arrowOffsetParent))) {
+      clientSize = elements.floating[clientProp] || rects.floating[length];
+    }
+    const centerToReference = endDiff / 2 - startDiff / 2;
+    const largestPossiblePadding = clientSize / 2 - arrowDimensions[length] / 2 - 1;
+    const minPadding = min(paddingObject[minProp], largestPossiblePadding);
+    const maxPadding = min(paddingObject[maxProp], largestPossiblePadding);
+    const min$1 = minPadding;
+    const max2 = clientSize - arrowDimensions[length] - maxPadding;
+    const center = clientSize / 2 - arrowDimensions[length] / 2 + centerToReference;
+    const offset3 = clamp(min$1, center, max2);
+    const shouldAddOffset = !middlewareData.arrow && getAlignment(placement) != null && center !== offset3 && rects.reference[length] / 2 - (center < min$1 ? minPadding : maxPadding) - arrowDimensions[length] / 2 < 0;
+    const alignmentOffset = shouldAddOffset ? center < min$1 ? center - min$1 : center - max2 : 0;
+    return {
+      [axis]: coords[axis] + alignmentOffset,
+      data: {
+        [axis]: offset3,
+        centerOffset: center - offset3 - alignmentOffset,
+        ...shouldAddOffset && {
+          alignmentOffset
+        }
+      },
+      reset: shouldAddOffset
+    };
+  }
+});
+function getPlacementList(alignment, autoAlignment, allowedPlacements) {
+  const allowedPlacementsSortedByAlignment = alignment ? [...allowedPlacements.filter((placement) => getAlignment(placement) === alignment), ...allowedPlacements.filter((placement) => getAlignment(placement) !== alignment)] : allowedPlacements.filter((placement) => getSide(placement) === placement);
+  return allowedPlacementsSortedByAlignment.filter((placement) => {
+    if (alignment) {
+      return getAlignment(placement) === alignment || (autoAlignment ? getOppositeAlignmentPlacement(placement) !== placement : false);
+    }
+    return true;
+  });
+}
+var autoPlacement = function(options) {
+  if (options === void 0) {
+    options = {};
+  }
+  return {
+    name: "autoPlacement",
+    options,
+    async fn(state) {
+      var _middlewareData$autoP, _middlewareData$autoP2, _placementsThatFitOnE;
+      const {
+        rects,
+        middlewareData,
+        placement,
+        platform: platform2,
+        elements
+      } = state;
+      const {
+        crossAxis = false,
+        alignment,
+        allowedPlacements = placements,
+        autoAlignment = true,
+        ...detectOverflowOptions
+      } = evaluate(options, state);
+      const placements$1 = alignment !== void 0 || allowedPlacements === placements ? getPlacementList(alignment || null, autoAlignment, allowedPlacements) : allowedPlacements;
+      const overflow = await detectOverflow(state, detectOverflowOptions);
+      const currentIndex = ((_middlewareData$autoP = middlewareData.autoPlacement) == null ? void 0 : _middlewareData$autoP.index) || 0;
+      const currentPlacement = placements$1[currentIndex];
+      if (currentPlacement == null) {
+        return {};
+      }
+      const alignmentSides = getAlignmentSides(currentPlacement, rects, await (platform2.isRTL == null ? void 0 : platform2.isRTL(elements.floating)));
+      if (placement !== currentPlacement) {
+        return {
+          reset: {
+            placement: placements$1[0]
+          }
+        };
+      }
+      const currentOverflows = [overflow[getSide(currentPlacement)], overflow[alignmentSides[0]], overflow[alignmentSides[1]]];
+      const allOverflows = [...((_middlewareData$autoP2 = middlewareData.autoPlacement) == null ? void 0 : _middlewareData$autoP2.overflows) || [], {
+        placement: currentPlacement,
+        overflows: currentOverflows
+      }];
+      const nextPlacement = placements$1[currentIndex + 1];
+      if (nextPlacement) {
+        return {
+          data: {
+            index: currentIndex + 1,
+            overflows: allOverflows
+          },
+          reset: {
+            placement: nextPlacement
+          }
+        };
+      }
+      const placementsSortedByMostSpace = allOverflows.map((d) => {
+        const alignment2 = getAlignment(d.placement);
+        return [d.placement, alignment2 && crossAxis ? (
+          // Check along the mainAxis and main crossAxis side.
+          d.overflows.slice(0, 2).reduce((acc, v) => acc + v, 0)
+        ) : (
+          // Check only the mainAxis.
+          d.overflows[0]
+        ), d.overflows];
+      }).sort((a, b) => a[1] - b[1]);
+      const placementsThatFitOnEachSide = placementsSortedByMostSpace.filter((d) => d[2].slice(
+        0,
+        // Aligned placements should not check their opposite crossAxis
+        // side.
+        getAlignment(d[0]) ? 2 : 3
+      ).every((v) => v <= 0));
+      const resetPlacement = ((_placementsThatFitOnE = placementsThatFitOnEachSide[0]) == null ? void 0 : _placementsThatFitOnE[0]) || placementsSortedByMostSpace[0][0];
+      if (resetPlacement !== placement) {
+        return {
+          data: {
+            index: currentIndex + 1,
+            overflows: allOverflows
+          },
+          reset: {
+            placement: resetPlacement
+          }
+        };
+      }
+      return {};
+    }
+  };
+};
+async function convertValueToCoords(state, options) {
+  const {
+    placement,
+    platform: platform2,
+    elements
+  } = state;
+  const rtl = await (platform2.isRTL == null ? void 0 : platform2.isRTL(elements.floating));
+  const side = getSide(placement);
+  const alignment = getAlignment(placement);
+  const isVertical = getSideAxis(placement) === "y";
+  const mainAxisMulti = ["left", "top"].includes(side) ? -1 : 1;
+  const crossAxisMulti = rtl && isVertical ? -1 : 1;
+  const rawValue = evaluate(options, state);
+  let {
+    mainAxis,
+    crossAxis,
+    alignmentAxis
+  } = typeof rawValue === "number" ? {
+    mainAxis: rawValue,
+    crossAxis: 0,
+    alignmentAxis: null
+  } : {
+    mainAxis: rawValue.mainAxis || 0,
+    crossAxis: rawValue.crossAxis || 0,
+    alignmentAxis: rawValue.alignmentAxis
+  };
+  if (alignment && typeof alignmentAxis === "number") {
+    crossAxis = alignment === "end" ? alignmentAxis * -1 : alignmentAxis;
+  }
+  return isVertical ? {
+    x: crossAxis * crossAxisMulti,
+    y: mainAxis * mainAxisMulti
+  } : {
+    x: mainAxis * mainAxisMulti,
+    y: crossAxis * crossAxisMulti
+  };
+}
+var offset = function(options) {
+  if (options === void 0) {
+    options = 0;
+  }
+  return {
+    name: "offset",
+    options,
+    async fn(state) {
+      var _middlewareData$offse, _middlewareData$arrow;
+      const {
+        x,
+        y,
+        placement,
+        middlewareData
+      } = state;
+      const diffCoords = await convertValueToCoords(state, options);
+      if (placement === ((_middlewareData$offse = middlewareData.offset) == null ? void 0 : _middlewareData$offse.placement) && (_middlewareData$arrow = middlewareData.arrow) != null && _middlewareData$arrow.alignmentOffset) {
+        return {};
+      }
+      return {
+        x: x + diffCoords.x,
+        y: y + diffCoords.y,
+        data: {
+          ...diffCoords,
+          placement
+        }
+      };
+    }
+  };
+};
+var shift = function(options) {
+  if (options === void 0) {
+    options = {};
+  }
+  return {
+    name: "shift",
+    options,
+    async fn(state) {
+      const {
+        x,
+        y,
+        placement
+      } = state;
+      const {
+        mainAxis: checkMainAxis = true,
+        crossAxis: checkCrossAxis = false,
+        limiter = {
+          fn: (_ref) => {
+            let {
+              x: x2,
+              y: y2
+            } = _ref;
+            return {
+              x: x2,
+              y: y2
+            };
+          }
+        },
+        ...detectOverflowOptions
+      } = evaluate(options, state);
+      const coords = {
+        x,
+        y
+      };
+      const overflow = await detectOverflow(state, detectOverflowOptions);
+      const crossAxis = getSideAxis(getSide(placement));
+      const mainAxis = getOppositeAxis(crossAxis);
+      let mainAxisCoord = coords[mainAxis];
+      let crossAxisCoord = coords[crossAxis];
+      if (checkMainAxis) {
+        const minSide = mainAxis === "y" ? "top" : "left";
+        const maxSide = mainAxis === "y" ? "bottom" : "right";
+        const min2 = mainAxisCoord + overflow[minSide];
+        const max2 = mainAxisCoord - overflow[maxSide];
+        mainAxisCoord = clamp(min2, mainAxisCoord, max2);
+      }
+      if (checkCrossAxis) {
+        const minSide = crossAxis === "y" ? "top" : "left";
+        const maxSide = crossAxis === "y" ? "bottom" : "right";
+        const min2 = crossAxisCoord + overflow[minSide];
+        const max2 = crossAxisCoord - overflow[maxSide];
+        crossAxisCoord = clamp(min2, crossAxisCoord, max2);
+      }
+      const limitedCoords = limiter.fn({
+        ...state,
+        [mainAxis]: mainAxisCoord,
+        [crossAxis]: crossAxisCoord
+      });
+      return {
+        ...limitedCoords,
+        data: {
+          x: limitedCoords.x - x,
+          y: limitedCoords.y - y,
+          enabled: {
+            [mainAxis]: checkMainAxis,
+            [crossAxis]: checkCrossAxis
+          }
+        }
+      };
+    }
+  };
+};
+
+// node_modules/@floating-ui/utils/dist/floating-ui.utils.dom.mjs
+function hasWindow() {
+  return typeof window !== "undefined";
+}
+function getNodeName(node) {
+  if (isNode(node)) {
+    return (node.nodeName || "").toLowerCase();
+  }
+  return "#document";
+}
+function getWindow(node) {
+  var _node$ownerDocument;
+  return (node == null || (_node$ownerDocument = node.ownerDocument) == null ? void 0 : _node$ownerDocument.defaultView) || window;
+}
+function getDocumentElement(node) {
+  var _ref;
+  return (_ref = (isNode(node) ? node.ownerDocument : node.document) || window.document) == null ? void 0 : _ref.documentElement;
+}
+function isNode(value) {
+  if (!hasWindow()) {
+    return false;
+  }
+  return value instanceof Node || value instanceof getWindow(value).Node;
+}
+function isElement(value) {
+  if (!hasWindow()) {
+    return false;
+  }
+  return value instanceof Element || value instanceof getWindow(value).Element;
+}
+function isHTMLElement(value) {
+  if (!hasWindow()) {
+    return false;
+  }
+  return value instanceof HTMLElement || value instanceof getWindow(value).HTMLElement;
+}
+function isShadowRoot(value) {
+  if (!hasWindow() || typeof ShadowRoot === "undefined") {
+    return false;
+  }
+  return value instanceof ShadowRoot || value instanceof getWindow(value).ShadowRoot;
+}
+function isOverflowElement(element) {
+  const {
+    overflow,
+    overflowX,
+    overflowY,
+    display
+  } = getComputedStyle2(element);
+  return /auto|scroll|overlay|hidden|clip/.test(overflow + overflowY + overflowX) && !["inline", "contents"].includes(display);
+}
+function isTableElement(element) {
+  return ["table", "td", "th"].includes(getNodeName(element));
+}
+function isTopLayer(element) {
+  return [":popover-open", ":modal"].some((selector) => {
+    try {
+      return element.matches(selector);
+    } catch (e) {
+      return false;
+    }
+  });
+}
+function isContainingBlock(elementOrCss) {
+  const webkit = isWebKit();
+  const css = isElement(elementOrCss) ? getComputedStyle2(elementOrCss) : elementOrCss;
+  return ["transform", "translate", "scale", "rotate", "perspective"].some((value) => css[value] ? css[value] !== "none" : false) || (css.containerType ? css.containerType !== "normal" : false) || !webkit && (css.backdropFilter ? css.backdropFilter !== "none" : false) || !webkit && (css.filter ? css.filter !== "none" : false) || ["transform", "translate", "scale", "rotate", "perspective", "filter"].some((value) => (css.willChange || "").includes(value)) || ["paint", "layout", "strict", "content"].some((value) => (css.contain || "").includes(value));
+}
+function getContainingBlock(element) {
+  let currentNode = getParentNode(element);
+  while (isHTMLElement(currentNode) && !isLastTraversableNode(currentNode)) {
+    if (isContainingBlock(currentNode)) {
+      return currentNode;
+    } else if (isTopLayer(currentNode)) {
+      return null;
+    }
+    currentNode = getParentNode(currentNode);
+  }
+  return null;
+}
+function isWebKit() {
+  if (typeof CSS === "undefined" || !CSS.supports) return false;
+  return CSS.supports("-webkit-backdrop-filter", "none");
+}
+function isLastTraversableNode(node) {
+  return ["html", "body", "#document"].includes(getNodeName(node));
+}
+function getComputedStyle2(element) {
+  return getWindow(element).getComputedStyle(element);
+}
+function getNodeScroll(element) {
+  if (isElement(element)) {
+    return {
+      scrollLeft: element.scrollLeft,
+      scrollTop: element.scrollTop
+    };
+  }
+  return {
+    scrollLeft: element.scrollX,
+    scrollTop: element.scrollY
+  };
+}
+function getParentNode(node) {
+  if (getNodeName(node) === "html") {
+    return node;
+  }
+  const result = (
+    // Step into the shadow DOM of the parent of a slotted node.
+    node.assignedSlot || // DOM Element detected.
+    node.parentNode || // ShadowRoot detected.
+    isShadowRoot(node) && node.host || // Fallback.
+    getDocumentElement(node)
+  );
+  return isShadowRoot(result) ? result.host : result;
+}
+function getNearestOverflowAncestor(node) {
+  const parentNode = getParentNode(node);
+  if (isLastTraversableNode(parentNode)) {
+    return node.ownerDocument ? node.ownerDocument.body : node.body;
+  }
+  if (isHTMLElement(parentNode) && isOverflowElement(parentNode)) {
+    return parentNode;
+  }
+  return getNearestOverflowAncestor(parentNode);
+}
+function getOverflowAncestors(node, list, traverseIframes) {
+  var _node$ownerDocument2;
+  if (list === void 0) {
+    list = [];
+  }
+  if (traverseIframes === void 0) {
+    traverseIframes = true;
+  }
+  const scrollableAncestor = getNearestOverflowAncestor(node);
+  const isBody = scrollableAncestor === ((_node$ownerDocument2 = node.ownerDocument) == null ? void 0 : _node$ownerDocument2.body);
+  const win = getWindow(scrollableAncestor);
+  if (isBody) {
+    const frameElement = getFrameElement(win);
+    return list.concat(win, win.visualViewport || [], isOverflowElement(scrollableAncestor) ? scrollableAncestor : [], frameElement && traverseIframes ? getOverflowAncestors(frameElement) : []);
+  }
+  return list.concat(scrollableAncestor, getOverflowAncestors(scrollableAncestor, [], traverseIframes));
+}
+function getFrameElement(win) {
+  return win.parent && Object.getPrototypeOf(win.parent) ? win.frameElement : null;
+}
+
+// node_modules/@floating-ui/dom/dist/floating-ui.dom.mjs
+function getCssDimensions(element) {
+  const css = getComputedStyle2(element);
+  let width = parseFloat(css.width) || 0;
+  let height = parseFloat(css.height) || 0;
+  const hasOffset = isHTMLElement(element);
+  const offsetWidth = hasOffset ? element.offsetWidth : width;
+  const offsetHeight = hasOffset ? element.offsetHeight : height;
+  const shouldFallback = round(width) !== offsetWidth || round(height) !== offsetHeight;
+  if (shouldFallback) {
+    width = offsetWidth;
+    height = offsetHeight;
+  }
+  return {
+    width,
+    height,
+    $: shouldFallback
+  };
+}
+function unwrapElement(element) {
+  return !isElement(element) ? element.contextElement : element;
+}
+function getScale(element) {
+  const domElement = unwrapElement(element);
+  if (!isHTMLElement(domElement)) {
+    return createCoords(1);
+  }
+  const rect = domElement.getBoundingClientRect();
+  const {
+    width,
+    height,
+    $
+  } = getCssDimensions(domElement);
+  let x = ($ ? round(rect.width) : rect.width) / width;
+  let y = ($ ? round(rect.height) : rect.height) / height;
+  if (!x || !Number.isFinite(x)) {
+    x = 1;
+  }
+  if (!y || !Number.isFinite(y)) {
+    y = 1;
+  }
+  return {
+    x,
+    y
+  };
+}
+var noOffsets = /* @__PURE__ */ createCoords(0);
+function getVisualOffsets(element) {
+  const win = getWindow(element);
+  if (!isWebKit() || !win.visualViewport) {
+    return noOffsets;
+  }
+  return {
+    x: win.visualViewport.offsetLeft,
+    y: win.visualViewport.offsetTop
+  };
+}
+function shouldAddVisualOffsets(element, isFixed, floatingOffsetParent) {
+  if (isFixed === void 0) {
+    isFixed = false;
+  }
+  if (!floatingOffsetParent || isFixed && floatingOffsetParent !== getWindow(element)) {
+    return false;
+  }
+  return isFixed;
+}
+function getBoundingClientRect(element, includeScale, isFixedStrategy, offsetParent) {
+  if (includeScale === void 0) {
+    includeScale = false;
+  }
+  if (isFixedStrategy === void 0) {
+    isFixedStrategy = false;
+  }
+  const clientRect = element.getBoundingClientRect();
+  const domElement = unwrapElement(element);
+  let scale = createCoords(1);
+  if (includeScale) {
+    if (offsetParent) {
+      if (isElement(offsetParent)) {
+        scale = getScale(offsetParent);
+      }
+    } else {
+      scale = getScale(element);
+    }
+  }
+  const visualOffsets = shouldAddVisualOffsets(domElement, isFixedStrategy, offsetParent) ? getVisualOffsets(domElement) : createCoords(0);
+  let x = (clientRect.left + visualOffsets.x) / scale.x;
+  let y = (clientRect.top + visualOffsets.y) / scale.y;
+  let width = clientRect.width / scale.x;
+  let height = clientRect.height / scale.y;
+  if (domElement) {
+    const win = getWindow(domElement);
+    const offsetWin = offsetParent && isElement(offsetParent) ? getWindow(offsetParent) : offsetParent;
+    let currentWin = win;
+    let currentIFrame = getFrameElement(currentWin);
+    while (currentIFrame && offsetParent && offsetWin !== currentWin) {
+      const iframeScale = getScale(currentIFrame);
+      const iframeRect = currentIFrame.getBoundingClientRect();
+      const css = getComputedStyle2(currentIFrame);
+      const left = iframeRect.left + (currentIFrame.clientLeft + parseFloat(css.paddingLeft)) * iframeScale.x;
+      const top = iframeRect.top + (currentIFrame.clientTop + parseFloat(css.paddingTop)) * iframeScale.y;
+      x *= iframeScale.x;
+      y *= iframeScale.y;
+      width *= iframeScale.x;
+      height *= iframeScale.y;
+      x += left;
+      y += top;
+      currentWin = getWindow(currentIFrame);
+      currentIFrame = getFrameElement(currentWin);
+    }
+  }
+  return rectToClientRect({
+    width,
+    height,
+    x,
+    y
+  });
+}
+function getWindowScrollBarX(element, rect) {
+  const leftScroll = getNodeScroll(element).scrollLeft;
+  if (!rect) {
+    return getBoundingClientRect(getDocumentElement(element)).left + leftScroll;
+  }
+  return rect.left + leftScroll;
+}
+function getHTMLOffset(documentElement, scroll, ignoreScrollbarX) {
+  if (ignoreScrollbarX === void 0) {
+    ignoreScrollbarX = false;
+  }
+  const htmlRect = documentElement.getBoundingClientRect();
+  const x = htmlRect.left + scroll.scrollLeft - (ignoreScrollbarX ? 0 : (
+    // RTL <body> scrollbar.
+    getWindowScrollBarX(documentElement, htmlRect)
+  ));
+  const y = htmlRect.top + scroll.scrollTop;
+  return {
+    x,
+    y
+  };
+}
+function convertOffsetParentRelativeRectToViewportRelativeRect(_ref) {
+  let {
+    elements,
+    rect,
+    offsetParent,
+    strategy
+  } = _ref;
+  const isFixed = strategy === "fixed";
+  const documentElement = getDocumentElement(offsetParent);
+  const topLayer = elements ? isTopLayer(elements.floating) : false;
+  if (offsetParent === documentElement || topLayer && isFixed) {
+    return rect;
+  }
+  let scroll = {
+    scrollLeft: 0,
+    scrollTop: 0
+  };
+  let scale = createCoords(1);
+  const offsets = createCoords(0);
+  const isOffsetParentAnElement = isHTMLElement(offsetParent);
+  if (isOffsetParentAnElement || !isOffsetParentAnElement && !isFixed) {
+    if (getNodeName(offsetParent) !== "body" || isOverflowElement(documentElement)) {
+      scroll = getNodeScroll(offsetParent);
+    }
+    if (isHTMLElement(offsetParent)) {
+      const offsetRect = getBoundingClientRect(offsetParent);
+      scale = getScale(offsetParent);
+      offsets.x = offsetRect.x + offsetParent.clientLeft;
+      offsets.y = offsetRect.y + offsetParent.clientTop;
+    }
+  }
+  const htmlOffset = documentElement && !isOffsetParentAnElement && !isFixed ? getHTMLOffset(documentElement, scroll, true) : createCoords(0);
+  return {
+    width: rect.width * scale.x,
+    height: rect.height * scale.y,
+    x: rect.x * scale.x - scroll.scrollLeft * scale.x + offsets.x + htmlOffset.x,
+    y: rect.y * scale.y - scroll.scrollTop * scale.y + offsets.y + htmlOffset.y
+  };
+}
+function getClientRects(element) {
+  return Array.from(element.getClientRects());
+}
+function getDocumentRect(element) {
+  const html = getDocumentElement(element);
+  const scroll = getNodeScroll(element);
+  const body = element.ownerDocument.body;
+  const width = max(html.scrollWidth, html.clientWidth, body.scrollWidth, body.clientWidth);
+  const height = max(html.scrollHeight, html.clientHeight, body.scrollHeight, body.clientHeight);
+  let x = -scroll.scrollLeft + getWindowScrollBarX(element);
+  const y = -scroll.scrollTop;
+  if (getComputedStyle2(body).direction === "rtl") {
+    x += max(html.clientWidth, body.clientWidth) - width;
+  }
+  return {
+    width,
+    height,
+    x,
+    y
+  };
+}
+function getViewportRect(element, strategy) {
+  const win = getWindow(element);
+  const html = getDocumentElement(element);
+  const visualViewport = win.visualViewport;
+  let width = html.clientWidth;
+  let height = html.clientHeight;
+  let x = 0;
+  let y = 0;
+  if (visualViewport) {
+    width = visualViewport.width;
+    height = visualViewport.height;
+    const visualViewportBased = isWebKit();
+    if (!visualViewportBased || visualViewportBased && strategy === "fixed") {
+      x = visualViewport.offsetLeft;
+      y = visualViewport.offsetTop;
+    }
+  }
+  return {
+    width,
+    height,
+    x,
+    y
+  };
+}
+function getInnerBoundingClientRect(element, strategy) {
+  const clientRect = getBoundingClientRect(element, true, strategy === "fixed");
+  const top = clientRect.top + element.clientTop;
+  const left = clientRect.left + element.clientLeft;
+  const scale = isHTMLElement(element) ? getScale(element) : createCoords(1);
+  const width = element.clientWidth * scale.x;
+  const height = element.clientHeight * scale.y;
+  const x = left * scale.x;
+  const y = top * scale.y;
+  return {
+    width,
+    height,
+    x,
+    y
+  };
+}
+function getClientRectFromClippingAncestor(element, clippingAncestor, strategy) {
+  let rect;
+  if (clippingAncestor === "viewport") {
+    rect = getViewportRect(element, strategy);
+  } else if (clippingAncestor === "document") {
+    rect = getDocumentRect(getDocumentElement(element));
+  } else if (isElement(clippingAncestor)) {
+    rect = getInnerBoundingClientRect(clippingAncestor, strategy);
+  } else {
+    const visualOffsets = getVisualOffsets(element);
+    rect = {
+      x: clippingAncestor.x - visualOffsets.x,
+      y: clippingAncestor.y - visualOffsets.y,
+      width: clippingAncestor.width,
+      height: clippingAncestor.height
+    };
+  }
+  return rectToClientRect(rect);
+}
+function hasFixedPositionAncestor(element, stopNode) {
+  const parentNode = getParentNode(element);
+  if (parentNode === stopNode || !isElement(parentNode) || isLastTraversableNode(parentNode)) {
+    return false;
+  }
+  return getComputedStyle2(parentNode).position === "fixed" || hasFixedPositionAncestor(parentNode, stopNode);
+}
+function getClippingElementAncestors(element, cache2) {
+  const cachedResult = cache2.get(element);
+  if (cachedResult) {
+    return cachedResult;
+  }
+  let result = getOverflowAncestors(element, [], false).filter((el) => isElement(el) && getNodeName(el) !== "body");
+  let currentContainingBlockComputedStyle = null;
+  const elementIsFixed = getComputedStyle2(element).position === "fixed";
+  let currentNode = elementIsFixed ? getParentNode(element) : element;
+  while (isElement(currentNode) && !isLastTraversableNode(currentNode)) {
+    const computedStyle = getComputedStyle2(currentNode);
+    const currentNodeIsContaining = isContainingBlock(currentNode);
+    if (!currentNodeIsContaining && computedStyle.position === "fixed") {
+      currentContainingBlockComputedStyle = null;
+    }
+    const shouldDropCurrentNode = elementIsFixed ? !currentNodeIsContaining && !currentContainingBlockComputedStyle : !currentNodeIsContaining && computedStyle.position === "static" && !!currentContainingBlockComputedStyle && ["absolute", "fixed"].includes(currentContainingBlockComputedStyle.position) || isOverflowElement(currentNode) && !currentNodeIsContaining && hasFixedPositionAncestor(element, currentNode);
+    if (shouldDropCurrentNode) {
+      result = result.filter((ancestor) => ancestor !== currentNode);
+    } else {
+      currentContainingBlockComputedStyle = computedStyle;
+    }
+    currentNode = getParentNode(currentNode);
+  }
+  cache2.set(element, result);
+  return result;
+}
+function getClippingRect(_ref) {
+  let {
+    element,
+    boundary,
+    rootBoundary,
+    strategy
+  } = _ref;
+  const elementClippingAncestors = boundary === "clippingAncestors" ? isTopLayer(element) ? [] : getClippingElementAncestors(element, this._c) : [].concat(boundary);
+  const clippingAncestors = [...elementClippingAncestors, rootBoundary];
+  const firstClippingAncestor = clippingAncestors[0];
+  const clippingRect = clippingAncestors.reduce((accRect, clippingAncestor) => {
+    const rect = getClientRectFromClippingAncestor(element, clippingAncestor, strategy);
+    accRect.top = max(rect.top, accRect.top);
+    accRect.right = min(rect.right, accRect.right);
+    accRect.bottom = min(rect.bottom, accRect.bottom);
+    accRect.left = max(rect.left, accRect.left);
+    return accRect;
+  }, getClientRectFromClippingAncestor(element, firstClippingAncestor, strategy));
+  return {
+    width: clippingRect.right - clippingRect.left,
+    height: clippingRect.bottom - clippingRect.top,
+    x: clippingRect.left,
+    y: clippingRect.top
+  };
+}
+function getDimensions(element) {
+  const {
+    width,
+    height
+  } = getCssDimensions(element);
+  return {
+    width,
+    height
+  };
+}
+function getRectRelativeToOffsetParent(element, offsetParent, strategy) {
+  const isOffsetParentAnElement = isHTMLElement(offsetParent);
+  const documentElement = getDocumentElement(offsetParent);
+  const isFixed = strategy === "fixed";
+  const rect = getBoundingClientRect(element, true, isFixed, offsetParent);
+  let scroll = {
+    scrollLeft: 0,
+    scrollTop: 0
+  };
+  const offsets = createCoords(0);
+  if (isOffsetParentAnElement || !isOffsetParentAnElement && !isFixed) {
+    if (getNodeName(offsetParent) !== "body" || isOverflowElement(documentElement)) {
+      scroll = getNodeScroll(offsetParent);
+    }
+    if (isOffsetParentAnElement) {
+      const offsetRect = getBoundingClientRect(offsetParent, true, isFixed, offsetParent);
+      offsets.x = offsetRect.x + offsetParent.clientLeft;
+      offsets.y = offsetRect.y + offsetParent.clientTop;
+    } else if (documentElement) {
+      offsets.x = getWindowScrollBarX(documentElement);
+    }
+  }
+  const htmlOffset = documentElement && !isOffsetParentAnElement && !isFixed ? getHTMLOffset(documentElement, scroll) : createCoords(0);
+  const x = rect.left + scroll.scrollLeft - offsets.x - htmlOffset.x;
+  const y = rect.top + scroll.scrollTop - offsets.y - htmlOffset.y;
+  return {
+    x,
+    y,
+    width: rect.width,
+    height: rect.height
+  };
+}
+function isStaticPositioned(element) {
+  return getComputedStyle2(element).position === "static";
+}
+function getTrueOffsetParent(element, polyfill) {
+  if (!isHTMLElement(element) || getComputedStyle2(element).position === "fixed") {
+    return null;
+  }
+  if (polyfill) {
+    return polyfill(element);
+  }
+  let rawOffsetParent = element.offsetParent;
+  if (getDocumentElement(element) === rawOffsetParent) {
+    rawOffsetParent = rawOffsetParent.ownerDocument.body;
+  }
+  return rawOffsetParent;
+}
+function getOffsetParent(element, polyfill) {
+  const win = getWindow(element);
+  if (isTopLayer(element)) {
+    return win;
+  }
+  if (!isHTMLElement(element)) {
+    let svgOffsetParent = getParentNode(element);
+    while (svgOffsetParent && !isLastTraversableNode(svgOffsetParent)) {
+      if (isElement(svgOffsetParent) && !isStaticPositioned(svgOffsetParent)) {
+        return svgOffsetParent;
+      }
+      svgOffsetParent = getParentNode(svgOffsetParent);
+    }
+    return win;
+  }
+  let offsetParent = getTrueOffsetParent(element, polyfill);
+  while (offsetParent && isTableElement(offsetParent) && isStaticPositioned(offsetParent)) {
+    offsetParent = getTrueOffsetParent(offsetParent, polyfill);
+  }
+  if (offsetParent && isLastTraversableNode(offsetParent) && isStaticPositioned(offsetParent) && !isContainingBlock(offsetParent)) {
+    return win;
+  }
+  return offsetParent || getContainingBlock(element) || win;
+}
+var getElementRects = async function(data) {
+  const getOffsetParentFn = this.getOffsetParent || getOffsetParent;
+  const getDimensionsFn = this.getDimensions;
+  const floatingDimensions = await getDimensionsFn(data.floating);
+  return {
+    reference: getRectRelativeToOffsetParent(data.reference, await getOffsetParentFn(data.floating), data.strategy),
+    floating: {
+      x: 0,
+      y: 0,
+      width: floatingDimensions.width,
+      height: floatingDimensions.height
+    }
+  };
+};
+function isRTL(element) {
+  return getComputedStyle2(element).direction === "rtl";
+}
+var platform = {
+  convertOffsetParentRelativeRectToViewportRelativeRect,
+  getDocumentElement,
+  getClippingRect,
+  getOffsetParent,
+  getElementRects,
+  getClientRects,
+  getDimensions,
+  getScale,
+  isElement,
+  isRTL
+};
+var offset2 = offset;
+var autoPlacement2 = autoPlacement;
+var shift2 = shift;
+var arrow2 = arrow;
+var computePosition2 = (reference, floating, options) => {
+  const cache2 = /* @__PURE__ */ new Map();
+  const mergedOptions = {
+    platform,
+    ...options
+  };
+  const platformWithCache = {
+    ...mergedOptions.platform,
+    _c: cache2
+  };
+  return computePosition(reference, floating, {
+    ...mergedOptions,
+    platform: platformWithCache
+  });
+};
+
+// node_modules/@sjmc11/tourguidejs/src/core/dialog.ts
+async function createTourGuideDialog() {
+  this.dialog = document.createElement("div");
+  this.dialog.classList.add("tg-dialog");
+  await renderDialogHtml(this).then((html) => {
+    this.dialog.innerHTML = html;
+  });
+  document.body.append(this.dialog);
+  return true;
+}
+async function renderDialogHtml(tgInstance) {
+  if (tgInstance.options.dialogClass) tgInstance.dialog.classList.add(tgInstance.options.dialogClass);
+  if (tgInstance.options.dialogZ) tgInstance.dialog.style.zIndex = String(tgInstance.options.dialogZ);
+  tgInstance.dialog.style.width = tgInstance.options.dialogWidth ? tgInstance.options.dialogWidth + "px" : "auto";
+  if (tgInstance.options.dialogMaxWidth) tgInstance.dialog.style.maxWidth = tgInstance.options.dialogMaxWidth + "px";
+  let htmlRes = "";
+  htmlRes += `<div class='tg-dialog-header'>`;
+  htmlRes += `<div class="tg-dialog-title" id="tg-dialog-title"><!-- JS rendered --></div>`;
+  if (tgInstance.options.closeButton) {
+    htmlRes += `<div class="tg-dialog-close-btn" id="tg-dialog-close-btn">`;
+    htmlRes += ` <svg width="12px" height="12px" id="Layer_1" version="1.1" viewBox="0 0 512 512" xml:space="preserve" xmlns="http://www.w3.org/2000/svg"><path d="M443.6,387.1L312.4,255.4l131.5-130c5.4-5.4,5.4-14.2,0-19.6l-37.4-37.6c-2.6-2.6-6.1-4-9.8-4c-3.7,0-7.2,1.5-9.8,4  L256,197.8L124.9,68.3c-2.6-2.6-6.1-4-9.8-4c-3.7,0-7.2,1.5-9.8,4L68,105.9c-5.4,5.4-5.4,14.2,0,19.6l131.5,130L68.4,387.1  c-2.6,2.6-4.1,6.1-4.1,9.8c0,3.7,1.4,7.2,4.1,9.8l37.4,37.6c2.7,2.7,6.2,4.1,9.8,4.1c3.5,0,7.1-1.3,9.8-4.1L256,313.1l130.7,131.1  c2.7,2.7,6.2,4.1,9.8,4.1c3.5,0,7.1-1.3,9.8-4.1l37.4-37.6c2.6-2.6,4.1-6.1,4.1-9.8C447.7,393.2,446.2,389.7,443.6,387.1z"/></svg>`;
+    htmlRes += `</div>`;
+  }
+  htmlRes += '<div class="tg-dialog-spinner" id="tg-dialog-spinner">';
+  htmlRes += '<svg fill="#000000" width="12" height="12" viewBox="0 0 20 20" stroke="#000000" stroke-width="0.8"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <path d="M10,1V3a7,7,0,1,1-7,7H1a9,9,0,1,0,9-9Z"></path> </g> </g></svg>';
+  htmlRes += "</div>";
+  htmlRes += `</div>`;
+  if (tgInstance.options.progressBar) {
+    htmlRes += `<div class="tg-dialog-progress-bar"><span class="tg-bar" id="tg-dialog-progbar"></span></div>`;
+  }
+  htmlRes += `<div class="tg-dialog-body" id="tg-dialog-body"><!-- JS rendered --></div>`;
+  if (tgInstance.options.showStepDots && tgInstance.options.stepDotsPlacement === "body") {
+    const dotsWrapperHtml = dotsWrapperHtmlString();
+    if (dotsWrapperHtml) htmlRes += dotsWrapperHtml;
+  }
+  htmlRes += `<div class="tg-dialog-footer">`;
+  let prevBtnClass = "tg-dialog-btn";
+  let prevDisabled = "false";
+  if (tgInstance.activeStep === 0) {
+    prevDisabled = "true";
+    prevBtnClass += " disabled";
+  }
+  if (tgInstance.options.showButtons && !tgInstance.options.hidePrev) htmlRes += `<button type="button" class="` + prevBtnClass + `" id="tg-dialog-prev-btn" disabled="` + prevDisabled + `">${tgInstance.options.prevLabel}</button>`;
+  htmlRes += '<div class="tg-dialog-footer-sup">';
+  if (tgInstance.options.showStepDots && tgInstance.options.stepDotsPlacement === "footer") {
+    const dotsWrapperHtml = dotsWrapperHtmlString();
+    if (dotsWrapperHtml) htmlRes += dotsWrapperHtml;
+  }
+  if (tgInstance.options.showStepProgress) htmlRes += `<span class="tg-step-progress" id="tg-step-progress"><!-- JS rendered --></span>`;
+  htmlRes += "</div>";
+  if (tgInstance.options.showButtons && !tgInstance.options.hideNext) htmlRes += `<button type="button" class="tg-dialog-btn" id="tg-dialog-next-btn">${tgInstance.options.nextLabel}</button>`;
+  htmlRes += `</div>`;
+  htmlRes += `<div id="tg-arrow" class="tg-arrow"></div><!-- end tour arrow -->`;
+  return htmlRes;
+}
+function updateDialogHtml(tgInstance) {
+  return new Promise((resolve, reject) => {
+    const stepData = tgInstance.tourSteps[tgInstance.activeStep];
+    if (!stepData) reject("No active step data");
+    const tgTitle = document.getElementById("tg-dialog-title");
+    if (tgTitle) tgTitle.innerHTML = stepData.title ? stepData.title : "";
+    const tgBody = document.getElementById("tg-dialog-body");
+    if (tgBody && stepData) {
+      if (typeof stepData.content === "string") {
+        tgBody.innerHTML = stepData.content ? stepData.content : "";
+      } else {
+        tgBody.innerHTML = "";
+        tgBody.append(stepData.content);
+      }
+    }
+    const tgDots = document.getElementById("tg-dialog-dots");
+    if (tgDots && tgInstance.options.showStepDots && computeDots(tgInstance)) tgDots.innerHTML = computeDots(tgInstance);
+    const backBtn = document.getElementById("tg-dialog-prev-btn");
+    if (backBtn) {
+      if (tgInstance.activeStep === 0) {
+        backBtn.classList.add("disabled");
+        backBtn.setAttribute("disabled", "true");
+      } else {
+        backBtn.classList.remove("disabled");
+        backBtn.removeAttribute("disabled");
+      }
+    }
+    const nextBtn = document.getElementById("tg-dialog-next-btn");
+    if (nextBtn) nextBtn.innerHTML = tgInstance.activeStep + 1 >= tgInstance.tourSteps.length ? tgInstance.options.finishLabel : tgInstance.options.nextLabel;
+    const tgProgress = document.getElementById("tg-step-progress");
+    if (tgProgress) tgProgress.innerHTML = tgInstance.activeStep + 1 + "/" + tgInstance.tourSteps.length;
+    const tgProgBar = document.getElementById("tg-dialog-progbar");
+    if (tgProgBar) {
+      if (tgInstance.options.progressBar) tgProgBar.style.backgroundColor = tgInstance.options.progressBar;
+      tgProgBar.style.width = (tgInstance.activeStep + 1) / tgInstance.tourSteps.length * 100 + "%";
+    }
+    resolve(true);
+  });
+}
+function computeDialogPosition(tgInstance) {
+  return new Promise(async (resolve) => {
+    const arrowElement = document.querySelector("#tg-arrow");
+    let targetElem = tgInstance.tourSteps[tgInstance.activeStep].dialogTarget || tgInstance.tourSteps[tgInstance.activeStep].target;
+    if (targetElem === document.body) {
+      Object.assign(tgInstance.dialog.style, {
+        top: `${window.innerHeight / 2.25 - tgInstance.dialog.clientHeight / 2}px`,
+        left: `${window.innerWidth / 2 - tgInstance.dialog.clientWidth / 2}px`,
+        position: "fixed"
+      });
+      tgInstance.dialog.classList.add("tg-dialog-fixed");
+      if (arrowElement) arrowElement.style.display = "none";
+      return resolve(true);
+    }
+    tgInstance.dialog.style.position = "absolute";
+    tgInstance.dialog.classList.remove("tg-dialog-fixed");
+    if (arrowElement) arrowElement.style.display = "inline-block";
+    computePosition2(targetElem, tgInstance.dialog, {
+      placement: tgInstance.options.dialogPlacement,
+      middleware: [
+        autoPlacement2({
+          autoAlignment: true,
+          padding: 5
+        }),
+        shift2({
+          crossAxis: tgInstance.options.allowDialogOverlap,
+          padding: 15
+        }),
+        arrow2({ element: arrowElement }),
+        offset2(20)
+      ]
+    }).then(({ x, y, placement, middlewareData }) => {
+      Object.assign(tgInstance.dialog.style, {
+        left: `${x}px`,
+        top: `${y}px`
+      });
+      if (middlewareData.arrow && arrowElement) {
+        Object.assign(arrowElement.style, arrowStyles(middlewareData.arrow, placement, tgInstance.dialog));
+      }
+      return resolve(true);
+    });
+  });
+}
+function arrowStyles(arrowMiddlewareData, placement, dialog) {
+  const arrowX = arrowMiddlewareData?.x || 0;
+  const arrowY = arrowMiddlewareData?.y || 0;
+  const arrowSize = 10;
+  const staticSide = {
+    top: "bottom",
+    right: "left",
+    bottom: "top",
+    left: "right"
+  }[placement.split("-")[0]];
+  const maxWidth = dialog.clientWidth - arrowSize;
+  const maxHeight = dialog.clientHeight - arrowSize;
+  const isAtMaxHeight = Math.abs(arrowY - maxHeight) <= arrowSize;
+  const isAtMaxWidth = Math.abs(arrowX - maxWidth) <= arrowSize;
+  const isAtMinHeight = Math.abs(arrowY) <= arrowSize;
+  const isAtMinWidth = Math.abs(arrowX) <= arrowSize;
+  const isInCorner = arrowMiddlewareData?.centerOffset !== 0 || (isAtMinWidth || isAtMaxWidth) && (isAtMinHeight || isAtMaxHeight);
+  return {
+    left: isAtMinWidth ? staticSide === "right" ? "" : "0" : isAtMaxWidth ? `${maxWidth}px` : `${arrowX}px`,
+    top: isAtMinHeight ? staticSide === "bottom" ? "" : "0" : isAtMaxHeight ? `${maxHeight}px` : `${arrowY}px`,
+    [staticSide]: isInCorner ? "0" : `-${arrowSize / 2}px`,
+    transform: isInCorner ? "none" : "rotate(45deg)"
+  };
+}
+
+// node_modules/@sjmc11/tourguidejs/src/core/backdrop.ts
+function createTourGuideBackdrop() {
+  this.backdrop = document.createElement("div");
+  this.computeBackdropAttributes();
+  document.body.append(this.backdrop);
+}
+function computeBackdropAttributes() {
+  if (!this.options) return;
+  this.backdrop.className = "tg-backdrop";
+  this.backdrop.style.boxShadow = this.options.backdropColor + " 0 0 1px 2px, " + this.options.backdropColor + " 0 0 0 1000vh";
+  if (this.options.backdropClass) this.backdrop.classList.add(this.options.backdropClass);
+  if (this.options.dialogAnimate) this.backdrop.classList.add("tg-backdrop-animate");
+}
+function computeBackdropPosition(tgInstance) {
+  return new Promise(async (resolve, reject) => {
+    if (typeof tgInstance.options.targetPadding === "undefined") return reject("Options failed to initialize");
+    if (!tgInstance.backdrop) return reject("No backdrop element initialized");
+    const stepData = tgInstance.tourSteps[tgInstance.activeStep];
+    const targetElem = stepData.target;
+    const targetElemRect = targetElem.getBoundingClientRect();
+    const isOverflow = targetElemRect.width + tgInstance.options.targetPadding > document.documentElement.clientWidth;
+    if (targetElem === document.body) {
+      const centeredOverlaySize = 0;
+      targetElemRect.width = centeredOverlaySize;
+      targetElemRect.height = centeredOverlaySize;
+      tgInstance.backdrop.style.position = "fixed";
+      tgInstance.backdrop.style.top = window.innerHeight / 2.5 + "px";
+      tgInstance.backdrop.style.left = window.innerWidth / 2 + "px";
+    } else if (stepData.fixed) {
+      tgInstance.backdrop.style.position = "fixed";
+      tgInstance.backdrop.style.top = targetElemRect.top - tgInstance.options.targetPadding / 2 + "px";
+      tgInstance.backdrop.style.left = (isOverflow ? targetElemRect.x : targetElemRect.x - tgInstance.options.targetPadding / 2) + "px";
+    } else {
+      tgInstance.backdrop.style.position = "absolute";
+      tgInstance.backdrop.style.top = window.scrollY + targetElemRect.top - tgInstance.options.targetPadding / 2 + "px";
+      tgInstance.backdrop.style.left = (isOverflow ? targetElemRect.x : targetElemRect.x - tgInstance.options.targetPadding / 2) + "px";
+    }
+    tgInstance.backdrop.style.pointerEvents = stepData.propagateEvents ? "none" : "";
+    tgInstance.backdrop.style.width = (isOverflow ? targetElemRect.width : targetElemRect.width + tgInstance.options.targetPadding) + "px";
+    tgInstance.backdrop.style.height = (targetElemRect.height ? targetElemRect.height + tgInstance.options.targetPadding : targetElemRect.height) + "px";
+    resolve(true);
+  });
+}
+
+// node_modules/@sjmc11/tourguidejs/src/core/positioning.ts
+function computeTourPositions() {
+  return new Promise(async (resolve) => {
+    this.backdrop.style.display = "block";
+    await computeBackdropPosition(this);
+    this.dialog.style.display = "block";
+    if (this.options.dialogAnimate && this.isVisible) this.dialog.classList.add("animate-position");
+    await computeDialogPosition(this);
+    if (this.options.dialogAnimate) setTimeout(() => {
+      this.dialog.classList.remove("animate-position");
+    }, 300);
+    this.isVisible = true;
+    if (!window.onresize) window.onresize = () => {
+      computeBackdropPosition(this);
+      computeDialogPosition(this);
+    };
+    if (!window.onscroll) window.onscroll = () => {
+      computeDialogPosition(this);
+    };
+    await setTimeout(() => {
+      return resolve(true);
+    }, 300);
+  });
+}
+var positioning_default = computeTourPositions;
+
+// node_modules/@sjmc11/tourguidejs/src/core/callbacks.ts
+function handleOnFinish(providedCallback) {
+  if (typeof providedCallback === "function") {
+    this._globalFinishCallback = providedCallback;
+  } else {
+    throw new Error(
+      "Provided callback for onFinish was not a function"
+    );
+  }
+}
+function handleOnBeforeExit(providedCallback) {
+  if (typeof providedCallback === "function") {
+    this._globalBeforeExitCallback = providedCallback;
+  } else {
+    throw new Error("Provided callback for onBeforeExit was not a function");
+  }
+}
+function handleOnAfterExit(providedCallback) {
+  if (typeof providedCallback === "function") {
+    this._globalAfterExitCallback = providedCallback;
+  } else {
+    throw new Error("Provided callback for onAfterExit was not a function");
+  }
+}
+function handleOnBeforeStepChange(providedCallback) {
+  if (typeof providedCallback === "function") {
+    this._globalBeforeChangeCallback = providedCallback;
+  } else {
+    throw new Error("Provided callback for onBeforeStepChange was not a function");
+  }
+}
+function handleOnAfterStepChange(providedCallback) {
+  if (typeof providedCallback === "function") {
+    this._globalAfterChangeCallback = providedCallback;
+  } else {
+    throw new Error("Provided callback for onAfterStepChange was not a function");
+  }
+}
+
+// node_modules/@sjmc11/tourguidejs/src/core/listeners.ts
+var clickOutsideHandler = async function(event) {
+  event.preventDefault();
+  event.stopPropagation();
+  event.stopImmediatePropagation();
+  if (!(event.target instanceof Element)) return;
+  const backdropRect = this.backdrop.getBoundingClientRect();
+  if (event.clientX >= backdropRect.x && event.clientX <= backdropRect.x + backdropRect.width && event.clientY >= backdropRect.y && event.clientY <= backdropRect.y + backdropRect.height) return;
+  const dialogRect = this.dialog.getBoundingClientRect();
+  if (event.clientX >= dialogRect.x && event.clientX <= dialogRect.x + dialogRect.width && event.clientY >= dialogRect.y && event.clientY <= dialogRect.y + dialogRect.height) return;
+  if (this.dialog.contains(event.target)) return;
+  await this.exit();
+};
+var keyPressHandler = async function(event) {
+  if (event.key === "Escape" && this.options.exitOnEscape) {
+    event.preventDefault();
+    await this.exit();
+    return;
+  }
+  if (event.key === "ArrowRight" && this.options.keyboardControls) {
+    event.preventDefault();
+    this.visitStep("next").catch((e) => {
+      if (this.options.debug) console.warn(e);
+    });
+    return;
+  }
+  if (event.key === "ArrowLeft" && this.options.keyboardControls) {
+    event.preventDefault();
+    this.visitStep("prev").catch((e) => {
+      if (this.options.debug) console.warn(e);
+    });
+    return;
+  }
+};
+function handleInitListeners() {
+  const initNextBtnListener = () => {
+    let nextBtn = document.getElementById("tg-dialog-next-btn");
+    if (!nextBtn || this._trackedEvents["nextBtnClickEvent"].initialized) return;
+    nextBtn.addEventListener("click", this._trackedEvents.nextBtnClickEvent.fn);
+    this._trackedEvents["nextBtnClickEvent"].initialized = true;
+  };
+  const initPrevBtnListener = () => {
+    let prevBtn = document.getElementById("tg-dialog-prev-btn");
+    if (!prevBtn || this._trackedEvents["prevBtnClickEvent"].initialized) return;
+    prevBtn.addEventListener("click", this._trackedEvents.prevBtnClickEvent.fn);
+    this._trackedEvents["prevBtnClickEvent"].initialized = true;
+  };
+  const initCloseBtnListener = () => {
+    let closeBtn = document.getElementById("tg-dialog-close-btn");
+    if (!closeBtn || this._trackedEvents["closeBtnClickEvent"].initialized) return;
+    closeBtn.addEventListener("click", this._trackedEvents.closeBtnClickEvent.fn, false);
+    this._trackedEvents["closeBtnClickEvent"].initialized = true;
+  };
+  const initClickOutsideListener = () => {
+    if (this._trackedEvents["outsideClickEvent"].initialized) return;
+    document.body.addEventListener("click", this._trackedEvents.outsideClickEvent.fn, false);
+    this._trackedEvents["outsideClickEvent"].initialized = true;
+  };
+  const initKeysListener = () => {
+    if (this._trackedEvents["keyPressEvent"].initialized) return;
+    window.addEventListener("keydown", this._trackedEvents.keyPressEvent.fn, false);
+    this._trackedEvents["keyPressEvent"].initialized = true;
+  };
+  return new Promise((resolve) => {
+    if (this.options.showButtons) initNextBtnListener();
+    if (this.options.showButtons) initPrevBtnListener();
+    if (this.options.closeButton) initCloseBtnListener();
+    if (this.options.exitOnClickOutside) initClickOutsideListener();
+    if (this.options.keyboardControls || this.options.exitOnEscape) initKeysListener();
+    return resolve(true);
+  });
+}
+function handleDestroyListeners() {
+  const destroyNextBtnListener = () => {
+    let nextBtn = document.getElementById("tg-dialog-next-btn");
+    if (nextBtn) {
+      nextBtn.removeEventListener("click", this._trackedEvents.nextBtnClickEvent.fn);
+      this._trackedEvents["nextBtnClickEvent"].initialized = false;
+    }
+  };
+  const destroyPrevBtnListener = () => {
+    let prevBtn = document.getElementById("tg-dialog-prev-btn");
+    if (prevBtn) {
+      prevBtn.removeEventListener("click", this._trackedEvents.prevBtnClickEvent.fn);
+      this._trackedEvents["prevBtnClickEvent"].initialized = false;
+    }
+  };
+  const destroyCloseBtnListener = () => {
+    let closeBtn = document.getElementById("tg-dialog-close-btn");
+    if (closeBtn) {
+      closeBtn.removeEventListener("click", this._trackedEvents.closeBtnClickEvent.fn, false);
+      this._trackedEvents["closeBtnClickEvent"].initialized = false;
+    }
+  };
+  const destroyClickOutsideListener = () => {
+    document.body.removeEventListener("click", this._trackedEvents.outsideClickEvent.fn, false);
+    this._trackedEvents["outsideClickEvent"].initialized = false;
+  };
+  const destroyKeysListener = () => {
+    window.removeEventListener("keydown", this._trackedEvents.keyPressEvent.fn, false);
+    this._trackedEvents["keyPressEvent"].initialized = false;
+  };
+  return new Promise((resolve) => {
+    if (this.options.showButtons) destroyNextBtnListener();
+    if (this.options.showButtons) destroyPrevBtnListener();
+    if (this.options.closeButton) destroyCloseBtnListener();
+    if (this.options.exitOnClickOutside) destroyClickOutsideListener();
+    if (this.options.keyboardControls || this.options.exitOnEscape) destroyKeysListener();
+    return resolve(true);
+  });
+}
+
+// node_modules/@sjmc11/tourguidejs/src/core/scrollTo.ts
+var scrollToTarget = (tgInstance, targetElem) => {
+  targetElem.scrollIntoView({ behavior: tgInstance.options.autoScrollSmooth ? "smooth" : "auto", block: "end", inline: "nearest" });
+};
+var scrollTo_default = scrollToTarget;
+
+// node_modules/@sjmc11/tourguidejs/src/handlers/handleVisitStep.ts
+async function handleVisitStep(stepIndex) {
+  return new Promise(async (resolve, reject) => {
+    if (this._promiseWaiting) return reject("Promise waiting");
+    if (typeof stepIndex === "string") {
+      if (stepIndex === "next") stepIndex = this.activeStep + 1;
+      else stepIndex = this.activeStep - 1;
+    }
+    if (stepIndex >= this.tourSteps.length) {
+      await this.finishTour(true, this.group);
+      return;
+    }
+    await goToStep(this, stepIndex).catch((e) => {
+      return reject(e);
+    });
+    return resolve(true);
+  });
+}
+async function handleVisitNextStep() {
+  return new Promise(async (resolve, reject) => {
+    const stepIndex = this.activeStep + 1;
+    try {
+      await this.visitStep(stepIndex);
+    } catch (e) {
+      return reject(e);
+    }
+    return resolve(true);
+  });
+}
+async function handleVisitPrevStep() {
+  return new Promise(async (resolve, reject) => {
+    const stepIndex = this.activeStep - 1;
+    try {
+      await this.visitStep(stepIndex);
+    } catch (e) {
+      return reject(e);
+    }
+    return resolve(true);
+  });
+}
+function goToStep(tgInstance, stepIndex) {
+  return new Promise(async (resolve, bail) => {
+    if (stepIndex >= tgInstance.tourSteps.length) {
+      return bail("End of tour steps");
+    }
+    if (stepIndex < 0) {
+      return bail("Start of tour steps");
+    }
+    const currentStepIndex = tgInstance.activeStep;
+    const currentStep = tgInstance.tourSteps[currentStepIndex];
+    const nextStep = tgInstance.tourSteps[stepIndex];
+    if (!nextStep || !currentStep) return bail("Step not found by index");
+    if (tgInstance._globalBeforeChangeCallback && stepIndex !== currentStepIndex || currentStep.beforeLeave || nextStep.beforeEnter) {
+      tgInstance._promiseWaiting = true;
+      tgInstance.dialog.classList.add("tg-dialog-loading");
+    }
+    if (tgInstance._globalBeforeChangeCallback && stepIndex !== currentStepIndex) {
+      try {
+        await tgInstance._globalBeforeChangeCallback();
+      } catch (e) {
+        return bail(e);
+      }
+    }
+    if (stepIndex !== currentStepIndex && currentStep.beforeLeave) {
+      try {
+        await currentStep.beforeLeave(currentStep, nextStep);
+      } catch (e) {
+        return bail(e);
+      }
+    }
+    if (nextStep.beforeEnter) {
+      try {
+        await nextStep.beforeEnter(currentStep, nextStep);
+      } catch (e) {
+        return bail(e);
+      }
+    }
+    if (typeof nextStep.target === "string") tgInstance.tourSteps[stepIndex].target = document.querySelector(nextStep.target);
+    if (!nextStep.target || !tgInstance.tourSteps[stepIndex].target) tgInstance.tourSteps[stepIndex].target = document.body;
+    tgInstance.activeStep = Number(stepIndex);
+    await updateDialogHtml(tgInstance).catch((e) => {
+      if (tgInstance.options.debug) console.warn(e);
+      bail(e);
+    });
+    if (tgInstance.options.autoScroll && nextStep.target !== document.body) await scrollTo_default(tgInstance, nextStep.target);
+    await tgInstance.updatePositions();
+    if (stepIndex !== currentStepIndex && currentStep.afterLeave) await currentStep.afterLeave(currentStep, nextStep);
+    if (nextStep.afterEnter) await nextStep.afterEnter(currentStep, nextStep);
+    if (tgInstance._globalAfterChangeCallback && stepIndex !== currentStepIndex) await tgInstance._globalAfterChangeCallback();
+    tgInstance._promiseWaiting = false;
+    tgInstance.dialog.classList.remove("tg-dialog-loading");
+    return resolve(true);
+  });
+}
+var handleVisitStep_default = handleVisitStep;
+
+// node_modules/@sjmc11/tourguidejs/src/core/steps.ts
+async function computeTourSteps(tgInstance) {
+  return new Promise(async (resolve, reject) => {
+    let computedSteps = [];
+    if (tgInstance.options.steps && tgInstance.options.steps.length) {
+      computedSteps = tgInstance.options.steps.map((t) => {
+        if (typeof t.target === "string") {
+          const targetElement = document.querySelector(t.target);
+          if (targetElement) {
+            t.target = targetElement;
+            if (tgInstance.options.targetPadding && tgInstance.options.autoScrollOffset) {
+              targetElement.style.scrollMargin = tgInstance.options.autoScrollOffset + tgInstance.options.targetPadding + "px 0";
+            } else {
+              targetElement.style.scrollMargin = "30px 0";
+            }
+          }
+        }
+        if (!t.target) t.target = document.body;
+        if (typeof t.dialogTarget === "string") {
+          const dialogTarget = document.querySelector(t.dialogTarget);
+          if (dialogTarget) {
+            t.dialogTarget = dialogTarget;
+          } else {
+            t.dialogTarget = void 0;
+          }
+        }
+        return t;
+      });
+    }
+    const tourElements = document.querySelectorAll("[data-tg-tour]");
+    if (tourElements) tourElements.forEach((tourElem) => {
+      const stepTitle = tourElem.getAttribute("data-tg-title");
+      const stepContent = tourElem.getAttribute("data-tg-tour");
+      const stepGroup = tourElem.getAttribute("data-tg-group");
+      const stepOrder = tourElem.getAttribute("data-tg-order");
+      const stepFixed = tourElem.getAttribute("data-tg-fixed");
+      const scrollMargin = tourElem.getAttribute("data-tg-margin");
+      const dialogTarget = tourElem.getAttribute("data-tg-dialog-target");
+      const propagateEvents = tourElem.getAttribute("data-tg-propagate-events");
+      if (tgInstance.options.targetPadding && tgInstance.options.autoScrollOffset) {
+        tourElem.style.scrollMargin = (scrollMargin ? scrollMargin + tgInstance.options.targetPadding : tgInstance.options.autoScrollOffset + tgInstance.options.targetPadding) + "px 0";
+      } else {
+        tourElem.style.scrollMargin = (scrollMargin ? scrollMargin : "30") + "px 0";
+      }
+      computedSteps.push({
+        title: stepTitle ? stepTitle : void 0,
+        order: stepOrder ? Number(stepOrder) : 999,
+        target: tourElem,
+        dialogTarget: dialogTarget ? document.querySelector(dialogTarget) : void 0,
+        content: stepContent ? stepContent : void 0,
+        fixed: stepFixed !== null && stepFixed !== "false",
+        group: stepGroup ? stepGroup : void 0,
+        propagateEvents: propagateEvents !== null && propagateEvents !== "false"
+        // TODO: Support events from data attributes
+      });
+    });
+    if (tgInstance.group) computedSteps = computedSteps.filter((step) => {
+      return step.group === tgInstance.group;
+    });
+    computedSteps.sort(function(a, b) {
+      const keyA = new Date(a.order), keyB = new Date(b.order);
+      return keyA < keyB ? -1 : 1;
+    });
+    tgInstance.tourSteps = computedSteps;
+    if (!tgInstance.tourSteps.length) return reject("No tour steps detected" + (tgInstance.group ? " in group: " + tgInstance.group : ""));
+    return resolve(true);
+  });
+}
+var steps_default = computeTourSteps;
+
+// node_modules/@sjmc11/tourguidejs/src/util/util_wait_for_element.ts
+function waitForElm(selector) {
+  return new Promise((resolve) => {
+    if (document.querySelector(selector)) {
+      return resolve(document.querySelector(selector));
+    }
+    const observer = new MutationObserver(() => {
+      if (document.querySelector(selector)) {
+        resolve(document.querySelector(selector));
+        observer.disconnect();
+      }
+    });
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+  });
+}
+var util_wait_for_element_default = waitForElm;
+
+// node_modules/@sjmc11/tourguidejs/src/handlers/handleAddStep.ts
+async function handleAddStep(newSteps) {
+  if (!this.options.steps) return;
+  this.options.steps.push(...newSteps);
+  await steps_default(this);
+  if (this.isVisible) await updateDialogHtml(this).catch((e) => {
+    if (this.options.debug) console.warn(e);
+  });
+  if (this.isVisible) this.updatePositions().catch((e) => {
+    if (this.options.debug) console.warn(e);
+  });
+  if (this.isVisible) await util_wait_for_element_default(".tg-dialog").then(async () => {
+    await this.destroyListeners();
+    await this.initListeners();
+    return true;
+  });
+}
+var handleAddStep_default = handleAddStep;
+
+// node_modules/@sjmc11/tourguidejs/src/handlers/handleTourStart.ts
+async function handleTourStart(group) {
+  return new Promise(async (resolve, reject) => {
+    if (this.isVisible) {
+      if (this.options.debug) console.warn("Tour already active");
+      return reject("Tour already active");
+    }
+    if (group) this.group = group;
+    if (this.options.debug) console.info("Start tour");
+    const tgInstance = this;
+    try {
+      await steps_default(tgInstance);
+    } catch (e) {
+      if (this.options.debug) console.warn(e);
+      return reject(e);
+    }
+    await tgInstance.visitStep(this.activeStep).catch((e) => {
+      if (this.options.debug) console.warn(e);
+      return reject(e);
+    });
+    await util_wait_for_element_default(".tg-dialog").then(async () => {
+      await this.initListeners();
+      if (this.options.dialogAnimate) this.dialog.classList.add("animate-position");
+    });
+    return resolve(true);
+  });
+}
+var handleTourStart_default = handleTourStart;
+
+// node_modules/@sjmc11/tourguidejs/src/handlers/handleSetOptions.ts
+async function handleSetOptions(options) {
+  if (!options) return;
+  Object.assign(this.options, options);
+  this.computeBackdropAttributes();
+  await renderDialogHtml(this).then((htmlResp) => {
+    if (htmlResp) this.dialog.innerHTML = htmlResp;
+  }).catch((e) => {
+    if (this.options.debug) console.warn(e);
+  });
+  await updateDialogHtml(this).catch((e) => {
+    if (this.options.debug) console.warn(e);
+  });
+  if (this.isVisible) await util_wait_for_element_default(".tg-dialog").then(async () => {
+    await this.destroyListeners();
+    await this.initListeners();
+    return true;
+  });
+  return this;
+}
+var handleSetOptions_default = handleSetOptions;
+
+// node_modules/@sjmc11/tourguidejs/src/handlers/handleClose.ts
+async function handleClose() {
+  return new Promise(async (resolve, reject) => {
+    if (this._promiseWaiting) return reject("Promise waiting");
+    this._promiseWaiting = true;
+    if (this._globalBeforeExitCallback) try {
+      await this._globalBeforeExitCallback();
+    } catch (e) {
+      return reject(e);
+    }
+    this.dialog.style.display = "none";
+    this.backdrop.style.display = "none";
+    this.isVisible = false;
+    if (!this.options.rememberStep) this.activeStep = 0;
+    if (this.options.debug) console.info("Tour exited");
+    await this.destroyListeners();
+    setTimeout(() => {
+      if (this._globalAfterExitCallback) this._globalAfterExitCallback();
+    }, 0);
+    this._promiseWaiting = false;
+    return resolve(true);
+  });
+}
+var handleClose_default = handleClose;
+
+// node_modules/@sjmc11/tourguidejs/src/handlers/handleRefresh.ts
+async function handleRefreshTour() {
+  return new Promise(async (resolve, reject) => {
+    await steps_default(this).catch((e) => {
+      return reject(e);
+    });
+    this.computeBackdropAttributes();
+    await this.refreshDialog().catch((e) => {
+      return reject(e);
+    });
+    return resolve(true);
+  });
+}
+async function handleRefreshDialog() {
+  return new Promise(async (resolve, reject) => {
+    await renderDialogHtml(this).then((htmlResp) => {
+      if (htmlResp) this.dialog.innerHTML = htmlResp;
+    }).catch((e) => {
+      if (this.options.debug) console.warn(e);
+    });
+    await updateDialogHtml(this).catch((e) => {
+      if (this.options.debug) console.warn(e);
+      reject(e);
+    });
+    await this.updatePositions();
+    if (this.isVisible) await util_wait_for_element_default(".tg-dialog").then(async () => {
+      await this.destroyListeners();
+      await this.initListeners();
+      return true;
+    });
+    return resolve(true);
+  });
+}
+var handleRefresh_default = handleRefreshTour;
+
+// node_modules/@sjmc11/tourguidejs/src/handlers/handleFinishTour.ts
+async function handleFinishTour(exit = true, tourGroup = "tour") {
+  if (this._globalFinishCallback) try {
+    await this._globalFinishCallback();
+  } catch (e) {
+    return false;
+  }
+  if (this.options.completeOnFinish) {
+    if (!localStorage.tg_tours_complete) {
+      localStorage.tg_tours_complete = [tourGroup];
+      if (exit) await this.exit();
+      this.activeStep = 0;
+      return;
+    }
+    const storageTours = localStorage.tg_tours_complete.split(",");
+    if (!storageTours.includes(tourGroup)) {
+      storageTours.push(tourGroup);
+      localStorage.tg_tours_complete = storageTours;
+    }
+  }
+  if (exit) await this.exit();
+  this.activeStep = 0;
+  this._promiseWaiting = false;
+  return true;
+}
+function getIsFinished(tourGroup = "tour") {
+  if (!localStorage.tg_tours_complete) return false;
+  const storageTours = localStorage.tg_tours_complete.split(",");
+  return storageTours.includes(tourGroup);
+}
+function delFinishedTour(tourGroup = "tour") {
+  if (tourGroup === "all") {
+    localStorage.tg_tours_complete = null;
+    return;
+  }
+  const storageTours = localStorage.tg_tours_complete.split(",");
+  localStorage.tg_tours_complete = storageTours.filter((x) => {
+    return x !== tourGroup;
+  });
+}
+var handleFinishTour_default = handleFinishTour;
+
+// node_modules/@sjmc11/tourguidejs/src/util/util_default_options.ts
+var defaultOptions2 = {
+  nextLabel: "Next",
+  prevLabel: "Back",
+  finishLabel: "Finish",
+  hidePrev: false,
+  hideNext: false,
+  dialogClass: "",
+  allowDialogOverlap: false,
+  dialogZ: 999,
+  dialogWidth: 0,
+  dialogMaxWidth: 340,
+  dialogAnimate: true,
+  dialogPlacement: void 0,
+  backdropClass: "",
+  backdropColor: "rgba(20,20,21,0.84)",
+  backdropAnimate: true,
+  targetPadding: 30,
+  completeOnFinish: true,
+  showStepDots: true,
+  stepDotsPlacement: "footer",
+  showButtons: true,
+  showStepProgress: true,
+  progressBar: "",
+  keyboardControls: true,
+  exitOnEscape: true,
+  exitOnClickOutside: true,
+  autoScroll: true,
+  autoScrollSmooth: true,
+  autoScrollOffset: 20,
+  closeButton: true,
+  rememberStep: false,
+  debug: true,
+  steps: []
+};
+var util_default_options_default = defaultOptions2;
+
+// node_modules/@sjmc11/tourguidejs/src/Tour.ts
+var TourGuideClient = class {
+  /**
+   * Primary elements
+   */
+  backdrop;
+  dialog;
+  /**
+   * Default Attributes
+   */
+  group = "";
+  isVisible = false;
+  activeStep = 0;
+  tourSteps = [];
+  options = util_default_options_default;
+  isFinished = getIsFinished;
+  /**
+   * Private
+   * @private
+   * promiseWaiting - used to wait for async functions to complete
+   */
+  _promiseWaiting = false;
+  /**
+   * Constructor
+   * @param options
+   */
+  constructor(options) {
+    this.dialog = document.createElement("div");
+    this.backdrop = document.createElement("div");
+    this.options = util_default_options_default;
+    if (options) Object.assign(this.options, options);
+    this.createTourGuideDialog().catch((e) => {
+      if (this.options.debug) console.warn(e);
+    });
+    this.createTourGuideBackdrop();
+  }
+  /**
+   * Backdrop / Target highlighter
+   */
+  createTourGuideBackdrop = createTourGuideBackdrop;
+  computeBackdropAttributes = computeBackdropAttributes;
+  /**
+   * Dialog
+   */
+  createTourGuideDialog = createTourGuideDialog;
+  /**
+   * Methods
+    */
+  start = handleTourStart_default;
+  // Start the tour - compute steps -> goToStep (checks -> update dialog html, dialog & backdrop) -> initListeners()
+  visitStep = handleVisitStep_default;
+  // visit step by stepIndex or `next` | `prev`
+  addSteps = handleAddStep_default;
+  // Push new steps to the tour
+  nextStep = handleVisitNextStep;
+  // navigate to next step - also handles calling finishTour() on final step
+  prevStep = handleVisitPrevStep;
+  // navigate to previous step
+  exit = handleClose_default;
+  // exit the tour
+  refresh = handleRefresh_default;
+  // Recompute everything including tour guide steps
+  refreshDialog = handleRefreshDialog;
+  // Recompute the dialog content & backdrop only
+  finishTour = handleFinishTour_default;
+  // Set tour as complete in localStorage & exit - pass group key
+  updatePositions = positioning_default;
+  // Set tour as complete in localStorage & exit - pass group key
+  deleteFinishedTour = delFinishedTour;
+  // Remove a completed tour from localStorage. Pass group key or `all` to clear.
+  setOptions = handleSetOptions_default;
+  // Update tour options & refresh dialog + backdrop
+  /**
+   * Listeners
+   */
+  // Init
+  initListeners = handleInitListeners;
+  // Destroy
+  destroyListeners = handleDestroyListeners;
+  // Track initialised eventListeners
+  _trackedEvents = {
+    nextBtnClickEvent: {
+      initialized: false,
+      fn: this.nextStep.bind(this)
+    },
+    prevBtnClickEvent: {
+      initialized: false,
+      fn: this.prevStep.bind(this)
+    },
+    closeBtnClickEvent: {
+      initialized: false,
+      fn: this.exit.bind(this)
+    },
+    keyPressEvent: {
+      initialized: false,
+      fn: keyPressHandler.bind(this)
+    },
+    outsideClickEvent: {
+      initialized: false,
+      fn: clickOutsideHandler.bind(this)
+    }
+  };
+  /**
+   * Callbacks
+   */
+  _globalFinishCallback;
+  _globalBeforeExitCallback;
+  _globalAfterExitCallback;
+  _globalBeforeChangeCallback;
+  _globalAfterChangeCallback;
+  // FINISH
+  onFinish = handleOnFinish;
+  // EXIT
+  onBeforeExit = handleOnBeforeExit;
+  onAfterExit = handleOnAfterExit;
+  // STEP CHANGE
+  onBeforeStepChange = handleOnBeforeStepChange;
+  onAfterStepChange = handleOnAfterStepChange;
+};
+
+// app/javascript/controllers/tour_controller.js
+var tour_controller_default = class extends Controller {
+  connect() {
+    const tg = new TourGuideClient({});
+    tg.start();
   }
 };
 
 // app/javascript/controllers/index.js
-function registerControllers(application2) {
-  application2.register("form-submit", form_submit_controller_default);
-  application2.register("chart", chart_controller_default);
-  application2.register("theme", theme_controller_default);
-  application2.register("flash", flash_controller_default);
-  application2.register("password-field", password_field_controller_default);
-}
+application.register("chart", chart_controller_default);
+application.register("flash", flash_controller_default);
+application.register("form-submit", form_submit_controller_default);
+application.register("password-field", password_field_controller_default);
+application.register("theme", theme_controller_default);
+application.register("tour", tour_controller_default);
 
 // node_modules/iconify-icon/dist/iconify-icon.mjs
 var defaultIconDimensions = Object.freeze(
@@ -16879,8 +18997,8 @@ function rotateFromString(value, defaultValue = 0) {
   return defaultValue;
 }
 var separator = /[\s,]+/;
-function flipFromString(custom, flip) {
-  flip.split(separator).forEach((str) => {
+function flipFromString(custom, flip2) {
+  flip2.split(separator).forEach((str) => {
     const value = str.trim();
     switch (value) {
       case "horizontal":
@@ -17259,11 +19377,11 @@ function sortIcons(icons) {
     const prefix = icon.prefix;
     const name = icon.name;
     const providerStorage = storage2[provider] || (storage2[provider] = /* @__PURE__ */ Object.create(null));
-    const localStorage = providerStorage[prefix] || (providerStorage[prefix] = getStorage(provider, prefix));
+    const localStorage2 = providerStorage[prefix] || (providerStorage[prefix] = getStorage(provider, prefix));
     let list;
-    if (name in localStorage.icons) {
+    if (name in localStorage2.icons) {
       list = result.loaded;
-    } else if (prefix === "" || localStorage.missing.has(name)) {
+    } else if (prefix === "" || localStorage2.missing.has(name)) {
       list = result.missing;
     } else {
       list = result.pending;
@@ -17961,20 +20079,20 @@ function getRenderMode(body, mode) {
 }
 var unitsSplit = /(-?[0-9.]*[0-9]+[0-9.]*)/g;
 var unitsTest = /^-?[0-9.]*[0-9]+[0-9.]*$/g;
-function calculateSize$1(size, ratio, precision) {
+function calculateSize$1(size2, ratio, precision) {
   if (ratio === 1) {
-    return size;
+    return size2;
   }
   precision = precision || 100;
-  if (typeof size === "number") {
-    return Math.ceil(size * ratio * precision) / precision;
+  if (typeof size2 === "number") {
+    return Math.ceil(size2 * ratio * precision) / precision;
   }
-  if (typeof size !== "string") {
-    return size;
+  if (typeof size2 !== "string") {
+    return size2;
   }
-  const oldParts = size.split(unitsSplit);
+  const oldParts = size2.split(unitsSplit);
   if (oldParts === null || !oldParts.length) {
-    return size;
+    return size2;
   }
   const newParts = [];
   let code = oldParts.shift();
@@ -18299,14 +20417,14 @@ var customStyle = "";
 function appendCustomStyle(style) {
   customStyle = style;
 }
-function updateStyle(parent, inline) {
+function updateStyle(parent, inline2) {
   let styleNode = Array.from(parent.childNodes).find((node) => node.hasAttribute && node.hasAttribute(nodeAttr));
   if (!styleNode) {
     styleNode = document.createElement("style");
     styleNode.setAttribute(nodeAttr, nodeAttr);
     parent.appendChild(styleNode);
   }
-  styleNode.textContent = ":host{display:inline-block;vertical-align:" + (inline ? "-0.125em" : "0") + "}span,svg{display:block;margin:auto}" + customStyle;
+  styleNode.textContent = ":host{display:inline-block;vertical-align:" + (inline2 ? "-0.125em" : "0") + "}span,svg{display:block;margin:auto}" + customStyle;
 }
 function exportFunctions() {
   setAPIModule("", fetchAPIModule);
@@ -18512,11 +20630,11 @@ function renderIcon(parent, state) {
     parent.appendChild(node);
   }
 }
-function setPendingState(icon, inline, lastState) {
+function setPendingState(icon, inline2, lastState) {
   const lastRender = lastState && (lastState.rendered ? lastState : lastState.lastRender);
   return {
     rendered: false,
-    inline,
+    inline: inline2,
     icon,
     lastRender
   };
@@ -18572,11 +20690,11 @@ function defineIconifyIcon(name = "iconify-icon") {
       const root = this._shadowRoot = this.attachShadow({
         mode: "open"
       });
-      const inline = this.hasAttribute("inline");
-      updateStyle(root, inline);
+      const inline2 = this.hasAttribute("inline");
+      updateStyle(root, inline2);
       this._state = setPendingState({
         value: ""
-      }, inline);
+      }, inline2);
       this._queueCheck();
     }
     /**
@@ -18797,11 +20915,11 @@ function defineIconifyIcon(name = "iconify-icon") {
      */
     _renderIcon(icon, customisations, attrMode) {
       const renderedMode = getRenderMode(icon.data.body, attrMode);
-      const inline = this._state.inline;
+      const inline2 = this._state.inline;
       renderIcon(this._shadowRoot, this._state = {
         rendered: true,
         icon,
-        inline,
+        inline: inline2,
         customisations,
         attrMode,
         renderedMode
@@ -18893,13 +21011,9 @@ var {
 } = IconifyIconComponent;
 
 // app/javascript/application.js
-console.log("Loading application.js");
 turbo_es2017_esm_exports.start();
-console.log("Starting Stimulus application");
-var application = Application.start();
-console.log("Registering controllers");
-registerControllers(application);
-console.log("Controllers registered");
+var application2 = Application.start();
+(void 0)(application2);
 /*! Bundled license information:
 
 apexcharts/dist/apexcharts.common.js:
