@@ -1,8 +1,9 @@
-class PlreportsController < ApplicationController
-  include ExchangeRateConcern
-
+class PlReportsController < ApplicationController
   def index
-    year = params[:year].presence || Date.today.year
+    @selected_year = (params[:year] || Time.current.year).to_i
+    @available_years = (2020..Time.current.year).to_a.reverse
+
+    year = @selected_year
 
     # 指定年の注文を取得
     orders = Order.where("extract(year from sale_date) = ?", year)
