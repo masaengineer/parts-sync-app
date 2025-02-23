@@ -13,11 +13,24 @@ export default class extends Controller {
 
     const options = {
       chart: {
-        type: 'line',
-        height: 350,
+        type: 'area',
+        height: 380,
         toolbar: {
           show: true,
+          tools: {
+            download: true,
+            zoom: false,
+            zoomin: false,
+            zoomout: false,
+            pan: false,
+            reset: false,
+          },
         },
+      },
+      colors: ['#3e5eff', '#FDA403'],
+      fill: {
+        type: 'solid',
+        opacity: 0.6,
       },
       series: chartData.series,
       xaxis: {
