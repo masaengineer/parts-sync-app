@@ -18960,9 +18960,13 @@ var {
 } = IconifyIconComponent;
 
 // app/javascript/application.js
+console.log("Loading application.js");
 turbo_es2017_esm_exports.start();
+console.log("Starting Stimulus application");
 var application = Application.start();
+console.log("Registering controllers");
 registerControllers(application);
+console.log("Controllers registered");
 /*! Bundled license information:
 
 apexcharts/dist/apexcharts.common.js:

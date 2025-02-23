@@ -49,4 +49,6 @@ public/dev-assets/actiontext-78de0ebeae470799f9ec25fd0e20ae2d931df88c2ff9315918d
 finance-myaccount.json
 orders.json
 test.json
-app/assets/stylesheets/application.css
+/app/assets/javascripts/application.js
+/app/assets/javascripts/application.js.map
+/app/assets/stylesheets/application.css
