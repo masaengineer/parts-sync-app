@@ -1,4 +1,6 @@
 class PlReportsController < ApplicationController
+  include ExchangeRateConcern
+
   def index
     @selected_year = (params[:year] || Time.current.year).to_i
     @available_years = (2020..Time.current.year).to_a.reverse
@@ -36,7 +38,7 @@ class PlReportsController < ApplicationController
       data = @monthly_data[month - 1]
 
       # サービスクラスで計算
-      calc_result = ReportCalculator.new(order).calculate
+      calc_result = PlReportCalculator.new(order).calculate
 
       # 売上(revenue)はcalc_result[:revenue](USD)を円換算
       revenue_jpy = convert_usd_to_jpy(calc_result[:revenue])
