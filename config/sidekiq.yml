@@ -1,0 +1,15 @@
+:concurrency: 5
+:queues:
+  - default
+  - mailers
+
+:schedule:
+  sync_ebay_orders:
+    cron: '5 * * * *'  # 毎時5分に実行
+    class: EbayOrdersSyncJob
+    queue: default
+
+  sync_ebay_transaction_fees:
+    cron: '10 * * * *'  # 毎時10分に実行
+    class: EbayTransactionFeesSyncJob
+    queue: default
