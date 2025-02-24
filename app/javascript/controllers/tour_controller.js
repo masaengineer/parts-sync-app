@@ -39,12 +39,13 @@ const tg = new tourguide.TourGuideClient({
   nextLabel: "次へ",
   prevLabel: "戻る"
 });
+
 export default class extends Controller {
   connect() {
-    if (!window.localStorage.hasOwnProperty('tg_tours_complete')) {
+    if (!tg.isFinished()) {
       tg.start();
     }
-    if (tg.tg_tours_complete ()) {
+    if (tg.isFinished()) {
       console.log("first tour has already finished")
     }
   }
