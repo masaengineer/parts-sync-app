@@ -1,7 +1,6 @@
 <% content_for(:title, t("sales_reports.index.title")) %>
 
-<div class="w-full p-6">
-  <div data-tg-tour="こんにちは！"></div>
+<div class="w-full p-6" data-controller="tour">
   <%= render 'csv_import_form' %>
   <%= render 'table', orders_data: @orders_data %>
 </div>
