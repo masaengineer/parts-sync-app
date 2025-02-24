@@ -1,11 +1,11 @@
 :scheduler:
   :schedule:
     sync_ebay_orders:
-      every: '5m'
+      every: '1h'
       class: EbayOrdersSyncJob
       queue: default
 
     sync_ebay_transaction_fees:
-      every: '5m'
+      every: '1h'
       class: EbayTransactionFeesSyncJob
       queue: default
