@@ -1,5 +1,5 @@
 <%# CSVインポートフォーム %>
-<div class="card card-bordered bg-base-100 shadow-sm mb-6">
+<div class="card card-bordered bg-base-100 shadow-sm mb-6" id="csv_import">
   <div class="card-body p-5">
     <%= form_with url: import_data_imports_path, local: true, method: :post, multipart: true, data: { controller: "form-submit" } do |f| %>
       <div class="grid grid-cols-1 md:grid-cols-5 gap-5">
