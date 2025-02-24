@@ -49,10 +49,3 @@ export default class extends Controller {
     }
   }
 }
-
-  disconnect() {
-    tg.finish().then(() => {
-      console.log('Tour finished');
-    });
-}
-
