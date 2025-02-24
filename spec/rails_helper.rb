@@ -35,6 +35,11 @@ end
 RSpec.configure do |config|
   # FactoryBotの設定を追加
   config.include FactoryBot::Syntax::Methods
+  
+  # Deviseのテストヘルパーを追加
+  config.include Devise::Test::IntegrationHelpers, type: :request
+  config.include Devise::Test::ControllerHelpers, type: :controller
+  config.include Devise::Test::IntegrationHelpers, type: :system
 
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_paths = [

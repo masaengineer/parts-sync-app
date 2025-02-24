@@ -1,32 +1,20 @@
-# == Schema Information
-#
-# Table name: orders
-#
-#  id           :bigint           not null, primary key
-#  order_number :string
-#  sale_date    :date
-#  created_at   :datetime         not null
-#  updated_at   :datetime         not null
-#  user_id      :bigint           not null
-#
-# Indexes
-#
-#  index_orders_on_order_number  (order_number)
-#  index_orders_on_user_id       (user_id)
-#
-# Foreign Keys
-#
-#  fk_rails_...  (user_id => users.id)
-#
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :order do
-    order_number { "ORD-#{Faker::Number.unique.number(digits: 8)}" }
-    sale_date { Faker::Date.backward(days: 30) }
-    association :user
+    order_number { SecureRandom.uuid }
+    sale_date { Date.current }
+    user
 
-    trait :with_skus do
+    trait :with_order_lines do
       after(:create) do |order|
-        create_list(:order_sku_link, 2, order: order)
+        create_list(:order_line, 2, order: order)
+      end
+    end
+
+    trait :with_payment_fees do
+      after(:create) do |order|
+        create_list(:payment_fee, 2, order: order)
       end
     end
 
@@ -40,6 +28,20 @@ FactoryBot.define do
       after(:create) do |order|
         create(:shipment, order: order)
       end
+    end
+
+    trait :with_sales do
+      after(:create) do |order|
+        create_list(:sale, 2, order: order)
+      end
+    end
+
+    trait :complete do
+      with_order_lines
+      with_payment_fees
+      with_procurement
+      with_shipment
+      with_sales
     end
   end
 end

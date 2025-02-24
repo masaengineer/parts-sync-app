@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :seller_sku do
-    sku_code { "MyString" }
+    sequence(:sku_code) { |n| "SKU#{n}" }
   end
 end

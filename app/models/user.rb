@@ -28,7 +28,7 @@ class User < ApplicationRecord
           :recoverable, :rememberable, :validatable,
           :omniauthable, omniauth_providers: [ :google_oauth2 ]
 
-  has_many :orders
+  has_many :orders, dependent: :destroy
   attr_accessor :agreement
 
   validates :email, presence: true, uniqueness: true
