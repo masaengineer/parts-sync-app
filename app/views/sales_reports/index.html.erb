@@ -1,7 +1,13 @@
 <% content_for(:title, t("sales_reports.index.title")) %>
 
+
+
 <div class="w-full p-6">
-  <div data-tg-tour="こんにちは！"></div>
+  <div class="flex justify-end mb-4">
+    <button data-controller="tour" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+      <i class="fas fa-info-circle mr-2"></i>使い方ツアー
+    </button>
+  </div>
   <%= render 'csv_import_form' %>
   <%= render 'table', orders_data: @orders_data %>
 </div>
