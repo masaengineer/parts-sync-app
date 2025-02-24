@@ -37,17 +37,22 @@ const steps = [
 const tg = new tourguide.TourGuideClient({
   steps: steps,
   nextLabel: "次へ",
-  prevLabel: "戻る"
+  prevLabel: "戻る",
+  finishLabel: "終了",
+  closeButton: true,
 });
+
 export default class extends Controller {
   connect() {
     if (!window.localStorage.hasOwnProperty('tg_tours_complete')) {
       tg.start();
+    }
   }
+}
 
   disconnect() {
     tg.finish().then(() => {
       console.log('Tour finished');
     });
-  }
 }
+
