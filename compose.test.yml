@@ -1,0 +1,65 @@
+services:
+  db:
+    image: postgres:14
+    restart: always
+    environment:
+      TZ: Asia/Tokyo
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
+      POSTGRES_HOST_AUTH_METHOD: trust
+    volumes:
+      - postgresql_test_data:/var/lib/postgresql/data
+    ports:
+      - 5433:5432
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7
+    ports:
+      - 6380:6379
+    volumes:
+      - redis_test_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    command: bash -c "RAILS_ENV=test bundle exec rails db:create db:migrate && bundle exec rspec"
+    tty: true
+    stdin_open: true
+    volumes:
+      - .:/app
+      - bundle_test_data:/usr/local/bundle:cached
+      - node_modules_test:/app/node_modules
+      - tmp-test-data:/app/tmp:cached
+    environment:
+      TZ: Asia/Tokyo
+      RAILS_ENV: test
+      POSTGRES_HOST: db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      REDIS_URL: redis://redis:6379/0
+      DOCKER_SYSTEM_SPEC: 'true'
+      CHROME_BIN: /usr/bin/chromium
+      CHROME_PATH: /usr/lib/chromium
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  bundle_test_data:
+  postgresql_test_data:
+  node_modules_test:
+  tmp-test-data:
+  redis_test_data:
