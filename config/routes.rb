@@ -27,5 +27,5 @@ Rails.application.routes.draw do
   get "terms_of_service", to: "static_pages#terms_of_service"
 
   # ヘルスチェック用エンドポイント
-  get 'health', to: 'application#health'
+  get "health", to: "application#health"
 end
