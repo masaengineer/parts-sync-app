@@ -2,8 +2,8 @@
 
 FactoryBot.define do
   factory :shipment do
-    order
-    tracking_number { SecureRandom.hex(8).upcase }
-    customer_international_shipping { rand(1000..5000) }
+    association :order
+    customer_international_shipping { 2000 }
+    sequence(:tracking_number) { |n| "TRK-#{n}" }
   end
 end

@@ -2,11 +2,11 @@
 
 FactoryBot.define do
   factory :order_line do
-    order
-    seller_sku
-    quantity { rand(1..10) }
-    unit_price { rand(100..10000) }
-    line_item_id { rand(1000..9999) }
-    line_item_name { Faker::Commerce.product_name }
+    association :seller_sku
+    association :order
+    quantity { 1 }
+    unit_price { 1000 }
+    line_item_id { 1 }
+    line_item_name { "テスト商品" }
   end
 end
