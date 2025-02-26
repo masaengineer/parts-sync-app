@@ -30,14 +30,14 @@ module Ebay
       Rails.logger.info "📦 Processing order #{order_data['orderId']} for user #{current_user.email}"
       return if current_user.blank?
 
-      order = Order.find_or_initialize_by(order_number: order_data['orderId'], user_id: current_user.id)
+      order = Order.find_or_initialize_by(order_number: order_data["orderId"], user_id: current_user.id)
       order.update!(
-        sale_date:  order_data['creationDate'],
+        sale_date:  order_data["creationDate"],
         user_id:    current_user.id
       )
       Rails.logger.info "💾 Order #{order.order_number} #{order.new_record? ? 'created' : 'updated'}"
 
-      import_order_lines(order, order_data['lineItems'])
+      import_order_lines(order, order_data["lineItems"])
       import_shipment(order, order_data)
     end
 
@@ -51,25 +51,25 @@ module Ebay
           next
         end
 
-        unless line_item['quantity'] && line_item['total'] && line_item['total']['value']
+        unless line_item["quantity"] && line_item["total"] && line_item["total"]["value"]
           Rails.logger.error "⚠️ Missing required data for line item #{line_item['lineItemId']}"
           next
         end
 
         order_line = OrderLine.find_or_initialize_by(
           order_id: order.id,
-          line_item_id: line_item['lineItemId']
+          line_item_id: line_item["lineItemId"]
         )
 
         attributes = {
-          quantity: line_item['quantity'],
-          unit_price: line_item['total']['value'],
-          line_item_name: line_item['title'],
-          line_item_id: line_item['lineItemId']
+          quantity: line_item["quantity"],
+          unit_price: line_item["total"]["value"],
+          line_item_name: line_item["title"],
+          line_item_id: line_item["lineItemId"]
         }
 
         # SKUが存在する場合はそのSKUを、存在しない場合は"undefined"を使用
-        sku_code = line_item['sku'].presence || 'undefined'
+        sku_code = line_item["sku"].presence || "undefined"
         seller_sku = ::SellerSku.find_or_create_by!(sku_code: sku_code)
         Rails.logger.debug "🏷️ SellerSku: #{seller_sku.sku_code}"
         attributes[:seller_sku_id] = seller_sku.id
@@ -81,14 +81,14 @@ module Ebay
 
     def import_shipment(order, order_data)
       Rails.logger.info "🚚 Processing shipment for order #{order.order_number}"
-      fulfillment_hrefs = order_data['fulfillmentHrefs']
+      fulfillment_hrefs = order_data["fulfillmentHrefs"]
 
       if fulfillment_hrefs.blank?
         Rails.logger.warn "⚠️ No fulfillment href found for order #{order.order_number}"
         return
       end
 
-      tracking_number = fulfillment_hrefs[0].split('/').last
+      tracking_number = fulfillment_hrefs[0].split("/").last
 
       shipment = Shipment.find_or_initialize_by(order_id: order.id)
       shipment.update!(

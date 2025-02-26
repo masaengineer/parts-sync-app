@@ -4,6 +4,6 @@ class ChangeUniqueIndexOnPaymentFees < ActiveRecord::Migration[7.2]
     remove_index :payment_fees, :transaction_id, unique: true
 
     # transaction_idとtransaction_typeの組み合わせでユニークインデックスを追加
-    add_index :payment_fees, [:transaction_id, :transaction_type], unique: true
+    add_index :payment_fees, [ :transaction_id, :transaction_type ], unique: true
   end
 end

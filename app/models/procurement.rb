@@ -27,6 +27,6 @@ class Procurement < ApplicationRecord
 
   # 仕入れに関連する全ての費用の合計を計算
   def total_cost
-    [purchase_price, forwarding_fee, option_fee, handling_fee].compact.sum
+    [ purchase_price, forwarding_fee, option_fee, handling_fee ].compact.sum
   end
 end

@@ -16,7 +16,7 @@ Rails.application.routes.draw do
       post :import
     end
   end
-  resources :ebay_orders, only: [:index] do
+  resources :ebay_orders, only: [ :index ] do
     collection do
       post :import_orders
     end
@@ -25,5 +25,4 @@ Rails.application.routes.draw do
   # 静的ページのルーティング
   get "privacy_policy", to: "static_pages#privacy_policy"
   get "terms_of_service", to: "static_pages#terms_of_service"
-
 end

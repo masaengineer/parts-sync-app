@@ -33,7 +33,7 @@ Rails.application.configure do
   config.asset_host = "https://www.parts-sync.site"
   Rails.application.routes.default_url_options = {
     host: "www.parts-sync.site",
-    protocol: 'https'
+    protocol: "https"
   }
 
   # Specifies the header that your server uses for sending files.
@@ -111,7 +111,7 @@ Rails.application.configure do
   config.assume_ssl = true
 
 
-#   # 以下の設定を確認・追加
-#   config.assets.digest = true
-#   config.assets.js_compressor = :terser
+  #   # 以下の設定を確認・追加
+  #   config.assets.digest = true
+  #   config.assets.js_compressor = :terser
 end
