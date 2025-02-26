@@ -3,9 +3,3 @@ PreCommit:
     enabled: true
     command: ['bundle', 'exec', 'rubocop', '-A']
     on_warn: fail
-
-PrePush:
-  RuboCop:
-    enabled: true
-    command: ['bundle', 'exec', 'rubocop', '.']
-    on_warn: fail
