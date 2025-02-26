@@ -2,10 +2,10 @@
 
 FactoryBot.define do
   factory :procurement do
-    order
-    purchase_price { rand(1000..100000) }
-    forwarding_fee { rand(500..5000) }
-    handling_fee { rand(100..1000) }
-    option_fee { rand(0..5000) }
+    association :order
+    purchase_price { 800 }
+    forwarding_fee { 200 }
+    option_fee { 100 }
+    handling_fee { 150 }
   end
 end

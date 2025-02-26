@@ -17,12 +17,12 @@ RSpec.describe 'データインポート', type: :system do
     context 'ファイルが選択されていない場合' do
       it 'エラーメッセージが表示されること' do
         begin
-          # 画面上にWisewillインポートボタンがあるか確認
-          unless page.has_button?('Wisewillインポート')
-            skip 'Wisewillインポートボタンが画面上に存在しません'
+          # 画面上にインポートボタンがあるか確認
+          unless page.has_button?('インポート')
+            skip 'インポートボタンが画面上に存在しません'
           end
 
-          click_button 'Wisewillインポート'
+          click_button 'インポート'
           expect(page).to have_content('ファイルを選択してください')
         rescue Capybara::ElementNotFound => e
           skip "要素が見つかりません: #{e.message}"
