@@ -102,3 +102,5 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
+
+gem "overcommit", "~> 0.67.0"
