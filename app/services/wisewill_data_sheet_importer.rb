@@ -15,7 +15,7 @@ class WisewillDataSheetImporter
     Rails.logger.info "[WisewillDataSheetImporter] インポート開始: #{@csv_path}"
 
     # BOMを除去し、UTF-8としてCSVを読み込む
-    csv_text = File.read(@csv_path).force_encoding('UTF-8').sub("\xEF\xBB\xBF", '')
+    csv_text = File.read(@csv_path).force_encoding("UTF-8").sub("\xEF\xBB\xBF", "")
     csv = CSV.parse(csv_text, headers: true)
 
     Rails.logger.info "[WisewillDataSheetImporter] CSVの行数: #{csv.size} (ヘッダーを除く)"
@@ -37,7 +37,7 @@ class WisewillDataSheetImporter
 
   private
 
-    # purchase_priceの存在チェック
+  # purchase_priceの存在チェック
   def validate_purchase_price(csv)
     csv.each_with_index do |row, index|
       if row["purchase_price"].blank?

@@ -1,5 +1,5 @@
-require 'logger'
-require 'stringio'
+require "logger"
+require "stringio"
 
 module Ebay
   class TransactionFeeImporter
@@ -89,7 +89,7 @@ module Ebay
       # PaymentFeeテーブルで既に同じtransaction_idの販売処理が存在する場合はスキップ
       if PaymentFee.exists?(
         order: order,
-        transaction_id: transaction['transactionId'],
+        transaction_id: transaction["transactionId"],
         transaction_type: PaymentFee.transaction_types[:sale]
       )
         logger.warn("⚠️ 既に処理済みの販売トランザクションをスキップ: transaction_id=#{transaction['transactionId']}")
@@ -106,11 +106,11 @@ module Ebay
         transaction["orderLineItems"].each do |item|
           logger.info("  === marketplaceFees: #{item['marketplaceFees'].inspect}")
           item["marketplaceFees"].each do |fee|
-            fee_category = PaymentFee.fee_categories.values.include?(fee["feeType"]) ? fee["feeType"] : 'undefined'
+            fee_category = PaymentFee.fee_categories.values.include?(fee["feeType"]) ? fee["feeType"] : "undefined"
             PaymentFee.create!(
               order: order,
               transaction_type: :sale,
-              transaction_id: transaction['transactionId'],
+              transaction_id: transaction["transactionId"],
               fee_category: fee_category,
               fee_amount: fee.dig("amount", "value").to_d
             )
@@ -131,7 +131,7 @@ module Ebay
     end
 
     def process_shipping_label_transaction(order, transaction, logger)
-      PaymentFee.find_or_create_by!(transaction_id: transaction['transactionId']) do |payment_fee|
+      PaymentFee.find_or_create_by!(transaction_id: transaction["transactionId"]) do |payment_fee|
         payment_fee.order = order
         payment_fee.transaction_type = :shipping_label
         payment_fee.fee_category = :undefined
@@ -150,7 +150,7 @@ module Ebay
 
       # 既存のレコードをチェック
       existing_fee = PaymentFee.find_by(
-        transaction_id: transaction['transactionId'],
+        transaction_id: transaction["transactionId"],
         transaction_type: :non_sale_charge,
         fee_category: transaction["feeType"]
       )
@@ -168,7 +168,7 @@ module Ebay
         transaction_type: :non_sale_charge,
         fee_category: transaction["feeType"],
         fee_amount: amount,
-        transaction_id: transaction['transactionId']
+        transaction_id: transaction["transactionId"]
       )
 
       # bookingEntry が CREDIT なら fee_amount を反転

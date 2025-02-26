@@ -100,7 +100,7 @@ RSpec.describe PLReportCalculator do
       skip "calculate_year_data method doesn't exist" unless described_class.respond_to?(:calculate_year_data)
 
       # 2023年の月次データを作成
-      [1, 4, 7, 10].each do |month|
+      [ 1, 4, 7, 10 ].each do |month|
         # 各四半期に1つの注文を作成
         order = create(:order, user: user, created_at: Date.new(2023, month, 15))
         create(:sale, order: order, order_net_amount: 100.0)

@@ -12,10 +12,10 @@ RSpec.describe 'CSVインポート機能', type: :system, skip: 'インポート
     unless File.exist?(csv_file_path)
       require 'csv'
       CSV.open(csv_file_path, 'w') do |csv|
-        csv << ['sku_code', 'quantity']
-        csv << ['OIL-001', '10']
-        csv << ['FIL-002', '15']
-        csv << ['FIL-003', '20']
+        csv << [ 'sku_code', 'quantity' ]
+        csv << [ 'OIL-001', '10' ]
+        csv << [ 'FIL-002', '15' ]
+        csv << [ 'FIL-003', '20' ]
       end
     end
   end

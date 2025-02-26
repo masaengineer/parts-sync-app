@@ -3,9 +3,9 @@ module Ebay
     class AuthError < StandardError; end
 
     REQUIRED_SCOPES = [
-      'https://api.ebay.com/oauth/api_scope',
-      'https://api.ebay.com/oauth/api_scope/sell.fulfillment',
-      'https://api.ebay.com/oauth/api_scope/sell.inventory'
+      "https://api.ebay.com/oauth/api_scope",
+      "https://api.ebay.com/oauth/api_scope/sell.fulfillment",
+      "https://api.ebay.com/oauth/api_scope/sell.inventory"
     ].freeze
 
     def initialize
@@ -27,12 +27,12 @@ module Ebay
       client = OAuth2::Client.new(
         @client_id,
         @client_secret,
-        site: 'https://api.ebay.com',
-        token_url: '/identity/v1/oauth2/token'
+        site: "https://api.ebay.com",
+        token_url: "/identity/v1/oauth2/token"
       )
 
       response = client.get_token(
-        grant_type: 'refresh_token',
+        grant_type: "refresh_token",
         refresh_token: @refresh_token
       )
 

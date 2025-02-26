@@ -2,8 +2,8 @@ module Ebay
   class FinanceApiClient
     class FinanceError < StandardError; end  # エラークラスを追加
 
-    API_BASE_URL = 'https://apiz.ebay.com'.freeze
-    TRANSACTION_ENDPOINT = '/sell/finances/v1/transaction'.freeze
+    API_BASE_URL = "https://apiz.ebay.com".freeze
+    TRANSACTION_ENDPOINT = "/sell/finances/v1/transaction".freeze
 
     def initialize
       @auth_service = AuthService.new
@@ -65,11 +65,11 @@ module Ebay
 
     def auth_headers
       token = @auth_service.access_token
-      raise ApiError, 'アクセストークンの取得に失敗しました' if token.nil?
+      raise ApiError, "アクセストークンの取得に失敗しました" if token.nil?
 
       {
-        'Authorization' => "Bearer #{token}",
-        'Content-Type' => 'application/json'
+        "Authorization" => "Bearer #{token}",
+        "Content-Type" => "application/json"
       }
     end
   end

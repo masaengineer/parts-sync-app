@@ -53,17 +53,17 @@ gem "rails-i18n"
 gem "meta-tags"
 
 # OAuth2認証のため
-gem 'oauth2'
+gem "oauth2"
 # HTTPクライアントとして使用
-gem 'faraday'
+gem "faraday"
 
 # sprocketsの追加
 gem "sprockets-rails"
 
-gem 'sidekiq'
-gem 'sidekiq-scheduler'
+gem "sidekiq"
+gem "sidekiq-scheduler"
 
-gem 'csv'
+gem "csv"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem

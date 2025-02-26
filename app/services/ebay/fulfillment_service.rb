@@ -2,7 +2,7 @@ module Ebay
   class FulfillmentService
     class FulfillmentError < StandardError; end
 
-    API_ENDPOINT = '/sell/fulfillment/v1/order'.freeze
+    API_ENDPOINT = "/sell/fulfillment/v1/order".freeze
 
     def initialize
       @auth_service = AuthService.new
@@ -26,13 +26,13 @@ module Ebay
 
       # 開始時刻を決定（UTCで計算）とミリ秒形式に変換
       start_time = if last_synced_at.nil? || last_synced_at < two_years_ago_utc
-                     two_years_ago_utc.strftime('%Y-%m-%dT%H:%M:%S.000Z')
-                   else
-                     last_synced_at.strftime('%Y-%m-%dT%H:%M:%S.000Z')
-                   end
+                     two_years_ago_utc.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+      else
+                     last_synced_at.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+      end
 
       # 終了時刻もミリ秒形式で
-      end_time = current_time_utc.strftime('%Y-%m-%dT%H:%M:%S.000Z')
+      end_time = current_time_utc.strftime("%Y-%m-%dT%H:%M:%S.000Z")
 
       Rails.logger.info "🕒 Time Range (UTC): #{start_time} to #{end_time}"
       Rails.logger.info "🕒 Time Range (JST): #{Time.parse(start_time).in_time_zone('Tokyo')} to #{Time.parse(end_time).in_time_zone('Tokyo')}"
@@ -56,14 +56,14 @@ module Ebay
         end
 
         orders_data = JSON.parse(response.body)
-        break if orders_data['orders'].empty?
+        break if orders_data["orders"].empty?
 
-        all_orders.concat(orders_data['orders'])
+        all_orders.concat(orders_data["orders"])
 
         loop_count += 1
         Rails.logger.info "eBay注文取得中: #{all_orders.size}件 (#{loop_count}回目)"
 
-        break if orders_data['orders'].size < limit
+        break if orders_data["orders"].size < limit
         offset += limit
       end
 
@@ -95,12 +95,12 @@ module Ebay
     def validate_auth_token
       token = @auth_service.access_token
       Rails.logger.debug "validate_auth_token called. token: #{token.present? ? 'present' : 'nil'}" # トークン検証ログ
-      raise FulfillmentError, 'アクセストークンの取得に失敗しました' if token.nil?
+      raise FulfillmentError, "アクセストークンの取得に失敗しました" if token.nil?
       token
     end
 
     def client
-      @client ||= Faraday.new(url: 'https://api.ebay.com') do |faraday|
+      @client ||= Faraday.new(url: "https://api.ebay.com") do |faraday|
         faraday.request :json
         faraday.response :raise_error
         faraday.adapter Faraday.default_adapter
@@ -111,9 +111,9 @@ module Ebay
 
     def auth_headers(current_user)
       {
-        'Authorization' => "Bearer #{validate_auth_token}",
-        'Content-Type' => 'application/json',
-        'Accept' => 'application/json'
+        "Authorization" => "Bearer #{validate_auth_token}",
+        "Content-Type" => "application/json",
+        "Accept" => "application/json"
       }
     end
   end

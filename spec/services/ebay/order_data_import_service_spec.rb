@@ -16,7 +16,7 @@ RSpec.describe Ebay::OrderDataImportService, type: :service do
                 'quantity' => 2,
                 'unitPrice' => { 'value' => '10.00' },
                 'title' => '商品A',
-                'fulfilmentHrefs' => ['/fulfilment/v1/tracking/ABCDEFG']
+                'fulfilmentHrefs' => [ '/fulfilment/v1/tracking/ABCDEFG' ]
               }
             ],
             'pricingSummary' => {
