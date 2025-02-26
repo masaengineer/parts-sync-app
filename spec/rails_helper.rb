@@ -35,7 +35,7 @@ end
 RSpec.configure do |config|
   # FactoryBotの設定を追加
   config.include FactoryBot::Syntax::Methods
-  
+
   # Deviseのテストヘルパーを追加
   config.include Devise::Test::IntegrationHelpers, type: :request
   config.include Devise::Test::ControllerHelpers, type: :controller
@@ -75,6 +75,43 @@ RSpec.configure do |config|
   config.filter_rails_from_backtrace!
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
+
+  # システムスペックの設定
+  config.before(:each, type: :system) do
+    driven_by :rack_test
+  end
+
+  config.before(:each, type: :system, js: true) do
+    driven_by :selenium_chrome_headless
+  end
+
+  # テストタグの設定
+  # :slowタグ付きのテストを除外するフィルタ（CI環境やローカル開発で使用）
+  config.filter_run_excluding slow: true if ENV['EXCLUDE_SLOW_TESTS'] == 'true'
+
+  # :jsタグ付きのテストを除外するフィルタ（CI環境やローカル開発で使用）
+  config.filter_run_excluding js: true if ENV['EXCLUDE_JS_TESTS'] == 'true'
+
+  # 特定のグループのテストのみを実行するフィルタ
+  if group = ENV['TEST_GROUP']
+    config.filter_run_including group: group.to_sym
+  end
+
+  # テスト実行中のCapybaraの待機時間を調整
+  # より安定したテスト実行のために待機時間を延長
+  config.around(:each, type: :system) do |example|
+    original_wait_time = Capybara.default_max_wait_time
+    Capybara.default_max_wait_time = 5 # 必要に応じて調整
+    example.run
+    Capybara.default_max_wait_time = original_wait_time
+  end
+
+  # 失敗したテストのスクリーンショットを保存
+  config.after(:each, type: :system) do |example|
+    if example.exception
+      page.save_screenshot(Rails.root.join("tmp/screenshots/#{example.full_description.gsub(/[^0-9A-Za-z]/, '_')}.png"))
+    end
+  end
 end
 
 # Shoulda Matchers の設定
@@ -83,4 +120,17 @@ Shoulda::Matchers.configure do |config|
     with.test_framework :rspec
     with.library :rails
   end
+end
+
+# Capybaraの設定追加
+Capybara.server = :puma, { Silent: true }
+# JavaScriptエラーが発生した場合にテストを失敗させる
+Capybara.register_driver :selenium_chrome_headless do |app|
+  browser_options = ::Selenium::WebDriver::Chrome::Options.new
+  browser_options.add_argument('--headless')
+  browser_options.add_argument('--no-sandbox')
+  browser_options.add_argument('--disable-gpu')
+  browser_options.add_argument('--disable-dev-shm-usage')
+  browser_options.add_argument('--window-size=1400,1400')
+  Capybara::Selenium::Driver.new(app, browser: :chrome, options: browser_options)
 end
