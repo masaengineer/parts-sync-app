@@ -7,9 +7,14 @@ on:
     branches: [main]
 
 jobs:
-  test:
+  lint: # 依存関係のないルートジョブ
     runs-on: ubuntu-latest
-    needs: lint
+    steps:
+      # lintジョブのステップ...
+
+  test:
+    needs: lint # 依存関係あり
+    runs-on: ubuntu-latest
     services:
       postgres:
         image: postgres:14
