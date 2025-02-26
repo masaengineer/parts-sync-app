@@ -83,6 +83,76 @@
 - **画像ドラッグアンドドロップ機能**：Stimulus
 - **テストコード**：SimpleCov
 
+# 使用技術
+
+- **バックエンド**：Ruby 3.2.2 / Ruby on Rails 7.0.8
+- **フロントエンド**：Hotwire（Turbo・Stimulus）/ Tailwind CSS
+- **データベース**：PostgreSQL
+- **インフラ**：Render（Web サービス・PostgreSQL）
+- **監視**：Sentry
+- **キャッシュ**：Redis
+- **CI/CD**：GitHub Actions
+- **その他の技術**
+
 # ER 図
 
 [![Image from Gyazo](https://i.gyazo.com/5cedc058c622f3a4191848d46cfac81c.png)](https://gyazo.com/5cedc058c622f3a4191848d46cfac81c)
+
+# CI/CD パイプライン
+
+本プロジェクトでは、GitHub Actions を使用して継続的インテグレーション(CI)と継続的デリバリー(CD)を実現しています。
+
+## CI ワークフロー
+
+`.github/workflows/ci.yml`で定義された CI ワークフローは以下のジョブで構成されています：
+
+1. **Lint**: コードの品質チェック
+
+   - Rubocop による静的コード解析
+   - Brakeman によるセキュリティチェック
+   - Bundle Audit による脆弱性チェック
+
+2. **Test**: 段階的なテスト実行
+
+   - ユニットテスト（モデルとサービス）
+   - 統合テスト（リクエスト）
+   - スモークテスト
+   - システムテスト（E2E）
+
+3. **Docker Test**: Docker コンテナ内でのテスト実行
+   - 高速テスト
+   - スモークテスト
+
+### テスト実行コマンド
+
+テストについての詳細は[テスト戦略と実行ガイド](spec/README.md)を参照してください。
+
+## CD ワークフロー
+
+`.github/workflows/cd.yml`で定義された CD ワークフローは以下のジョブで構成されています：
+
+1. **Verify**: デプロイ前の基本的な動作確認
+
+   - スモークテストの実行
+
+2. **Deploy Staging**: ステージング環境へのデプロイ
+
+   - develop ブランチへのプッシュ時に実行
+   - Render へのデプロイ
+   - Slack 通知
+
+3. **Deploy Production**: 本番環境へのデプロイ
+   - main ブランチへのプッシュ時に実行
+   - Render へのデプロイ
+   - Slack 通知
+
+さらに、`.github/workflows/post-deploy-check.yml`でデプロイ後のヘルスチェックを実施しています。
+
+## 環境変数の設定
+
+GitHub リポジトリの「Settings > Secrets and variables > Actions」で以下のシークレットを設定する必要があります：
+
+- `RENDER_API_KEY`: Render の API キー
+- `RENDER_SERVICE_ID_STAGING`: ステージング環境のサービス ID
+- `RENDER_SERVICE_ID_PRODUCTION`: 本番環境のサービス ID
+- `SLACK_WEBHOOK_URL`: Slack 通知用の Webhook URL

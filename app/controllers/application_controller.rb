@@ -29,4 +29,13 @@ class ApplicationController < ActionController::Base
       "application"
     end
   end
+
+  # ヘルスチェック用エンドポイント（CI/CDのデプロイ検証に使用）
+  def health
+    ActiveRecord::Base.connection.execute("SELECT 1")
+    Redis.new(url: ENV.fetch("REDIS_URL", "redis://localhost:6379/0")).ping
+    render json: { status: "OK", time: Time.current }, status: :ok
+  rescue => e
+    render json: { status: "ERROR", error: e.message }, status: :internal_server_error
+  end
 end
