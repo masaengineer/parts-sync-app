@@ -102,4 +102,3 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
-gem 'overcommit', require: false, group: :development
