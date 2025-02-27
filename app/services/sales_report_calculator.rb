@@ -20,7 +20,6 @@
 #      }
 #
 class SalesReportCalculator
-
   def initialize(order)
     @order = order
   end
@@ -43,8 +42,8 @@ class SalesReportCalculator
 
     # --- ドルから円へ換算して利益計算 ---
     # CurrencyConverterを使用してUSDからJPYへ変換
-    revenue_in_jpy      = CurrencyConverter.to_jpy(order_revenue_usd, currency: 'USD')
-    payment_fees_in_jpy = CurrencyConverter.to_jpy(order_payment_fees_usd, currency: 'USD')
+    revenue_in_jpy      = CurrencyConverter.to_jpy(order_revenue_usd, currency: "USD")
+    payment_fees_in_jpy = CurrencyConverter.to_jpy(order_payment_fees_usd, currency: "USD")
 
     # 総コストの計算（仕入原価 + その他原価 + 手数料 + 送料）
     total_cost_jpy = payment_fees_in_jpy +

@@ -36,14 +36,14 @@ class MonthlyReportCalculator
               .joins(:sales)
 
     # 通貨ごとに金額を集計
-    usd_sales = orders.where(currency: 'USD').sum("sales.order_net_amount") || 0
-    eur_sales = orders.where(currency: 'EUR').sum("sales.order_net_amount") || 0
-    gbp_sales = orders.where(currency: 'GBP').sum("sales.order_net_amount") || 0
+    usd_sales = orders.where(currency: "USD").sum("sales.order_net_amount") || 0
+    eur_sales = orders.where(currency: "EUR").sum("sales.order_net_amount") || 0
+    gbp_sales = orders.where(currency: "GBP").sum("sales.order_net_amount") || 0
 
     # 外貨を円に変換して合算
-    jpy_total = CurrencyConverter.to_jpy(usd_sales, currency: 'USD') +
-                CurrencyConverter.to_jpy(eur_sales, currency: 'EUR') +
-                CurrencyConverter.to_jpy(gbp_sales, currency: 'GBP')
+    jpy_total = CurrencyConverter.to_jpy(usd_sales, currency: "USD") +
+                CurrencyConverter.to_jpy(eur_sales, currency: "EUR") +
+                CurrencyConverter.to_jpy(gbp_sales, currency: "GBP")
     jpy_total
   end
 

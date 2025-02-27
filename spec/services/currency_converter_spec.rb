@@ -51,10 +51,10 @@ RSpec.describe CurrencyConverter do
     it '複数の金額を一括で変換できること' do
       allow(CurrencyConverter).to receive(:fetch_exchange_rate).with('USD', anything).and_return(135.0)
 
-      amounts = [100.0, 200.0, 300.0]
+      amounts = [ 100.0, 200.0, 300.0 ]
       results = CurrencyConverter.bulk_to_jpy(amounts, currency: 'USD')
 
-      expect(results).to eq [13500, 27000, 40500]
+      expect(results).to eq [ 13500, 27000, 40500 ]
     end
   end
 end

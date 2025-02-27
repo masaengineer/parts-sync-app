@@ -90,8 +90,8 @@ RSpec.describe MonthlyData, type: :model do
     it 'ユーザーと年度を指定して正しくデータを取得すること' do
       data = MonthlyData.for_user(user).for_year(2023)
       expect(data.count).to eq(2)
-      expect(data.pluck(:year).uniq).to eq([2023])
-      expect(data.pluck(:user_id).uniq).to eq([user.id])
+      expect(data.pluck(:year).uniq).to eq([ 2023 ])
+      expect(data.pluck(:user_id).uniq).to eq([ user.id ])
     end
   end
 end

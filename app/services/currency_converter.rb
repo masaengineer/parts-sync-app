@@ -4,13 +4,13 @@ class CurrencyConverter
   # 為替レートの定数
   # 環境変数から取得するか、デフォルト値を使用
   DEFAULT_RATES = {
-    'USD' => ENV.fetch("USD_TO_JPY_RATE", 135.0).to_f,
-    'EUR' => ENV.fetch("EUR_TO_JPY_RATE", 145.0).to_f,
-    'GBP' => ENV.fetch("GBP_TO_JPY_RATE", 170.0).to_f
+    "USD" => ENV.fetch("USD_TO_JPY_RATE", 135.0).to_f,
+    "EUR" => ENV.fetch("EUR_TO_JPY_RATE", 145.0).to_f,
+    "GBP" => ENV.fetch("GBP_TO_JPY_RATE", 170.0).to_f
   }
 
   # デフォルトでは現在のレートを使用
-  def self.to_jpy(amount, currency: 'USD', rate: nil, date: nil)
+  def self.to_jpy(amount, currency: "USD", rate: nil, date: nil)
     return 0 if amount.nil? || amount.zero?
 
     # レートが指定されていない場合、DBやAPIから取得
@@ -21,7 +21,7 @@ class CurrencyConverter
   end
 
   # 複数の金額を一括で円に変換
-  def self.bulk_to_jpy(amounts, currency: 'USD', rate: nil, date: nil)
+  def self.bulk_to_jpy(amounts, currency: "USD", rate: nil, date: nil)
     exchange_rate = rate || fetch_exchange_rate(currency, date)
 
     amounts.map { |amount| (amount * exchange_rate).round }
@@ -40,12 +40,12 @@ class CurrencyConverter
 
     # 環境変数から設定されたレートを使用するか、デフォルト値を使用
     case currency.upcase
-    when 'USD'
-      DEFAULT_RATES['USD']
-    when 'EUR'
-      DEFAULT_RATES['EUR']
-    when 'GBP'
-      DEFAULT_RATES['GBP']
+    when "USD"
+      DEFAULT_RATES["USD"]
+    when "EUR"
+      DEFAULT_RATES["EUR"]
+    when "GBP"
+      DEFAULT_RATES["GBP"]
     else
       1.0    # その他の通貨はそのまま（円と仮定）
     end
