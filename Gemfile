@@ -95,6 +95,7 @@ group :development do
   gem "letter_opener"  # 開発環境でメールをブラウザで確認するためのgem
   gem "letter_opener_web"  # letter_openerをWeb経由で確認するためのgem
   gem "annotate"  # モデルファイルに対してスキーマ情報のコメントを自動生成するためのgem
+  gem "overcommit"  # Git hooksを管理するためのgem
 end
 
 group :test do
@@ -102,5 +103,3 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
-
-gem "overcommit", "~> 0.67.0"

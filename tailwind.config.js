@@ -1,4 +1,4 @@
-import theme from 'daisyui/src/theming/themes';
+const themes = require('daisyui/src/theming/themes');
 
 module.exports = {
   content: [
@@ -35,7 +35,7 @@ module.exports = {
     themes: [
       {
         light: {
-          ...theme.light,
+          ...themes.light,
           primary: '#3e5eff',
           'primary-content': '#ffffff',
           secondary: '#494949',
@@ -60,7 +60,7 @@ module.exports = {
           '--topbar-background': '#ffffff',
         },
         dark: {
-          ...theme.dark,
+          ...themes.dark,
           primary: '#167bff',
           'primary-content': '#ffffff',
           secondary: '#494949',

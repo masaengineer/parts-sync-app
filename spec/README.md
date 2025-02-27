@@ -157,26 +157,29 @@ end
 
 ## テスト実行コマンド
 
-テスト実行には以下の Rake タスクが利用できます：
+テスト実行には以下の RSpec コマンドが利用できます：
 
 ```bash
 # 全てのテストを実行
-bin/rails test:all
-
-# 高速テストのみを実行（:slowと:jsタグなし）
-bin/rails test:fast
+bundle exec rspec
 
 # モデルテストのみを実行
-bin/rails test:models
+bundle exec rspec spec/models
+
+# サービステストのみを実行
+bundle exec rspec spec/services
 
 # 統合テストのみを実行
-bin/rails test:requests
+bundle exec rspec spec/requests
 
 # E2Eテストのみを実行
-bin/rails test:system
+bundle exec rspec spec/system
 
 # 基本的な操作のスモークテストのみを実行
-bin/rails test:smoke
+bundle exec rspec spec/system --tag smoke
+
+# 高速テストのみを実行（モデル、サービス、リクエストテスト）
+bundle exec rspec spec/models spec/services spec/requests
 ```
 
 ## Docker 環境でのテスト実行
@@ -195,16 +198,16 @@ bin/rails test:smoke
 docker compose -f compose.test.yml run --rm test bundle exec rails db:create db:schema:load RAILS_ENV=test
 
 # 全てのテストを実行
-bin/rails test:docker_run
+docker compose -f compose.test.yml run --rm test bundle exec rspec
 
-# 高速テストのみを実行
-bin/rails test:docker_fast
+# 高速テストのみを実行（モデル、サービス、リクエストテスト）
+docker compose -f compose.test.yml run --rm test bundle exec rspec spec/models spec/services spec/requests
 
 # E2Eテストのみを実行
-bin/rails test:docker_system
+docker compose -f compose.test.yml run --rm test bundle exec rspec spec/system
 
 # スモークテストのみを実行
-bin/rails test:docker_smoke
+docker compose -f compose.test.yml run --rm test bundle exec rspec spec/system --tag smoke
 ```
 
 ### 特定のテストのみを実行する場合
@@ -245,7 +248,24 @@ CI 環境では、以下の順序でテストを実行することを推奨し�
 3. スモークテスト（基本的な E2E テスト）
 4. 全ての E2E テスト
 
-これにより、問題を早期に発見できます。GitHub Actions のワークフローが`.github/workflows/test.yml`に定義されています。
+これにより、問題を早期に発見できます。GitHub Actions のワークフローが`.github/workflows/ci.yml`に定義されています。
+
+CI 環境では以下のような順序でテストが実行されます：
+
+```bash
+# モデルとサービスのテスト（単体テスト）
+bundle exec rspec spec/models
+bundle exec rspec spec/services
+
+# リクエストのテスト（統合テスト）
+bundle exec rspec spec/requests
+
+# スモークテスト（基本的なE2Eテスト）
+bundle exec rspec spec/system --tag smoke
+
+# 全てのシステムテスト（E2Eテスト）
+bundle exec rspec spec/system
+```
 
 ## テスト作成時の注意点
 

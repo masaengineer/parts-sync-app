@@ -488,7 +488,7 @@ DEPENDENCIES
   oauth2
   omniauth-google-oauth2
   omniauth-rails_csrf_protection
-  overcommit (~> 0.67.0)
+  overcommit
   pg (~> 1.1)
   pry-byebug
   pry-rails
