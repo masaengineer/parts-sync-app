@@ -1,98 +1,80 @@
 class MonthlyReportCalculator
-  def initialize(order)
-    @order = order
+  attr_reader :user, :year
+
+  def initialize(user, year)
+    @user = user
+    @year = year
   end
 
+  # 月次データを計算して返す
   def calculate
-    {
-      revenue: calculate_revenue,
-      payment_fees: calculate_payment_fees,
-      shipping_cost: calculate_shipping_cost,
-      procurement_cost: calculate_procurement_cost
-    }
-  end
-
-  def calculate_monthly_data
-    orders = fetch_orders
-    initialize_monthly_data.tap do |monthly_data|
-      aggregate_orders(orders, monthly_data)
-      calculate_metrics(monthly_data)
+    (1..12).map do |month|
+      {
+        month: month,
+        revenue: calculate_revenue(month),
+        procurement_cost: calculate_procurement_cost(month),
+        gross_profit: calculate_gross_profit(month),
+        expenses: calculate_expenses(month),
+        contribution_margin: calculate_contribution_margin(month),
+        contribution_margin_rate: calculate_contribution_margin_rate(month)
+      }
     end
   end
 
   private
 
-  def fetch_orders
-    Order.where("extract(year from sale_date) = ?", @order.sale_date.year)
-         .includes(
-           :sales,
-           :shipment,
-           :payment_fees,
-           :procurement,
-           order_lines: { seller_sku: :manufacturer_skus }
-         )
+  # 指定した月の開始日と終了日を取得
+  def date_range(month)
+    start_date = Date.new(year, month, 1)
+    end_date = start_date.end_of_month
+    start_date..end_date
   end
 
-  def initialize_monthly_data
-    (1..12).map do |month|
-      {
-        month: month,
-        revenue: 0,
-        procurement_cost: 0,
-        shipping_cost: 0,
-        payment_fees: 0,
-        expenses: 0
-      }
-    end
+  # 売上高の計算
+  def calculate_revenue(month)
+    orders = user.orders.where(sale_date: date_range(month))
+              .joins(:sales)
+
+    # 通貨ごとに金額を集計
+    usd_sales = orders.where(currency: 'USD').sum("sales.order_net_amount") || 0
+    eur_sales = orders.where(currency: 'EUR').sum("sales.order_net_amount") || 0
+    gbp_sales = orders.where(currency: 'GBP').sum("sales.order_net_amount") || 0
+
+    # 外貨を円に変換して合算
+    jpy_total = CurrencyConverter.to_jpy(usd_sales, currency: 'USD') +
+                CurrencyConverter.to_jpy(eur_sales, currency: 'EUR') +
+                CurrencyConverter.to_jpy(gbp_sales, currency: 'GBP')
+    jpy_total
   end
 
-  def aggregate_orders(orders, monthly_data)
-    orders.each do |order|
-      month_index = order.sale_date.month - 1
-      data = monthly_data[month_index]
-
-      data[:revenue] += order.sales.total_amount
-      data[:procurement_cost] += order.procurement.total_cost
-      data[:shipping_cost] += order.shipment.cost
-      data[:payment_fees] += order.payment_fees.total_amount
-    end
+  # 原価の計算
+  def calculate_procurement_cost(month)
+    user.orders.where(sale_date: date_range(month))
+        .joins(:procurement)
+        .sum("procurements.purchase_price + procurements.forwarding_fee + procurements.option_fee + procurements.handling_fee")
   end
 
-  def calculate_metrics(monthly_data)
-    monthly_data.each do |data|
-      data[:expenses] = data[:shipping_cost] + data[:payment_fees]
-      data[:gross_profit] = data[:revenue] - data[:procurement_cost]
-      data[:contribution_margin] = data[:gross_profit] - data[:expenses]
-      data[:contribution_margin_rate] = calculate_percentage(data[:contribution_margin], data[:revenue])
-    end
+  # 粗利の計算（売上高 - 原価）
+  def calculate_gross_profit(month)
+    calculate_revenue(month) - calculate_procurement_cost(month)
   end
 
-  def calculate_percentage(value, total)
-    return 0 if total.zero?
-    (value.to_f / total * 100).round(1)
+  # 販管費の計算
+  def calculate_expenses(month)
+    Expense.where(year: year, month: month).sum(:amount)
   end
 
-  def calculate_revenue
-    @order.sales.sum(:order_net_amount)
+  # 限界利益の計算（粗利 - 販管費）
+  def calculate_contribution_margin(month)
+    calculate_gross_profit(month) - calculate_expenses(month)
   end
 
-  def calculate_payment_fees
-    @order.payment_fees.sum(:fee_amount)
-  end
+  # 限界利益率の計算（限界利益 / 売上高 * 100）
+  def calculate_contribution_margin_rate(month)
+    revenue = calculate_revenue(month)
+    return 0 if revenue.zero?
 
-  def calculate_shipping_cost
-    @order.shipment&.customer_international_shipping || 0
-  end
-
-  def calculate_procurement_cost
-    procurement = @order.procurement
-    return 0 unless procurement
-
-    [
-      procurement.purchase_price,
-      procurement.forwarding_fee,
-      procurement.handling_fee,
-      procurement.option_fee
-    ].compact.sum
+    contribution_margin = calculate_contribution_margin(month)
+    ((contribution_margin / revenue) * 100).round
   end
 end

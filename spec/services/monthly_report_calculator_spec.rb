@@ -1,142 +1,102 @@
-# frozen_string_literal: true
-
 require 'rails_helper'
 
 RSpec.describe MonthlyReportCalculator do
   let(:user) { create(:user) }
-  let(:order) { create(:order, user: user, created_at: Date.new(2023, 5, 15)) }
-  let(:calculator) { described_class.new(order) }
+  let(:year) { 2023 }
+  let(:month) { 1 }
+
+  subject(:calculator) { described_class.new(user, year) }
+
+  before do
+    # テストデータの作成
+    date = Date.new(year, month, 15)
+
+    # 注文データの作成
+    order = create(:order, user: user, sale_date: date)
+
+    # 売上データの作成
+    create(:sale, order: order, order_net_amount: 100000)
+
+    # 原価データの作成
+    create(:procurement,
+      order: order,
+      purchase_price: 50000,
+      forwarding_fee: 5000,
+      option_fee: 2000,
+      handling_fee: 3000
+    )
+
+    # 販管費データの作成
+    create(:expense, year: year, month: month, amount: 20000)
+  end
 
   describe '#calculate' do
-    context '完全な注文データの場合' do
-      before do
-        # 売上データを作成
-        create(:sale, order: order, order_net_amount: 100.0, order_gross_amount: 110.0)
-
-        # 手数料データを作成
-        create(:payment_fee, order: order, fee_amount: 10.0)
-
-        # 配送データを作成
-        create(:shipment, order: order, customer_international_shipping: 2000)
-
-        # 調達データを作成
-        create(:procurement,
-          order: order,
-          purchase_price: 5000,
-          forwarding_fee: 500,
-          option_fee: 300,
-          handling_fee: 200
-        )
-      end
-
-      it '売上が正しく計算されること' do
-        expect(calculator.revenue).to eq(100.0)
-      end
-
-      it '支払い手数料が正しく計算されること' do
-        expect(calculator.payment_fee).to eq(10.0)
-      end
-
-      it '配送コストが正しく計算されること' do
-        expect(calculator.shipping_cost).to eq(2000)
-      end
-
-      it '調達コストが正しく計算されること' do
-        expect(calculator.procurement_cost).to eq(5000)
-      end
-
-      it '総コストが正しく計算されること' do
-        # 手数料: 10 USD = 1,500 JPY
-        # 送料: 2,000 JPY
-        # 仕入: 5,000 JPY
-        # その他: 1,000 JPY (500 + 300 + 200)
-        # 合計コスト = 1,500 + 2,000 + 5,000 + 1,000 = 9,500 JPY
-        expect(calculator.total_cost).to eq(9500)
-      end
-
-      it '利益が正しく計算されること' do
-        # 売上: 100 USD = 15,000 JPY
-        # 合計コスト: 9,500 JPY
-        # 利益 = 15,000 - 9,500 = 5,500 JPY
-        expect(calculator.profit).to eq(5500)
-      end
-
-      it '利益率が正しく計算されること' do
-        # 利益: 5,500 JPY
-        # 売上: 15,000 JPY
-        # 利益率 = 5,500 / 15,000 = 36.67%
-        expect(calculator.profit_rate).to be_within(0.1).of(36.67)
-      end
+    it '12ヶ月分のデータを返すこと' do
+      result = calculator.calculate
+      expect(result.size).to eq(12)
+      expect(result.first[:month]).to eq(1)
+      expect(result.last[:month]).to eq(12)
     end
 
-    context 'データが欠損している場合' do
-      it '売上データが欠損している場合を適切に処理すること' do
-        expect(calculator.revenue).to eq(0.0)
-        expect(calculator.profit).to eq(0)
-        expect(calculator.profit_rate).to eq(0)
-      end
+    it '各月のデータに必要なメトリクスが含まれていること' do
+      result = calculator.calculate
+      january_data = result.find { |d| d[:month] == 1 }
 
-      it '調達データが欠損している場合を適切に処理すること' do
-        create(:sale, order: order, order_net_amount: 100.0)
-        expect(calculator.procurement_cost).to eq(0)
-      end
-
-      it '配送データが欠損している場合を適切に処理すること' do
-        create(:sale, order: order, order_net_amount: 100.0)
-        expect(calculator.shipping_cost).to eq(0)
-      end
+      expect(january_data).to include(
+        :month,
+        :revenue,
+        :procurement_cost,
+        :gross_profit,
+        :expenses,
+        :contribution_margin,
+        :contribution_margin_rate
+      )
     end
   end
 
-  describe '#calculate_monthly_data' do
-    let(:year) { 2023 }
-    let(:month) { 5 }
+  describe '計算ロジック' do
+    it '売上高が正しく計算されること' do
+      # privateメソッドをテストするためにsendを使用
+      revenue = calculator.send(:calculate_revenue, month)
+      expect(revenue).to eq(100000)
+    end
 
-    before do
-      # 3つの注文を作成する (5月)
-      3.times do |i|
-        order = create(:order, user: user, created_at: Date.new(2023, 5, 10 + i))
-        create(:sale, order: order, order_net_amount: 100.0)
-        create(:payment_fee, order: order, fee_amount: 10.0)
-        create(:shipment, order: order, customer_international_shipping: 2000)
-        create(:procurement, order: order, purchase_price: 5000)
+    it '原価が正しく計算されること' do
+      procurement_cost = calculator.send(:calculate_procurement_cost, month)
+      expect(procurement_cost).to eq(60000) # 50000 + 5000 + 2000 + 3000
+    end
+
+    it '粗利が正しく計算されること' do
+      gross_profit = calculator.send(:calculate_gross_profit, month)
+      expect(gross_profit).to eq(40000) # 100000 - 60000
+    end
+
+    it '販管費が正しく計算されること' do
+      expenses = calculator.send(:calculate_expenses, month)
+      expect(expenses).to eq(20000)
+    end
+
+    it '限界利益が正しく計算されること' do
+      contribution_margin = calculator.send(:calculate_contribution_margin, month)
+      expect(contribution_margin).to eq(20000) # 40000 - 20000
+    end
+
+    it '限界利益率が正しく計算されること' do
+      contribution_margin_rate = calculator.send(:calculate_contribution_margin_rate, month)
+      expect(contribution_margin_rate).to eq(20) # (20000 / 100000) * 100
+    end
+
+    context '売上高が0の場合' do
+      before do
+        # 売上が0の注文を作成
+        zero_revenue_order = create(:order, user: user, sale_date: Date.new(year, 2, 15))
+        create(:sale, order: zero_revenue_order, order_net_amount: 0)
       end
 
-      # 4月の注文を1つ作成
-      april_order = create(:order, user: user, created_at: Date.new(2023, 4, 15))
-      create(:sale, order: april_order, order_net_amount: 50.0)
-    end
-
-    it '月次データが正しく集計されること' do
-      result = described_class.calculate_monthly_data(user.id, year, month)
-
-      # 5月の注文が3つあるため、集計結果は3倍になる
-      expect(result[:revenue]).to eq(300.0)
-      expect(result[:payment_fee]).to eq(30.0)
-      expect(result[:shipping_cost]).to eq(6000)
-      expect(result[:procurement_cost]).to eq(15000)
-
-      # 売上: 300 USD = 45,000 JPY
-      # 手数料: 30 USD = 4,500 JPY
-      # 送料: 6,000 JPY
-      # 仕入: 15,000 JPY
-      # 合計コスト = 4,500 + 6,000 + 15,000 = 25,500 JPY
-      # 利益 = 45,000 - 25,500 = 19,500 JPY
-      expect(result[:profit]).to eq(19500)
-
-      # 利益率 = 19,500 / 45,000 = 43.33%
-      expect(result[:profit_rate]).to be_within(0.1).of(43.33)
-    end
-
-    it '注文のない月は空のデータを返すこと' do
-      result = described_class.calculate_monthly_data(user.id, 2023, 6)
-
-      expect(result[:revenue]).to eq(0.0)
-      expect(result[:payment_fee]).to eq(0.0)
-      expect(result[:shipping_cost]).to eq(0)
-      expect(result[:procurement_cost]).to eq(0)
-      expect(result[:profit]).to eq(0)
-      expect(result[:profit_rate]).to eq(0)
+      it '限界利益率は0を返すこと' do
+        contribution_margin_rate = calculator.send(:calculate_contribution_margin_rate, 2)
+        expect(contribution_margin_rate).to eq(0)
+      end
     end
   end
 end

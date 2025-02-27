@@ -20,7 +20,6 @@
 #      }
 #
 class SalesReportCalculator
-  include ExchangeRateConcern
 
   def initialize(order)
     @order = order
@@ -43,8 +42,9 @@ class SalesReportCalculator
     procurement_data = calculate_procurement_data(@order)
 
     # --- ドルから円へ換算して利益計算 ---
-    revenue_in_jpy      = convert_usd_to_jpy(order_revenue_usd)
-    payment_fees_in_jpy = convert_usd_to_jpy(order_payment_fees_usd)
+    # CurrencyConverterを使用してUSDからJPYへ変換
+    revenue_in_jpy      = CurrencyConverter.to_jpy(order_revenue_usd, currency: 'USD')
+    payment_fees_in_jpy = CurrencyConverter.to_jpy(order_payment_fees_usd, currency: 'USD')
 
     # 総コストの計算（仕入原価 + その他原価 + 手数料 + 送料）
     total_cost_jpy = payment_fees_in_jpy +
