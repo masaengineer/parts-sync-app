@@ -93,8 +93,8 @@ jobs:
           POSTGRES_PASSWORD: postgres
           REDIS_URL: redis://localhost:6379/0
         run: |
-          bundle exec rails test:models
-          bundle exec rails test:services
+          bundle exec rspec spec/models
+          bundle exec rspec spec/services
 
       - name: Run Integration Tests
         env:
@@ -103,7 +103,7 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           REDIS_URL: redis://localhost:6379/0
-        run: bundle exec rails test:requests
+        run: bundle exec rspec spec/requests
 
       - name: Run Smoke Tests
         env:
@@ -112,7 +112,7 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           REDIS_URL: redis://localhost:6379/0
-        run: bundle exec rails test:smoke
+        run: bundle exec rspec spec/system --tag smoke
 
       - name: Run System Tests
         env:
@@ -121,7 +121,7 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           REDIS_URL: redis://localhost:6379/0
-        run: bundle exec rails test:system
+        run: bundle exec rspec spec/system
 
       - name: Upload Test Artifacts
         if: failure()
@@ -148,10 +148,10 @@ jobs:
         run: docker compose -f compose.test.yml build
 
       - name: Run Fast Tests in Docker
-        run: docker compose -f compose.test.yml run --rm test bundle exec rails test:fast
+        run: docker compose -f compose.test.yml run --rm test bundle exec rspec spec/models spec/services spec/requests
 
       - name: Run Smoke Tests in Docker
-        run: docker compose -f compose.test.yml run --rm test bundle exec rails test:smoke
+        run: docker compose -f compose.test.yml run --rm test bundle exec rspec spec/system --tag smoke
 
       - name: Upload Docker Test Artifacts
         if: failure()
