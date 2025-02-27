@@ -3,7 +3,7 @@ ja:
     header:
       navigation:
         sales_reports: '売上レポート'
-        pl_reports: '損益レポート'
+        monthly_reports: '月次レポート'
       profile:
         edit: 'プロフィール編集'
         guest: 'ゲスト'

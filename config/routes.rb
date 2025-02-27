@@ -9,7 +9,7 @@ Rails.application.routes.draw do
   }
 
   resources :users, only: [ :index, :show ]
-  resources :pl_reports, only: [ :index ]
+  resources :monthly_reports, only: [ :index ]
   resources :sales_reports, only: [ :index, :show ]
   resources :data_imports, only: [ :index, :show ] do
     collection do

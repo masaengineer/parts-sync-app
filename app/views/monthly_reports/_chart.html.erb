@@ -1,0 +1,46 @@
+<%
+chart_data = {
+  series: [
+    {
+      name: t("monthly_reports.index.metrics.revenue"),
+      data: @monthly_data.map { |d| d[:revenue] }
+    },
+    {
+      name: t("monthly_reports.index.metrics.contribution_margin"),
+      data: @monthly_data.map { |d| d[:contribution_margin] }
+    }
+  ],
+  categories: @monthly_data.map { |d| t("monthly_reports.index.table.month", month: d[:month]) }
+} %>
+
+<%# 年度選択とチャート %>
+<div class="card card-bordered bg-base-100 shadow-sm mt-5">
+  <div class="card-body p-5">
+    <%# 年度選択フォーム %>
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-5">
+      <div class="form-control">
+        <div class="dropdown">
+          <label tabindex="0" class="select select-sm select-bordered w-full focus:select-primary text-base">
+            <%= @selected_year %> 年度
+          </label>
+          <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 mt-1">
+            <% @available_years.each do |year| %>
+              <li>
+                <%= link_to "#{year}年度", monthly_reports_path(year: year), class: "#{year == @selected_year ? 'active' : ''}" %>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <%# チャート %>
+    <div data-chart-data="<%= chart_data.to_json %>">
+      <div
+        data-controller="chart"
+        data-chart-target="chart"
+        style="height: 350px;"
+      ></div>
+    </div>
+  </div>
+</div>

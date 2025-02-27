@@ -1,4 +1,4 @@
-class PlReportCalculator
+class MonthlyReportCalculator
   def initialize(order)
     @order = order
   end

@@ -23,7 +23,7 @@ const steps = [
     order: 4,
   },{
     title: "レポート切り替え機能",
-    content: "損益レポートへ切り替えると、年間の月別の収支を確認することができます。",
+    content: "月次レポートへ切り替えると、月ごとの年間収支を確認することができます。",
     target: "#report_change",
     order: 5,
   },{

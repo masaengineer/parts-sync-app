@@ -1,4 +1,4 @@
-class PlReportsController < ApplicationController
+class MonthlyReportsController < ApplicationController
   include ExchangeRateConcern
 
   def index
@@ -38,7 +38,7 @@ class PlReportsController < ApplicationController
       data = @monthly_data[month - 1]
 
       # サービスクラスで計算
-      calc_result = PlReportCalculator.new(order).calculate
+      calc_result = MonthlyReportCalculator.new(order).calculate
 
       # 売上(revenue)はcalc_result[:revenue](USD)を円換算
       revenue_jpy = convert_usd_to_jpy(calc_result[:revenue])

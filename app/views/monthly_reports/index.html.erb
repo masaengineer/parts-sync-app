@@ -1,0 +1,15 @@
+<% content_for(:title, t("monthly_reports.index.title")) %>
+
+<% metrics = [
+  {key: :revenue, label: t("monthly_reports.index.metrics.revenue")},
+  {key: :procurement_cost, label: t("monthly_reports.index.metrics.procurement_cost")},
+  {key: :gross_profit, label: t("monthly_reports.index.metrics.gross_profit")},
+  {key: :expenses, label: t("monthly_reports.index.metrics.expenses")},
+  {key: :contribution_margin, label: t("monthly_reports.index.metrics.contribution_margin")},
+  {key: :contribution_margin_rate, label: t("monthly_reports.index.metrics.contribution_margin_rate")}
+] %>
+
+<div class="w-full p-6">
+  <%= render 'chart', metrics: metrics %>
+  <%= render 'table', metrics: metrics %>
+</div>
