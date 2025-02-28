@@ -6,7 +6,7 @@ class CreateCurrencies < ActiveRecord::Migration[7.2]
       t.string :symbol                      # 通貨記号 ($, ¥等)
       t.boolean :active, default: true      # 有効/無効フラグ
       t.timestamps
-      
+
       t.index :code, unique: true
     end
   end
