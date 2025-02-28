@@ -45,7 +45,7 @@ class SalesReportCalculator
 
     # --- 円建てコストの合計 ---
     total_jpy_costs = order_shipping_cost_jpy +
-                      procurement_data[:procurement_cost] + 
+                      procurement_data[:procurement_cost] +
                       procurement_data[:other_costs]
 
     # --- 利益計算（JPY） ---
