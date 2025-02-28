@@ -1,7 +1,8 @@
 class OrderLine < ApplicationRecord
   belongs_to :seller_sku
   belongs_to :order
-  belongs_to :currency, optional: true
+  # currency_idカラムを削除したため、orderから通貨を委譲
+  delegate :currency, to: :order
 
   validates :quantity, presence: true, numericality: { greater_than: 0 }
   validates :line_item_id, presence: true

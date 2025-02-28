@@ -1,6 +1,7 @@
 class PaymentFee < ApplicationRecord
   belongs_to :order, foreign_key: :order_id
-  belongs_to :currency, optional: true
+  # currency_idカラムを削除したため、orderから通貨を委譲
+  delegate :currency, to: :order
 
   validates :fee_amount, presence: true, numericality: true
   validates :fee_category, presence: true
