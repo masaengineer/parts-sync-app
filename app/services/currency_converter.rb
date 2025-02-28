@@ -1,10 +1,8 @@
-# app/services/currency_converter.rb
-
 class CurrencyConverter
   # 為替レートの定数
   # 環境変数から取得するか、デフォルト値を使用
   DEFAULT_RATES = {
-    "USD" => ENV.fetch("USD_TO_JPY_RATE", 135.0).to_f,
+    "USD" => ENV.fetch("USD_TO_JPY_RATE", 150.0).to_f,
     "EUR" => ENV.fetch("EUR_TO_JPY_RATE", 145.0).to_f,
     "GBP" => ENV.fetch("GBP_TO_JPY_RATE", 170.0).to_f
   }
