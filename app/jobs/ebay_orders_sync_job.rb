@@ -22,7 +22,7 @@ class EbayOrdersSyncJob < ApplicationJob
         Rails.logger.info "✅ ユーザーID: #{user.id} の注文同期完了"
       rescue Ebay::EbaySalesOrderClient::FulfillmentError => e
         Rails.logger.error "❌ ユーザーID: #{user.id} - eBay API エラー: #{e.message}"
-        Rails.logger.error e.backtrace.join("\n")
+        Rails.logger.error e.backtrace.joinq("\n")
         raise  # 再試行のために例外を再度発生
       rescue StandardError => e
         Rails.logger.error "❌ ユーザーID: #{user.id} - 予期せぬエラー: #{e.message}"

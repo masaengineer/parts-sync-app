@@ -28,14 +28,10 @@ module Ebay
       transactions.each do |transaction|
         order_number = find_order_number(transaction)
 
-        unless order_number
-          next
-        end
+        next unless order_number
 
         order = Order.find_by(order_number: order_number)
-        unless order
-          next
-        end
+        next unless order
 
         case transaction["transactionType"]
         when "SALE"
@@ -63,9 +59,7 @@ module Ebay
         transaction["orderId"]
       end
 
-      if order_number.nil? || order_number == "0"
-        return nil
-      end
+      return nil if order_number.nil? || order_number == "0"
 
       order_number
     end
@@ -74,126 +68,370 @@ module Ebay
     # @param order [Order] 注文オブジェクト
     # @param transaction [Hash] 取引データ
     def process_sale_transaction(order, transaction)
-      # PaymentFeeテーブルで既に同じtransaction_idの販売処理が存在する場合はスキップ
-      if PaymentFee.exists?(
-        order: order,
-        transaction_id: transaction["transactionId"],
-        transaction_type: PaymentFee.transaction_types[:sale]
-      )
-        return
+      Rails.logger.debug "Processing sale transaction: #{transaction['transactionId']}"
+
+      begin
+        log_transaction_details(transaction)
+        fee_processed = process_marketplace_fees(order, transaction)
+        create_sale_record(order, transaction) if fee_processed
+        Rails.logger.debug "Transaction processing completed successfully"
+      rescue StandardError => e
+        Rails.logger.error "予期せぬエラー: #{e.class.name} - #{e.message}"
+        Rails.logger.error e.backtrace.join("\n")
+        raise
       end
+    end
+
+    # トランザクションの詳細情報をログに記録
+    # @param transaction [Hash] 取引データ
+    private def log_transaction_details(transaction)
+      Rails.logger.debug "Transaction keys: #{transaction.keys.inspect}"
+      Rails.logger.debug "Transaction type: #{transaction['transactionType']}"
 
       amount = transaction.dig("amount", "value").to_d
-      total_fee_basis_amount = transaction.dig("totalFeeBasisAmount", "value").to_d
+      Rails.logger.debug "Amount: #{amount.inspect}"
 
-      ActiveRecord::Base.transaction do
-        # marketplaceFeesの情報をPaymentFeeとして登録
-        transaction["orderLineItems"].each do |item|
-          item["marketplaceFees"].each do |fee|
-            fee_category = PaymentFee.fee_categories.values.include?(fee["feeType"]) ? fee["feeType"] : "undefined"
-            PaymentFee.create!(
-              order: order,
-              transaction_type: :sale,
-              transaction_id: transaction["transactionId"],
-              fee_category: fee_category,
-              fee_amount: fee.dig("amount", "value").to_d
-            )
-          end
+      total_fee_basis_amount = transaction.dig("totalFeeBasisAmount", "value").to_d
+      Rails.logger.debug "Total Fee Basis Amount: #{total_fee_basis_amount.inspect}"
+
+      Rails.logger.debug "OrderLineItems count: #{transaction['orderLineItems']&.size || 'N/A'}"
+    end
+
+    # マーケットプレイス手数料を処理
+    # @param order [Order] 注文オブジェクト
+    # @param transaction [Hash] 取引データ
+    # @return [Boolean] 少なくとも1つの手数料が処理されたかどうか
+    private def process_marketplace_fees(order, transaction)
+      fee_processed = false
+
+      # orderLineItemsがnilの場合は処理をスキップ
+      return fee_processed unless transaction["orderLineItems"].is_a?(Array)
+
+      transaction["orderLineItems"].each_with_index do |item, idx|
+        Rails.logger.debug "Processing orderLineItem #{idx}: #{item.keys.inspect}"
+
+        unless valid_marketplace_fees?(item)
+          Rails.logger.error "Invalid marketplaceFees for item #{idx}: #{item['marketplaceFees'].inspect}"
+          next
         end
 
-        # PaymentFeeの作成に成功したら、Saleレコードも作成
-        Sale.create!(
+        item["marketplaceFees"].each_with_index do |fee, fee_idx|
+          if process_single_fee(order, transaction, fee, idx, fee_idx)
+            fee_processed = true
+          end
+        end
+      end
+
+      fee_processed
+    end
+
+    # 単一の手数料を処理
+    # @param order [Order] 注文オブジェクト
+    # @param transaction [Hash] 取引データ
+    # @param fee [Hash] 手数料データ
+    # @param item_idx [Integer] アイテムのインデックス (ログ用)
+    # @param fee_idx [Integer] 手数料のインデックス (ログ用)
+    # @return [Boolean] 手数料の処理に成功したかどうか
+    private def process_single_fee(order, transaction, fee, item_idx, fee_idx)
+      Rails.logger.debug "Processing fee #{fee_idx} of item #{item_idx}: #{fee.inspect}"
+
+      fee_category = determine_fee_category(fee)
+      Rails.logger.debug "Fee category determined as: #{fee_category}"
+
+      if duplicate_fee?(transaction, fee_category)
+        Rails.logger.debug "Skipping duplicate fee: transaction_id=#{transaction['transactionId']}, fee_category=#{fee_category}"
+        return false
+      end
+
+      begin
+        payment_fee = PaymentFee.create!(
+          order: order,
+          transaction_type: :sale,
+          transaction_id: transaction["transactionId"],
+          fee_category: fee_category,
+          fee_amount: fee.dig("amount", "value").to_d
+        )
+        Rails.logger.debug "Created PaymentFee: #{payment_fee.id}"
+        true
+      rescue ActiveRecord::RecordNotUnique => e
+        Rails.logger.warn "重複エラー (個別処理): #{e.message}"
+        false
+      rescue => e
+        Rails.logger.error "Failed to create PaymentFee: #{e.message}"
+        Rails.logger.error e.backtrace.join("\n")
+        raise
+      end
+    end
+
+    # 手数料カテゴリを判定
+    # @param fee [Hash] 手数料データ
+    # @return [String] 手数料カテゴリ
+    private def determine_fee_category(fee)
+      PaymentFee.fee_categories.values.include?(fee["feeType"]) ? fee["feeType"] : "undefined"
+    end
+
+    # 手数料が重複しているかチェック
+    # @param transaction [Hash] 取引データ
+    # @param fee_category [String] 手数料カテゴリ
+    # @return [Boolean] 重複しているかどうか
+    private def duplicate_fee?(transaction, fee_category)
+      PaymentFee.exists?(
+        transaction_id: transaction["transactionId"],
+        transaction_type: PaymentFee.transaction_types[:sale],
+        fee_category: fee_category
+      )
+    end
+
+    # marketplaceFeesが有効かチェック
+    # @param item [Hash] オーダーラインアイテム
+    # @return [Boolean] 有効かどうか
+    private def valid_marketplace_fees?(item)
+      item["marketplaceFees"].is_a?(Array) && !item["marketplaceFees"].nil?
+    end
+
+    # Saleレコードを作成
+    # @param order [Order] 注文オブジェクト
+    # @param transaction [Hash] 取引データ
+    private def create_sale_record(order, transaction)
+      return if Sale.exists?(order_id: order.id)
+
+      begin
+        amount = transaction.dig("amount", "value").to_d
+        total_fee_basis_amount = transaction.dig("totalFeeBasisAmount", "value").to_d
+
+        sale = Sale.create!(
           order: order,
           order_net_amount: amount,
           order_gross_amount: total_fee_basis_amount
         )
+        Rails.logger.debug "Created Sale: #{sale.id}"
+      rescue ActiveRecord::RecordNotUnique => e
+        Rails.logger.warn "重複エラー (Sale): #{e.message}"
+      rescue => e
+        Rails.logger.error "Failed to create Sale: #{e.message}"
+        Rails.logger.error e.backtrace.join("\n")
+        raise
       end
-    rescue ActiveRecord::RecordNotUnique => e
-      # 重複エラーは無視
     end
 
     # 配送ラベル取引を処理
     # @param order [Order] 注文オブジェクト
     # @param transaction [Hash] 取引データ
     def process_shipping_label_transaction(order, transaction)
-      PaymentFee.find_or_create_by!(transaction_id: transaction["transactionId"]) do |payment_fee|
-        payment_fee.order = order
-        payment_fee.transaction_type = :shipping_label
-        payment_fee.fee_category = :undefined
-        payment_fee.fee_amount = transaction.dig("amount", "value").to_d
+      Rails.logger.debug "Processing shipping label transaction: #{transaction['transactionId']}"
+
+      begin
+        log_transaction_details(transaction)
+        create_shipping_label_payment_fee(order, transaction)
+        Rails.logger.debug "Shipping label transaction processing completed successfully"
+      rescue StandardError => e
+        Rails.logger.error "予期せぬエラー: #{e.class.name} - #{e.message}"
+        Rails.logger.error e.backtrace.join("\n")
+        raise
       end
+    end
+
+    # 配送ラベル用のPaymentFeeレコードを作成
+    # @param order [Order] 注文オブジェクト
+    # @param transaction [Hash] 取引データ
+    private def create_shipping_label_payment_fee(order, transaction)
+      # 既に同じtransaction_idの配送ラベル処理が存在する場合はスキップ
+      if duplicate_shipping_label_fee?(order, transaction)
+        Rails.logger.debug "Skipping duplicate shipping label transaction: #{transaction['transactionId']}"
+        return
+      end
+
+      fee_amount = transaction.dig("amount", "value").to_d
+      Rails.logger.debug "Shipping label fee amount: #{fee_amount}"
+
+      begin
+        payment_fee = PaymentFee.create!(
+          order: order,
+          transaction_type: :shipping_label,
+          transaction_id: transaction["transactionId"],
+          fee_category: "undefined",
+          fee_amount: fee_amount
+        )
+        Rails.logger.debug "Created shipping label PaymentFee: #{payment_fee.id}"
+      rescue ActiveRecord::RecordNotUnique => e
+        Rails.logger.warn "重複エラー (配送ラベル): #{e.message}"
+      rescue => e
+        Rails.logger.error "Failed to create shipping label PaymentFee: #{e.message}"
+        Rails.logger.error e.backtrace.join("\n")
+        raise
+      end
+    end
+
+    # 配送ラベル手数料が重複しているかチェック
+    # @param order [Order] 注文オブジェクト
+    # @param transaction [Hash] 取引データ
+    # @return [Boolean] 重複しているかどうか
+    private def duplicate_shipping_label_fee?(order, transaction)
+      PaymentFee.exists?(
+        order: order,
+        transaction_id: transaction["transactionId"],
+        transaction_type: PaymentFee.transaction_types[:shipping_label]
+      )
     end
 
     # 非販売手数料取引を処理
     # @param order [Order] 注文オブジェクト
     # @param transaction [Hash] 取引データ
     def process_non_sale_charge_transaction(order, transaction)
+      Rails.logger.debug "Processing non-sale charge transaction: #{transaction['transactionId']}"
+
+      begin
+        log_transaction_details(transaction)
+        create_non_sale_charge_payment_fee(order, transaction)
+        Rails.logger.debug "Non-sale charge transaction processing completed successfully"
+      rescue StandardError => e
+        Rails.logger.error "予期せぬエラー: #{e.class.name} - #{e.message}"
+        Rails.logger.error e.backtrace.join("\n")
+        raise
+      end
+    end
+
+    # 非販売手数料用のPaymentFeeレコードを作成
+    # @param order [Order] 注文オブジェクト
+    # @param transaction [Hash] 取引データ
+    private def create_non_sale_charge_payment_fee(order, transaction)
+      # AD_FEE以外はスキップ
       unless transaction["feeType"] == "AD_FEE"
+        Rails.logger.debug "Skipping non-AD_FEE transaction: #{transaction['transactionId']}, feeType: #{transaction['feeType']}"
         return
       end
 
-      # 既存のレコードをチェック
-      existing_fee = PaymentFee.find_by(
-        transaction_id: transaction["transactionId"],
-        transaction_type: :non_sale_charge,
-        fee_category: transaction["feeType"]
-      )
-
-      if existing_fee
+      # 既に同じtransaction_idの非販売手数料処理が存在する場合はスキップ
+      if duplicate_non_sale_charge_fee?(order, transaction, transaction["feeType"])
+        Rails.logger.debug "Skipping duplicate non-sale charge transaction: #{transaction['transactionId']}"
         return
       end
 
-      amount = transaction.dig("amount", "value").to_d
-
-      payment_fee = PaymentFee.new(
-        order: order,
-        transaction_type: :non_sale_charge,
-        fee_category: transaction["feeType"],
-        fee_amount: amount,
-        transaction_id: transaction["transactionId"]
-      )
+      fee_amount = transaction.dig("amount", "value").to_d
+      Rails.logger.debug "Non-sale charge fee amount: #{fee_amount}"
 
       # bookingEntry が CREDIT なら fee_amount を反転
-      payment_fee.fee_amount *= -1 if transaction["bookingEntry"] == "CREDIT"
+      if transaction["bookingEntry"] == "CREDIT"
+        fee_amount *= -1
+        Rails.logger.debug "Reversed fee amount due to CREDIT booking entry: #{fee_amount}"
+      end
 
-      payment_fee.save
-    rescue ActiveRecord::RecordNotUnique => e
-      # 重複エラーは無視
+      begin
+        payment_fee = PaymentFee.create!(
+          order: order,
+          transaction_type: :non_sale_charge,
+          transaction_id: transaction["transactionId"],
+          fee_category: transaction["feeType"],
+          fee_amount: fee_amount
+        )
+        Rails.logger.debug "Created non-sale charge PaymentFee: #{payment_fee.id}"
+      rescue ActiveRecord::RecordNotUnique => e
+        Rails.logger.warn "重複エラー (非販売手数料): #{e.message}"
+      rescue => e
+        Rails.logger.error "Failed to create non-sale charge PaymentFee: #{e.message}"
+        Rails.logger.error e.backtrace.join("\n")
+        raise
+      end
+    end
+
+    # 非販売手数料が重複しているかチェック
+    # @param order [Order] 注文オブジェクト
+    # @param transaction [Hash] 取引データ
+    # @param fee_category [String] 手数料カテゴリ
+    # @return [Boolean] 重複しているかどうか
+    private def duplicate_non_sale_charge_fee?(order, transaction, fee_category = nil)
+      exists_params = {
+        order: order,
+        transaction_id: transaction["transactionId"],
+        transaction_type: PaymentFee.transaction_types[:non_sale_charge]
+      }
+
+      # fee_categoryが指定されていれば条件に追加
+      exists_params[:fee_category] = fee_category if fee_category
+
+      PaymentFee.exists?(exists_params)
     end
 
     # 返金取引を処理
     # @param order [Order] 注文オブジェクト
     # @param transaction [Hash] 取引データ
     def process_refund_transaction(order, transaction)
+      Rails.logger.debug "Processing refund transaction: #{transaction['transactionId']}"
+
+      begin
+        log_transaction_details(transaction)
+        create_refund_payment_fee(order, transaction)
+        Rails.logger.debug "Refund transaction processing completed successfully"
+      rescue StandardError => e
+        Rails.logger.error "予期せぬエラー: #{e.class.name} - #{e.message}"
+        Rails.logger.error e.backtrace.join("\n")
+        raise
+      end
+    end
+
+    # 返金用のPaymentFeeレコードを作成
+    # @param order [Order] 注文オブジェクト
+    # @param transaction [Hash] 取引データ
+    private def create_refund_payment_fee(order, transaction)
+      # DEBIT以外のbookingEntryはスキップ
       unless transaction["bookingEntry"] == "DEBIT"
+        Rails.logger.debug "Skipping non-DEBIT refund transaction: #{transaction['transactionId']}, bookingEntry: #{transaction['bookingEntry']}"
         return
       end
 
-      # PaymentFee で既に同じ transaction_id の返金が登録されている場合は処理をスキップ
-      if PaymentFee.exists?(
-        order: order,
-        transaction_id: transaction["transactionId"],
-        transaction_type: PaymentFee.transaction_types[:refund]
-      )
+      # 既に同じtransaction_idの返金処理が存在する場合はスキップ
+      if duplicate_refund_fee?(order, transaction)
+        Rails.logger.debug "Skipping duplicate refund transaction: #{transaction['transactionId']}"
         return
       end
 
       amount = transaction.dig("amount", "value").to_d
+      Rails.logger.debug "Refund amount: #{amount}"
+
       total_fee_basis_amount = transaction.dig("totalFeeBasisAmount", "value").to_d
+      Rails.logger.debug "Refund total fee basis amount: #{total_fee_basis_amount}"
 
-      # 返金用のSaleレコードを新規に作成（通常のSaleデータとは別に保存）
-      Sale.create!(
-        order: order,
-        order_net_amount: -amount,
-        order_gross_amount: -total_fee_basis_amount
-      )
+      fee_amount = transaction.dig("totalFeeAmount", "value").to_d
+      Rails.logger.debug "Refund fee amount: #{fee_amount}"
 
-      PaymentFee.create!(
+      begin
+        # トランザクション内で処理して一貫性を確保
+        ActiveRecord::Base.transaction do
+          # 返金用のSaleレコードを新規に作成（通常のSaleデータとは別に保存）
+          sale = Sale.create!(
+            order: order,
+            order_net_amount: -amount,
+            order_gross_amount: -total_fee_basis_amount
+          )
+          Rails.logger.debug "Created refund Sale: #{sale.id}"
+
+          payment_fee = PaymentFee.create!(
+            order: order,
+            transaction_type: :refund,
+            transaction_id: transaction["transactionId"],
+            fee_category: "undefined",
+            fee_amount: -fee_amount  # マイナス値として保存
+          )
+          Rails.logger.debug "Created refund PaymentFee: #{payment_fee.id}"
+        end
+      rescue ActiveRecord::RecordNotUnique => e
+        Rails.logger.warn "重複エラー (返金): #{e.message}"
+      rescue => e
+        Rails.logger.error "Failed to create refund records: #{e.message}"
+        Rails.logger.error e.backtrace.join("\n")
+        raise
+      end
+    end
+
+    # 返金手数料が重複しているかチェック
+    # @param order [Order] 注文オブジェクト
+    # @param transaction [Hash] 取引データ
+    # @return [Boolean] 重複しているかどうか
+    private def duplicate_refund_fee?(order, transaction)
+      PaymentFee.exists?(
         order: order,
-        transaction_type: :refund,
-        fee_category: :undefined,
-        fee_amount: -transaction.dig("totalFeeAmount", "value").to_d,
-        transaction_id: transaction["transactionId"]
+        transaction_id: transaction["transactionId"],
+        transaction_type: PaymentFee.transaction_types[:refund]
       )
     end
   end

@@ -31,7 +31,21 @@ module Ebay
 
       # 通貨情報を取得
       currency_code = extract_currency_code(order_data)
-      currency = ::Currency.find_or_create_by_code(currency_code) if currency_code.present?
+      # 通貨を作成または検索
+      currency = nil
+      if currency_code.present?
+        currency = ::Currency.find_by(code: currency_code)
+        if currency.nil?
+          # 通貨がない場合は作成（必須属性を設定）
+          # 通貨コードに応じて適切な名前とシンボルを設定
+          currency_name, currency_symbol = currency_info_for_code(currency_code)
+          currency = ::Currency.create!(
+            code: currency_code,
+            name: currency_name,
+            symbol: currency_symbol
+          )
+        end
+      end
 
       order = Order.find_or_initialize_by(order_number: order_data["orderId"], user_id: current_user.id)
       order.update!(
@@ -52,10 +66,6 @@ module Ebay
         next unless line_item
         next unless line_item["quantity"] && line_item["total"] && line_item["total"]["value"]
 
-        # 各明細行の通貨情報を取得
-        currency_code = line_item.dig("total", "currency")
-        currency = currency_code.present? ? ::Currency.find_or_create_by_code(currency_code) : order.currency
-
         order_line = OrderLine.find_or_initialize_by(
           order_id: order.id,
           line_item_id: line_item["lineItemId"]
@@ -65,8 +75,7 @@ module Ebay
           quantity: line_item["quantity"],
           unit_price: line_item["total"]["value"],
           line_item_name: line_item["title"],
-          line_item_id: line_item["lineItemId"],
-          currency_id: currency&.id
+          line_item_id: line_item["lineItemId"]
         }
 
         # SKUが存在する場合はそのSKUを、存在しない場合は"undefined"を使用
@@ -90,13 +99,9 @@ module Ebay
 
       tracking_number = fulfillment_hrefs[0].split("/").last
 
-      # 注文の通貨情報をShipmentにも設定
-      currency = order.currency
-
       shipment = Shipment.find_or_initialize_by(order_id: order.id)
       shipment.update!(
-        tracking_number: tracking_number,
-        currency_id: currency&.id
+        tracking_number: tracking_number
       )
     end
 
@@ -106,8 +111,30 @@ module Ebay
     def extract_currency_code(order_data)
       # 優先順位：価格サマリーの合計 > 支払いサマリーの合計 > デフォルト(USD)
       order_data.dig("pricingSummary", "total", "currency") ||
-        order_data.dig("paymentSummary", "totalDueSeller", "currency") ||
+        order_data.dig("paymentSummary", "totalDueSeller", "convertedFromCurrency") ||
         "USD"
+    end
+
+    # 通貨コードに応じた名前とシンボルを返す
+    # @param code [String] 通貨コード
+    # @return [Array] [通貨名, 通貨シンボル]
+    def currency_info_for_code(code)
+      case code
+      when "USD"
+        [ "US Dollar", "$" ]
+      when "JPY"
+        [ "Japanese Yen", "¥" ]
+      when "EUR"
+        [ "Euro", "€" ]
+      when "GBP"
+        [ "British Pound", "£" ]
+      when "CAD"
+        [ "Canadian Dollar", "C$" ]
+      when "AUD"
+        [ "Australian Dollar", "A$" ]
+      else
+        [ "Unknown Currency (#{code})", code ]
+      end
     end
   end
 end
