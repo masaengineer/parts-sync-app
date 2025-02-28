@@ -5,7 +5,11 @@ class SalesReportCalculator
 
   def calculate
     # --- 売上 ---
-    order_revenue_usd      = @order.sales.sum(&:order_net_amount).to_f
+    order_revenue_usd = @order.sales.sum(&:order_gross_amount).to_f
+
+    # --- 為替レート ---
+    exchange_rate = @order.sales.map(&:exchangerate).first.to_f
+    exchange_rate = 1.0 if exchange_rate.zero? # レートが無い場合はデフォルト値
 
     # --- 手数料合計 ---
     order_payment_fees_usd = @order.payment_fees.sum(&:fee_amount).to_f
@@ -18,19 +22,37 @@ class SalesReportCalculator
     # --- 調達コスト(円)とSKU合計数量 ---
     procurement_data = calculate_procurement_data(@order)
 
-    # --- ドルから円へ換算して利益計算 ---
-    # CurrencyConverterを使用してUSDからJPYへ変換
-    revenue_in_jpy      = CurrencyConverter.to_jpy(order_revenue_usd, currency: "USD")
-    payment_fees_in_jpy = CurrencyConverter.to_jpy(order_payment_fees_usd, currency: "USD")
+    # --- USD売上の計算（order_gross_amount × exchangerate） ---
+    usd_revenue = order_revenue_usd * exchange_rate
 
-    # 総コストの計算（仕入原価 + その他原価 + 手数料 + 送料）
-    total_cost_jpy = payment_fees_in_jpy +
-                      order_shipping_cost_jpy +
-                      procurement_data[:procurement_cost] +
+    # --- 手数料をUSDで計算 ---
+    payment_fees_in_usd = order_payment_fees_usd
+
+    # --- USD売上から手数料を引いた純売上をJPYに変換 ---
+    net_revenue_usd = usd_revenue - payment_fees_in_usd
+    # 固定レート 1 USD = 150 JPY を使用
+    usd_to_jpy_rate = 150.0
+
+    # --- USD売上の計算（order_gross_amount × exchangerate） ---
+    usd_revenue = order_revenue_usd * exchange_rate
+
+    # --- 手数料をUSDで計算 ---
+    payment_fees_in_usd = order_payment_fees_usd
+
+    # --- USD売上から手数料を引いた純売上をJPYに変換 ---
+    net_revenue_usd = usd_revenue - payment_fees_in_usd
+    net_revenue_jpy = net_revenue_usd * usd_to_jpy_rate
+
+    # --- 円建てコストの合計 ---
+    total_jpy_costs = order_shipping_cost_jpy +
+                      procurement_data[:procurement_cost] + 
                       procurement_data[:other_costs]
 
-    profit_jpy = revenue_in_jpy - total_cost_jpy
-    profit_rate = revenue_in_jpy.zero? ? 0 : (profit_jpy / revenue_in_jpy) * 100
+    # --- 利益計算（JPY） ---
+    profit_jpy = net_revenue_jpy - total_jpy_costs
+    # 利益率計算も USD 売上を JPY に変換して計算
+    jpy_revenue = usd_revenue * usd_to_jpy_rate
+    profit_rate = jpy_revenue.zero? ? 0 : (profit_jpy / jpy_revenue) * 100
 
     # --- SKU情報の取得 ---
     order_lines = @order.order_lines
@@ -39,18 +61,19 @@ class SalesReportCalculator
 
     {
       order: @order,
-      revenue: order_revenue_usd,                       # 表示上ドルのまま
-      payment_fees: order_payment_fees_usd,             # 表示上ドルのまま
-      shipping_cost: order_shipping_cost_jpy,           # 円
+      revenue: usd_revenue,                         # USD売上
+      payment_fees: payment_fees_in_usd,            # USD手数料
+      shipping_cost: order_shipping_cost_jpy,       # 円
       procurement_cost: procurement_data[:procurement_cost], # 仕入原価（円）
-      other_costs: procurement_data[:other_costs],      # その他原価（円）
+      other_costs: procurement_data[:other_costs],  # その他原価（円）
       quantity: procurement_data[:total_quantity],
-      profit: profit_jpy,                               # 円
-      profit_rate: profit_rate,                         # %
+      profit: profit_jpy,                           # JPY利益
+      profit_rate: profit_rate,                     # %
       tracking_number: @order.shipment&.tracking_number, # 追跡番号
-      sale_date: @order.sale_date,                      # 販売日
-      sku_codes: sku_codes,                             # SKUコード（カンマ区切り）
-      product_names: product_names                      # 商品名（カンマ区切り）
+      sale_date: @order.sale_date,                  # 販売日
+      sku_codes: sku_codes,                         # SKUコード（カンマ区切り）
+      product_names: product_names,                 # 商品名（カンマ区切り）
+      exchange_rate: exchange_rate                  # 為替レート
     }
   end
 

@@ -199,10 +199,16 @@ module Ebay
         amount = transaction.dig("amount", "value").to_d
         total_fee_basis_amount = transaction.dig("totalFeeBasisAmount", "value").to_d
 
+        # USD以外の通貨の場合、amount内にexchangeRateが含まれる
+        exchange_rate_value = transaction.dig("amount", "exchangeRate")
+        exchange_rate = exchange_rate_value.nil? ? 1.0 : exchange_rate_value.to_d
+        Rails.logger.debug "Exchange rate from API: #{exchange_rate}"
+
         sale = Sale.create!(
           order: order,
           order_net_amount: amount,
-          order_gross_amount: total_fee_basis_amount
+          order_gross_amount: total_fee_basis_amount,
+          exchangerate: exchange_rate
         )
         Rails.logger.debug "Created Sale: #{sale.id}"
       rescue ActiveRecord::RecordNotUnique => e
