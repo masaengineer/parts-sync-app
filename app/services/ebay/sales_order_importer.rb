@@ -121,19 +121,19 @@ module Ebay
     def currency_info_for_code(code)
       case code
       when "USD"
-        ["US Dollar", "$"]
+        [ "US Dollar", "$" ]
       when "JPY"
-        ["Japanese Yen", "¥"]
+        [ "Japanese Yen", "¥" ]
       when "EUR"
-        ["Euro", "€"]
+        [ "Euro", "€" ]
       when "GBP"
-        ["British Pound", "£"]
+        [ "British Pound", "£" ]
       when "CAD"
-        ["Canadian Dollar", "C$"]
+        [ "Canadian Dollar", "C$" ]
       when "AUD"
-        ["Australian Dollar", "A$"]
+        [ "Australian Dollar", "A$" ]
       else
-        ["Unknown Currency (#{code})", code]
+        [ "Unknown Currency (#{code})", code ]
       end
     end
   end

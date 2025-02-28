@@ -103,7 +103,7 @@ module Ebay
     # @return [Boolean] 少なくとも1つの手数料が処理されたかどうか
     private def process_marketplace_fees(order, transaction)
       fee_processed = false
-      
+
       # orderLineItemsがnilの場合は処理をスキップ
       return fee_processed unless transaction["orderLineItems"].is_a?(Array)
 
