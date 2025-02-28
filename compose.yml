@@ -50,6 +50,7 @@ services:
       RAILS_LIVE_RELOAD_ENABLED: 'true'
       RAILS_LIVE_RELOAD_HOST: '0.0.0.0'
       RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
+      RAILS_ENV: development
     env_file:
       - .env
     ports:
@@ -78,6 +79,7 @@ services:
       POSTGRES_PASSWORD: password
       REDIS_URL: redis://redis:6379/0
       RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
+      RAILS_ENV: development
     env_file:
       - .env
     depends_on:
