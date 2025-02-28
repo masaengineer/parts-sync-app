@@ -1,7 +1,7 @@
 ja:
-  pl_reports:
+  monthly_reports:
     index:
-      title: '簡易PLレポート'
+      title: '月次レポート'
       metrics:
         revenue: '売上高'
         procurement_cost: '原価'

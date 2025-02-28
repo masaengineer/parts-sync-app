@@ -10,9 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_02_20_083337) do
+ActiveRecord::Schema[7.2].define(version: 2025_02_28_163914) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "currencies", force: :cascade do |t|
+    t.string "code", null: false
+    t.string "name"
+    t.string "symbol"
+    t.boolean "active", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_currencies_on_code", unique: true
+  end
 
   create_table "expenses", force: :cascade do |t|
     t.integer "year"
@@ -58,6 +68,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_20_083337) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.bigint "currency_id"
+    t.index ["currency_id"], name: "index_orders_on_currency_id"
     t.index ["order_number"], name: "index_orders_on_order_number"
     t.index ["user_id"], name: "index_orders_on_user_id"
   end
@@ -108,6 +120,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_20_083337) do
     t.datetime "updated_at", null: false
     t.bigint "order_id"
     t.string "tracking_number"
+    t.bigint "currency_id"
+    t.index ["currency_id"], name: "index_shipments_on_currency_id"
     t.index ["order_id"], name: "index_shipments_on_order_id"
   end
 
@@ -143,10 +157,12 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_20_083337) do
   add_foreign_key "manufacturer_skus", "manufacturers"
   add_foreign_key "order_lines", "orders"
   add_foreign_key "order_lines", "seller_skus"
+  add_foreign_key "orders", "currencies"
   add_foreign_key "orders", "users"
   add_foreign_key "payment_fees", "orders"
   add_foreign_key "procurements", "orders"
   add_foreign_key "sales", "orders"
+  add_foreign_key "shipments", "currencies"
   add_foreign_key "sku_mappings", "manufacturer_skus"
   add_foreign_key "sku_mappings", "seller_skus"
 end

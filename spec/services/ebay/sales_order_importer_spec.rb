@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Ebay::OrderDataImportService, type: :service do
+RSpec.describe Ebay::SalesOrderImporter, type: :service do
   describe '#import' do
     let(:user) { create(:user) } # ユーザーのファクトリを作成
     let(:orders_data) do
@@ -74,7 +74,7 @@ RSpec.describe Ebay::OrderDataImportService, type: :service do
       it 'raises FulfillmentError and logs error' do
         expect {
           described_class.new(orders_data).import
-        }.to raise_error(Ebay::FulfillmentService::FulfillmentError)
+        }.to raise_error(Ebay::EbaySalesOrderClient::FulfillmentError)
 
         expect(Rails.logger).to receive(:error).with(/データ保存エラー/)
       end

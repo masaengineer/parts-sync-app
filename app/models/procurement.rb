@@ -1,24 +1,3 @@
-# == Schema Information
-#
-# Table name: procurements
-#
-#  id             :bigint           not null, primary key
-#  purchase_price :decimal(, )
-#  forwarding_fee :decimal(, )
-#  created_at     :datetime         not null
-#  updated_at     :datetime         not null
-#  handling_fee   :decimal(10, 2)
-#  order_id       :bigint           not null
-#  option_fee     :decimal(, )
-#
-# Indexes
-#
-#  index_procurements_on_order_id  (order_id) UNIQUE
-#
-# Foreign Keys
-#
-#  fk_rails_...  (order_id => orders.id)
-#
 class Procurement < ApplicationRecord
   belongs_to :order
 

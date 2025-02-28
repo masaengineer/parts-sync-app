@@ -1,37 +1,13 @@
-# 売上・コスト・利益などをまとめて計算するサービスクラス。
-# USD_TO_JPYレートを用いてドル建て→円建ての利益計算なども共通化できるようにする。
-#
-# 例:
-#   result = SalesReportCalculator.new(order).calculate
-#   => {
-#        order: <Order ...>,
-#        revenue: 売上(USD),
-#        payment_fees: 手数料合計(USD),
-#        shipping_cost: 送料(円),
-#        procurement_cost: 仕入原価(円),      # purchase_price
-#        other_costs: その他原価(円),         # forwarding_fee + option_fee + handling_fee
-#        quantity: SKUの合計数量,
-#        profit: 利益(円),
-#        profit_rate: 利益率(％),
-#        tracking_number: 追跡番号,
-#        sale_date: 販売日,
-#        sku_codes: SKUコード（カンマ区切り）,
-#        product_names: 商品名（カンマ区切り）
-#      }
-#
 class SalesReportCalculator
-  include ExchangeRateConcern
-
   def initialize(order)
     @order = order
   end
 
-  # 計算を実行し、ハッシュ形式で返す
   def calculate
-    # --- 売上(USD) ---
+    # --- 売上 ---
     order_revenue_usd      = @order.sales.sum(&:order_net_amount).to_f
 
-    # --- 手数料合計(USD) ---
+    # --- 手数料合計 ---
     order_payment_fees_usd = @order.payment_fees.sum(&:fee_amount).to_f
 
     # --- 送料(円) ---
@@ -43,8 +19,9 @@ class SalesReportCalculator
     procurement_data = calculate_procurement_data(@order)
 
     # --- ドルから円へ換算して利益計算 ---
-    revenue_in_jpy      = convert_usd_to_jpy(order_revenue_usd)
-    payment_fees_in_jpy = convert_usd_to_jpy(order_payment_fees_usd)
+    # CurrencyConverterを使用してUSDからJPYへ変換
+    revenue_in_jpy      = CurrencyConverter.to_jpy(order_revenue_usd, currency: "USD")
+    payment_fees_in_jpy = CurrencyConverter.to_jpy(order_payment_fees_usd, currency: "USD")
 
     # 総コストの計算（仕入原価 + その他原価 + 手数料 + 送料）
     total_cost_jpy = payment_fees_in_jpy +

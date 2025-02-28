@@ -1,21 +1,10 @@
-# == Schema Information
-#
-# Table name: shipments
-#
-#  id                              :bigint           not null, primary key
-#  customer_international_shipping :decimal(, )
-#  created_at                      :datetime         not null
-#  updated_at                      :datetime         not null
-#  order_id                        :bigint
-#  tracking_number                 :string
-#
-# Indexes
-#
-#  index_shipments_on_order_id  (order_id)
-#
 class Shipment < ApplicationRecord
   belongs_to :order
-
+  belongs_to :currency, optional: true
+  
+  # shipmentの通貨が設定されていない場合はJPYを自動的に設定する
+  before_validation :set_default_currency, if: -> { currency_id.nil? }
+  
   def self.ransackable_attributes(auth_object = nil)
     %w[
       tracking_number
@@ -23,5 +12,11 @@ class Shipment < ApplicationRecord
       created_at
       updated_at
     ]
+  end
+  
+  private
+  
+  def set_default_currency
+    self.currency = Currency.find_by(code: 'JPY')
   end
 end

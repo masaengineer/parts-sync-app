@@ -1,12 +1,12 @@
 module Ebay
-  class FinanceApiClient
+  class EbayFinanceClient
     class FinanceError < StandardError; end  # エラークラスを追加
 
     API_BASE_URL = "https://apiz.ebay.com".freeze
     TRANSACTION_ENDPOINT = "/sell/finances/v1/transaction".freeze
 
     def initialize
-      @auth_service = AuthService.new
+      @auth_service = EbayAuthClient.new
     end
 
     def fetch_transactions(filters = {})

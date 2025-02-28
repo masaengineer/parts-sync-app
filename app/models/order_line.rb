@@ -1,20 +1,8 @@
-# == Schema Information
-#
-# Table name: order_lines
-#
-#  id             :bigint           not null, primary key
-#  seller_sku_id  :bigint           not null
-#  quantity       :integer
-#  unit_price     :decimal(, )
-#  line_item_id   :integer
-#  line_item_name :string
-#  order_id       :bigint           not null
-#  created_at     :datetime         not null
-#  updated_at     :datetime         not null
-#
 class OrderLine < ApplicationRecord
   belongs_to :seller_sku
   belongs_to :order
+  # currency_idカラムを削除したため、orderから通貨を委譲
+  delegate :currency, to: :order
 
   validates :quantity, presence: true, numericality: { greater_than: 0 }
   validates :line_item_id, presence: true
@@ -24,6 +12,6 @@ class OrderLine < ApplicationRecord
   end
 
   def self.ransackable_associations(auth_object = nil)
-    %w[order seller_sku] # 検索可能な関連付け
+    %w[order seller_sku currency] # 検索可能な関連付け
   end
 end

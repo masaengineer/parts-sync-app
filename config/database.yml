@@ -23,11 +23,12 @@ default: &default
 
 development:
   <<: *default
-  database: parts_sync_new_development
+
+  database: parts_sync_development
 
 test:
   <<: *default
-  database: parts_sync_new_test
+  database: parts_sync_test
   host: <%= ENV.fetch("POSTGRES_HOST") { 'db' } %>
 
 # As with config/credentials.yml, you never want to store sensitive information,
@@ -52,6 +53,6 @@ test:
 #
 production:
   <<: *default
-  database: parts_sync_new_production
-  username: parts_sync_new
+  database: parts_sync_production
+  username: parts_sync
   password: <%= ENV["PARTS_SYNC_NEW_DATABASE_PASSWORD"] %>
