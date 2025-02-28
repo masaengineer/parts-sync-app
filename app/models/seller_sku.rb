@@ -1,16 +1,3 @@
-# == Schema Information
-#
-# Table name: seller_skus
-#
-#  id         :bigint           not null, primary key
-#  sku_code   :string           not null
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#
-# Indexes
-#
-#  index_seller_skus_on_sku_code  (sku_code) UNIQUE
-#
 class SellerSku < ApplicationRecord
   has_many :order_lines
   has_many :sku_mappings

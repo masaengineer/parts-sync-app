@@ -91,10 +91,8 @@ end
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
-  gem "rails-erd"  # ER図を生成するためのgem
   gem "letter_opener"  # 開発環境でメールをブラウザで確認するためのgem
   gem "letter_opener_web"  # letter_openerをWeb経由で確認するためのgem
-  gem "annotate"  # モデルファイルに対してスキーマ情報のコメントを自動生成するためのgem
   gem "overcommit"  # Git hooksを管理するためのgem
 end
 

@@ -23,6 +23,7 @@ default: &default
 
 development:
   <<: *default
+
   database: parts_sync_development
 
 test:

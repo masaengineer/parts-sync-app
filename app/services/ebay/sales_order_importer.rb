@@ -29,10 +29,15 @@ module Ebay
     def import_order(order_data, current_user)
       return if current_user.blank?
 
+      # 通貨情報を取得
+      currency_code = extract_currency_code(order_data)
+      currency = ::Currency.find_or_create_by_code(currency_code) if currency_code.present?
+
       order = Order.find_or_initialize_by(order_number: order_data["orderId"], user_id: current_user.id)
       order.update!(
         sale_date:  order_data["creationDate"],
-        user_id:    current_user.id
+        user_id:    current_user.id,
+        currency_id: currency&.id
       )
 
       import_order_lines(order, order_data["lineItems"])
@@ -47,6 +52,10 @@ module Ebay
         next unless line_item
         next unless line_item["quantity"] && line_item["total"] && line_item["total"]["value"]
 
+        # 各明細行の通貨情報を取得
+        currency_code = line_item.dig("total", "currency")
+        currency = currency_code.present? ? ::Currency.find_or_create_by_code(currency_code) : order.currency
+
         order_line = OrderLine.find_or_initialize_by(
           order_id: order.id,
           line_item_id: line_item["lineItemId"]
@@ -56,7 +65,8 @@ module Ebay
           quantity: line_item["quantity"],
           unit_price: line_item["total"]["value"],
           line_item_name: line_item["title"],
-          line_item_id: line_item["lineItemId"]
+          line_item_id: line_item["lineItemId"],
+          currency_id: currency&.id
         }
 
         # SKUが存在する場合はそのSKUを、存在しない場合は"undefined"を使用
@@ -80,10 +90,24 @@ module Ebay
 
       tracking_number = fulfillment_hrefs[0].split("/").last
 
+      # 注文の通貨情報をShipmentにも設定
+      currency = order.currency
+
       shipment = Shipment.find_or_initialize_by(order_id: order.id)
       shipment.update!(
-        tracking_number: tracking_number
+        tracking_number: tracking_number,
+        currency_id: currency&.id
       )
+    end
+
+    # 注文データから通貨コードを抽出
+    # @param order_data [Hash] 注文データ
+    # @return [String, nil] 通貨コード
+    def extract_currency_code(order_data)
+      # 優先順位：価格サマリーの合計 > 支払いサマリーの合計 > デフォルト(USD)
+      order_data.dig("pricingSummary", "total", "currency") ||
+        order_data.dig("paymentSummary", "totalDueSeller", "currency") ||
+        "USD"
     end
   end
 end
