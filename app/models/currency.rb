@@ -11,10 +11,6 @@ class Currency < ApplicationRecord
 
   # 関連付け
   has_many :orders
-  has_many :sales
-  has_many :order_lines
-  has_many :payment_fees
-  has_many :shipments
 
   # バリデーション
   validates :code, presence: true, uniqueness: true

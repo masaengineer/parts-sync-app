@@ -4,10 +4,10 @@ class SalesReportCalculator
   end
 
   def calculate
-    # --- 売上(USD) ---
+    # --- 売上 ---
     order_revenue_usd      = @order.sales.sum(&:order_net_amount).to_f
 
-    # --- 手数料合計(USD) ---
+    # --- 手数料合計 ---
     order_payment_fees_usd = @order.payment_fees.sum(&:fee_amount).to_f
 
     # --- 送料(円) ---

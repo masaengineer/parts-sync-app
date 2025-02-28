@@ -32,23 +32,19 @@ module SalesReportsHelper
     when :fee
       format_currency(data[:payment_fees], data[:order].currency)
     when :shipping_cost
-      # 送料は通常、配送先の通貨で表示
-      shipment_currency = data[:order].shipment&.currency || data[:order].currency
-      format_currency(data[:shipping_cost], shipment_currency)
+      # 送料は常にJPYとして扱う
+      format_jpy_currency(data[:shipping_cost])
     when :procurement_cost
-      # 調達コストは通常、日本円で表示
-      jpy_currency = Currency.find_by(code: "JPY")
-      format_currency(data[:procurement_cost], jpy_currency)
+      # 仕入原価は常にJPYとして扱う
+      format_jpy_currency(data[:procurement_cost])
     when :other_cost
-      # その他コストも通常、日本円で表示
-      jpy_currency = Currency.find_by(code: "JPY")
-      format_currency(data[:other_costs], jpy_currency)
+      # その他原価は常にJPYとして扱う
+      format_jpy_currency(data[:other_costs])
     when :quantity
       data[:quantity]
     when :profit
-      # 利益は日本円で表示
-      jpy_currency = Currency.find_by(code: "JPY")
-      format_currency(data[:profit], jpy_currency)
+      # 利益は常にJPYとして扱う
+      format_jpy_currency(data[:profit])
     when :profit_rate
       "#{number_with_precision(data[:profit_rate], precision: 1)}%"
     when :tracking_number
@@ -60,6 +56,29 @@ module SalesReportsHelper
   def get_column_class(column, type = :cell)
     return column[:class] if column[:class]
     type == :header ? column[:header_class] : column[:cell_class]
+  end
+
+  # 検索フォームの入力フィールドを生成するヘルパーメソッド
+  def search_form_field(form, field_name, label_text, options = {})
+    field_type = options[:field_type] || :search_field
+    input_classes = "input input-sm input-bordered w-full focus:input-primary text-base"
+    label_classes = "label font-medium text-sm"
+
+    content_tag(:div, class: "form-control w-full") do
+      concat form.label(field_name, label_text, class: label_classes)
+      concat form.send(field_type, field_name, class: input_classes)
+    end
+  end
+
+  # 検索フォームのフィールド設定を返すメソッド
+  def search_form_fields
+    [
+      { name: :order_number_cont, label: "注文番号" },
+      { name: :shipment_tracking_number_cont, label: "追跡番号" },
+      { name: :order_lines_seller_sku_sku_code_cont, label: "SKUコード" },
+      { name: :sale_date_gteq, label: "販売日（から）", field_type: :date_field },
+      { name: :sale_date_lteq, label: "販売日（まで）", field_type: :date_field }
+    ]
   end
 
   private
@@ -76,15 +95,30 @@ module SalesReportsHelper
       return number_to_currency(amount, unit: "$", precision: 2, format: "%u%n")
     end
 
-    # 通貨コードに応じて精度を変更
-    precision = currency.code == "JPY" ? 0 : 2
+    # 通貨コードに応じて精度と単位を変更
+    if currency.code == "JPY"
+      precision = 0
+      unit = "¥"
+    else
+      precision = 2
+      unit = currency.symbol || "$"
+    end
 
     # 通貨シンボルと金額を表示
     number_to_currency(
       amount,
-      unit: currency.symbol,
+      unit: unit,
       precision: precision,
       format: "%u%n"
     )
+  end
+
+  # JPY通貨の金額フォーマットを行う
+  # @param amount [Numeric] 金額
+  # @return [String] フォーマットされた金額
+  def format_jpy_currency(amount)
+    return "" if amount.nil?
+
+    number_to_currency(amount, unit: "¥", precision: 0, format: "%u%n")
   end
 end
