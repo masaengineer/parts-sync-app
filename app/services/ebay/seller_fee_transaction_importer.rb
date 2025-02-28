@@ -1,8 +1,8 @@
 module Ebay
-  class TransactionFeeImporter
+  class SellerFeeTransactionImporter
     class ImportError < StandardError; end
 
-    def initialize(api_client = FinanceApiClient.new)
+    def initialize(api_client = EbayFinanceClient.new)
       @api_client = api_client
     end
 

@@ -1,5 +1,5 @@
 module Ebay
-  class OrderDataImportService
+  class SalesOrderImporter
     def initialize(orders_data)
       @orders_data = orders_data
     end
@@ -16,9 +16,9 @@ module Ebay
         current_user.update!(ebay_orders_last_synced_at: @orders_data[:last_synced_at])
       end
     rescue ActiveRecord::RecordInvalid => e
-      raise ::Ebay::FulfillmentService::FulfillmentError, "データ保存中にエラーが発生しました: #{e.message}"
+      raise ::Ebay::EbaySalesOrderClient::FulfillmentError, "データ保存中にエラーが発生しました: #{e.message}"
     rescue StandardError => e
-      raise ::Ebay::FulfillmentService::FulfillmentError, "予期せぬエラーが発生しました: #{e.message}"
+      raise ::Ebay::EbaySalesOrderClient::FulfillmentError, "予期せぬエラーが発生しました: #{e.message}"
     end
 
     private

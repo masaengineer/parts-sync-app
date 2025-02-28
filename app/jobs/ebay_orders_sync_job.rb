@@ -2,7 +2,7 @@ class EbayOrdersSyncJob < ApplicationJob
   queue_as :default
 
   # エラー時の再試行設定
-  retry_on Ebay::FulfillmentService::FulfillmentError, wait: 5.seconds, attempts: 3
+  retry_on Ebay::EbaySalesOrderClient::FulfillmentError, wait: 5.seconds, attempts: 3
   retry_on ActiveRecord::RecordInvalid, wait: 5.seconds, attempts: 3
 
   def perform
@@ -14,13 +14,13 @@ class EbayOrdersSyncJob < ApplicationJob
         Rails.logger.info "ユーザーID: #{user.id} の注文同期を開始"
 
         # eBay APIからデータを取得するサービス
-        orders_data = Ebay::FulfillmentService.new.fetch_orders(user)
+        orders_data = Ebay::EbaySalesOrderClient.new.fetch_orders(user)
 
         # 取得したデータをインポート
-        Ebay::OrderDataImportService.new(orders_data).import(user)
+        Ebay::SalesOrderImporter.new(orders_data).import(user)
 
         Rails.logger.info "✅ ユーザーID: #{user.id} の注文同期完了"
-      rescue Ebay::FulfillmentService::FulfillmentError => e
+      rescue Ebay::EbaySalesOrderClient::FulfillmentError => e
         Rails.logger.error "❌ ユーザーID: #{user.id} - eBay API エラー: #{e.message}"
         Rails.logger.error e.backtrace.join("\n")
         raise  # 再試行のために例外を再度発生

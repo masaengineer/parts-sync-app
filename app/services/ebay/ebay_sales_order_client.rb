@@ -1,11 +1,11 @@
 module Ebay
-  class FulfillmentService
+  class EbaySalesOrderClient
     class FulfillmentError < StandardError; end
 
     API_ENDPOINT = "/sell/fulfillment/v1/order".freeze
 
     def initialize
-      @auth_service = AuthService.new
+      @auth_service = EbayAuthClient.new
       validate_auth_token
     end
 

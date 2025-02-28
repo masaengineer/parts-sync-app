@@ -1,5 +1,5 @@
 module Ebay
-  class AuthService
+  class EbayAuthClient
     class AuthError < StandardError; end
 
     REQUIRED_SCOPES = [
