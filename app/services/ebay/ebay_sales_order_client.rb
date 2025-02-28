@@ -64,7 +64,7 @@ module Ebay
 
       # 最終同期日時を返す（UTC）
       last_synced_at = current_time_utc
-      
+
       { orders: all_orders, last_synced_at: last_synced_at }
     rescue Faraday::BadRequestError, Faraday::UnauthorizedError, Faraday::ForbiddenError => e
       error_body = e.response[:body] rescue nil

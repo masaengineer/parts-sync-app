@@ -1,7 +1,6 @@
 # app/controllers/monthly_reports_controller.rb
 
 class MonthlyReportsController < ApplicationController
-
   def index
     # 利用可能な年度を取得（ordersテーブルから）
     @available_years = current_user.orders
