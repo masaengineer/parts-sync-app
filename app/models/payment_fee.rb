@@ -19,6 +19,7 @@
 #
 class PaymentFee < ApplicationRecord
   belongs_to :order, foreign_key: :order_id
+  belongs_to :currency, optional: true
 
   validates :fee_amount, presence: true, numericality: true
   validates :fee_category, presence: true

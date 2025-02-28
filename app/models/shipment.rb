@@ -8,6 +8,7 @@
 #  updated_at                      :datetime         not null
 #  order_id                        :bigint
 #  tracking_number                 :string
+#  currency_code                   :string
 #
 # Indexes
 #
@@ -15,6 +16,7 @@
 #
 class Shipment < ApplicationRecord
   belongs_to :order
+  belongs_to :currency, optional: true
 
   def self.ransackable_attributes(auth_object = nil)
     %w[
