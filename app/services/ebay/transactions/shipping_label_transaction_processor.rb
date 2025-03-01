@@ -5,7 +5,7 @@ module Ebay
       protected
 
       def transaction_type
-        'shipping_label'
+        "shipping_label"
       end
 
       def process_transaction
@@ -35,9 +35,9 @@ module Ebay
           )
           Rails.logger.debug "Created shipping label PaymentFee: #{payment_fee.id}"
         rescue ActiveRecord::RecordNotUnique => e
-          log_duplicate_error('配送ラベル')
+          log_duplicate_error("配送ラベル")
         rescue => e
-          log_creation_error('shipping label PaymentFee', e)
+          log_creation_error("shipping label PaymentFee", e)
           raise
         end
       end

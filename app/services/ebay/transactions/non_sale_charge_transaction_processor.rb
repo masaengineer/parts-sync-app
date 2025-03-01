@@ -5,7 +5,7 @@ module Ebay
       protected
 
       def transaction_type
-        'non_sale_charge'
+        "non_sale_charge"
       end
 
       def process_transaction
@@ -49,9 +49,9 @@ module Ebay
           )
           Rails.logger.debug "Created non-sale charge PaymentFee: #{payment_fee.id}"
         rescue ActiveRecord::RecordNotUnique => e
-          log_duplicate_error('非販売手数料')
+          log_duplicate_error("非販売手数料")
         rescue => e
-          log_creation_error('non-sale charge PaymentFee', e)
+          log_creation_error("non-sale charge PaymentFee", e)
           raise
         end
       end

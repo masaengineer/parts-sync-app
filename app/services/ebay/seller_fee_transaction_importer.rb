@@ -1,8 +1,8 @@
-require_relative 'transactions/base_transaction_processor'
-require_relative 'transactions/sale_transaction_processor'
-require_relative 'transactions/shipping_label_transaction_processor'
-require_relative 'transactions/non_sale_charge_transaction_processor'
-require_relative 'transactions/refund_transaction_processor'
+require_relative "transactions/base_transaction_processor"
+require_relative "transactions/sale_transaction_processor"
+require_relative "transactions/shipping_label_transaction_processor"
+require_relative "transactions/non_sale_charge_transaction_processor"
+require_relative "transactions/refund_transaction_processor"
 
 module Ebay
   class SellerFeeTransactionImporter
@@ -48,15 +48,15 @@ module Ebay
     # @param transaction [Hash] 取引データ
     def process_transaction_by_type(order, transaction)
       processor_class = case transaction["transactionType"]
-        when "SALE"
+      when "SALE"
           Ebay::Transactions::SaleTransactionProcessor
-        when "SHIPPING_LABEL"
+      when "SHIPPING_LABEL"
           Ebay::Transactions::ShippingLabelTransactionProcessor
-        when "NON_SALE_CHARGE"
+      when "NON_SALE_CHARGE"
           Ebay::Transactions::NonSaleChargeTransactionProcessor
-        when "REFUND"
+      when "REFUND"
           Ebay::Transactions::RefundTransactionProcessor
-        else
+      else
           Rails.logger.debug "Unsupported transaction type: #{transaction['transactionType']}"
           return
       end

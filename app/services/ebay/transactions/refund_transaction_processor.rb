@@ -5,7 +5,7 @@ module Ebay
       protected
 
       def transaction_type
-        'refund'
+        "refund"
       end
 
       def process_transaction
@@ -58,9 +58,9 @@ module Ebay
             Rails.logger.debug "Created refund PaymentFee: #{payment_fee.id}"
           end
         rescue ActiveRecord::RecordNotUnique => e
-          log_duplicate_error('返金')
+          log_duplicate_error("返金")
         rescue => e
-          log_creation_error('refund records', e)
+          log_creation_error("refund records", e)
           raise
         end
       end

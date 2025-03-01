@@ -5,7 +5,7 @@ module Ebay
       protected
 
       def transaction_type
-        'sale'
+        "sale"
       end
 
       def process_transaction
@@ -68,10 +68,10 @@ module Ebay
           Rails.logger.debug "Created PaymentFee: #{payment_fee.id}"
           true
         rescue ActiveRecord::RecordNotUnique => e
-          log_duplicate_error('個別処理')
+          log_duplicate_error("個別処理")
           false
         rescue => e
-          log_creation_error('PaymentFee', e)
+          log_creation_error("PaymentFee", e)
           raise
         end
       end
@@ -120,9 +120,9 @@ module Ebay
           )
           Rails.logger.debug "Created Sale: #{sale.id}"
         rescue ActiveRecord::RecordNotUnique => e
-          log_duplicate_error('Sale')
+          log_duplicate_error("Sale")
         rescue => e
-          log_creation_error('Sale', e)
+          log_creation_error("Sale", e)
           raise
         end
       end
