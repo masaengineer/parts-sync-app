@@ -193,7 +193,8 @@ module Ebay
     # @param order [Order] 注文オブジェクト
     # @param transaction [Hash] 取引データ
     private def create_sale_record(order, transaction)
-      return if Sale.exists?(order_id: order.id)
+      # 同じオーダーIDですでにSALEタイプ（正の金額）のレコードが存在するかチェック
+      return if Sale.where(order_id: order.id).where('order_net_amount > 0').exists?
 
       begin
         amount = transaction.dig("amount", "value").to_d
