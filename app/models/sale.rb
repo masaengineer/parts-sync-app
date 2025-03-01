@@ -2,7 +2,7 @@ class Sale < ApplicationRecord
   belongs_to :order
   # currency_idカラムを削除したため、orderから通貨を委譲
   delegate :currency, to: :order
-  
+
   # 金額の正負に基づいてトランザクションタイプを判断
   def transaction_type
     order_net_amount.negative? ? "REFUND" : "SALE"
