@@ -35,15 +35,30 @@ class MonthlyReportCalculator
     orders = user.orders.where(sale_date: date_range(month))
               .joins(:sales)
 
-    # 通貨ごとに金額を集計
-    usd_sales = orders.where(currency: "USD").sum("sales.order_net_amount") || 0
-    eur_sales = orders.where(currency: "EUR").sum("sales.order_net_amount") || 0
-    gbp_sales = orders.where(currency: "GBP").sum("sales.order_net_amount") || 0
+    # 通貨ごとの売上高をexchangerateを使って円換算して集計
+    jpy_total = 0
 
-    # 外貨を円に変換して合算
-    jpy_total = CurrencyConverter.to_jpy(usd_sales, currency: "USD") +
-                CurrencyConverter.to_jpy(eur_sales, currency: "EUR") +
-                CurrencyConverter.to_jpy(gbp_sales, currency: "GBP")
+    # USD売上（exchangerate = 1.0）
+    usd_orders = orders.where(currency: "USD")
+    usd_sales = usd_orders.joins(:sales).sum("sales.order_net_amount")
+    jpy_total += usd_sales * 135.0 # デフォルトのUSD→JPYレート
+
+    # USD以外の外貨売上（exchangerateを使用）
+    non_usd_orders = orders.where.not(currency: "USD")
+    non_usd_orders.each do |order|
+      # 各注文の売上とexchangerateを取得
+      sale = order.sales.first
+      next unless sale
+
+      # salesテーブルに保存されたexchangerateを使って計算
+      net_amount = sale.order_net_amount || 0
+      exchange_rate = sale.exchangerate || 1.0
+
+      # 外貨を円に変換（exchangerateはUSDへの変換率なので、さらにUSD→JPYレートで円に変換）
+      jpy_amount = (net_amount * exchange_rate) * 135.0 # USD→JPYレート
+      jpy_total += jpy_amount
+    end
+
     jpy_total
   end
 
