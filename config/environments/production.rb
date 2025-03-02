@@ -112,6 +112,6 @@ Rails.application.configure do
 
 
   #   # 以下の設定を確認・追加
-    # config.assets.digest = false
+  # config.assets.digest = false
   #   config.assets.js_compressor = :terser
 end
