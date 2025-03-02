@@ -4,7 +4,7 @@ Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
   # Code is not reloaded between requests.
-  config.enable_reloading = false
+  # config.enable_reloading = false
 
   # Eager load code on boot. This eager loads most of Rails and
   # your application in memory, allowing both threaded web servers
@@ -21,7 +21,7 @@ Rails.application.configure do
   # config.require_master_key = true
 
   # Disable serving static files from `public/`, relying on NGINX/Apache to do so instead.
-  config.public_file_server.enabled = false
+  # config.public_file_server.enabled = false
 
   # Compress CSS using a preprocessor.
   # config.assets.css_compressor = :sass
@@ -30,11 +30,11 @@ Rails.application.configure do
   config.assets.compile = false
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
-  # config.asset_host = "https://www.parts-sync.site"
-  Rails.application.routes.default_url_options = {
-    host: "www.parts-sync.site",
-    protocol: "https"
-  }
+  # config.asset_host = "http://assets.example.com"
+  # Rails.application.routes.default_url_options = {
+  #   host: "www.parts-sync.site",
+  #   protocol: "https"
+  # }
 
   # Specifies the header that your server uses for sending files.
   # config.action_dispatch.x_sendfile_header = "X-Sendfile" # for Apache
@@ -97,7 +97,7 @@ Rails.application.configure do
   config.active_record.dump_schema_after_migration = false
 
   # Only use :id for inspections in production.
-  config.active_record.attributes_for_inspect = [ :id ]
+  # config.active_record.attributes_for_inspect = [ :id ]
 
   # Enable DNS rebinding protection and other `Host` header attacks.
   config.hosts = [
@@ -112,6 +112,6 @@ Rails.application.configure do
 
 
   #   # 以下の設定を確認・追加
-    # config.assets.digest = false
+  # config.assets.digest = false
   #   config.assets.js_compressor = :terser
 end
