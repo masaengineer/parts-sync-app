@@ -1,6 +1,6 @@
 # サービス概要
 
-**「Parts Sync（仮称）」** は、カーパーツ小売業者向けの売上管理に特化した業務効率化 SaaS です。
+**「Parts Sync」** は、カーパーツ小売業者向けの売上管理に特化した業務効率化 SaaS です。
 商品や販売データを一元管理し、日々の販売管理プロセスを自動化することで、作業効率を向上させます。
 将来的には、蓄積されたデータを活用した分析機能や、他販路への出品＆在庫管理機能を構想しています。
 
@@ -14,10 +14,10 @@
 
 # ユーザー層について
 
-- **主要ターゲット**：年商 1,000 万円〜1 億円規模のカーパーツ EC 事業者
+- **主要ターゲット**：年商 3,000 万円〜1 億円規模のカーパーツ EC 事業者
 - **選定理由**：
   - 取扱商品数が 1 万点以上と多く、効率的な商品管理が必須
-  - 既存システムの価格が少なくない負担である
+  - 市場に存在する業務効率化システムの価格が少なくない負担である
   - 成長過程にあり、システム投資による業務効率化ニーズが高い
 
 # サービスの利用イメージ
@@ -43,17 +43,13 @@
 
 - **業界特化型の機能設計**
 
-  - 複数販路の売上管理に対応（Shopify, eBay, Yahoo ショッピング, BtoB）
+  - 海外販売プラットフォームeBayとの連携対応
   - 国際取引にまつわる多通貨対応や、各配送オプションへの対応が可能
 
 - **コストパフォーマンス**
-
   - 初期費用を抑制
   - 段階的な機能追加オプションの提供
 
-- **将来的な拡張性が高い**
-  - ユーザーフィードバックを反映した継続的な機能改善
-  - API 連携による他システムとの統合（Shopify, eBay 等に対応）
 
 # 機能候補
 
@@ -67,92 +63,27 @@
 
 ### 本リリース
 
-- ユーザー権限管理
-- 画像登録機能
-- インライン編集機能
-- 画像ドラッグアンドドロップ並び替え機能
+- eBay APIによる受注情報の定期取得機能
+- 月次レポート機能
+- 表示件数の設定機能
+- 多通貨対応
+- 経費手動入力機能
+- 取引詳細画面の追加
+- ダークモード
+- オンラインガイド機能
 
-# 機能の実装方針予定
 
-- **CSV 取り込み機能**：roo-rb
-- **ページネーション**：Kaminari
-- **検索機能**：Ransak
-- **権限管理**：Pundit
-- **画像登録**：Cloudinary
-- **インライン編集機能**：Hotwire + Turbo
-- **画像ドラッグアンドドロップ機能**：Stimulus
-- **テストコード**：SimpleCov
 
 # 使用技術
 
 - **バックエンド**：Ruby 3.2.2 / Ruby on Rails 7.0.8
-- **フロントエンド**：Hotwire（Turbo・Stimulus）/ Tailwind CSS
+- **フロントエンド**：Hotwire（Turbo・Stimulus）/ Tailwind CSS / DaisyUI
 - **データベース**：PostgreSQL
 - **インフラ**：Render（Web サービス・PostgreSQL）
-- **監視**：Sentry
 - **キャッシュ**：Redis
+- **キューイング**：Sidekiq
 - **CI/CD**：GitHub Actions
 - **その他の技術**
 
 # ER 図
-
-[![Image from Gyazo](https://i.gyazo.com/5cedc058c622f3a4191848d46cfac81c.png)](https://gyazo.com/5cedc058c622f3a4191848d46cfac81c)
-
-# CI/CD パイプライン
-
-本プロジェクトでは、GitHub Actions を使用して継続的インテグレーション(CI)と継続的デリバリー(CD)を実現しています。
-
-## CI ワークフロー
-
-`.github/workflows/ci.yml`で定義された CI ワークフローは以下のジョブで構成されています：
-
-1. **Lint**: コードの品質チェック
-
-   - Rubocop による静的コード解析
-   - Brakeman によるセキュリティチェック
-   - Bundle Audit による脆弱性チェック
-
-2. **Test**: 段階的なテスト実行
-
-   - ユニットテスト（モデルとサービス）
-   - 統合テスト（リクエスト）
-   - スモークテスト
-   - システムテスト（E2E）
-
-3. **Docker Test**: Docker コンテナ内でのテスト実行
-   - 高速テスト
-   - スモークテスト
-
-### テスト実行コマンド
-
-テストについての詳細は[テスト戦略と実行ガイド](spec/README.md)を参照してください。
-
-## CD ワークフロー
-
-`.github/workflows/cd.yml`で定義された CD ワークフローは以下のジョブで構成されています：
-
-1. **Verify**: デプロイ前の基本的な動作確認
-
-   - スモークテストの実行
-
-2. **Deploy Staging**: ステージング環境へのデプロイ
-
-   - develop ブランチへのプッシュ時に実行
-   - Render へのデプロイ
-   - Slack 通知
-
-3. **Deploy Production**: 本番環境へのデプロイ
-   - main ブランチへのプッシュ時に実行
-   - Render へのデプロイ
-   - Slack 通知
-
-さらに、`.github/workflows/post-deploy-check.yml`でデプロイ後のヘルスチェックを実施しています。
-
-## 環境変数の設定
-
-GitHub リポジトリの「Settings > Secrets and variables > Actions」で以下のシークレットを設定する必要があります：
-
-- `RENDER_API_KEY`: Render の API キー
-- `RENDER_SERVICE_ID_STAGING`: ステージング環境のサービス ID
-- `RENDER_SERVICE_ID_PRODUCTION`: 本番環境のサービス ID
-- `SLACK_WEBHOOK_URL`: Slack 通知用の Webhook URL
+[![Image from Gyazo](https://i.gyazo.com/219e7b0c7a3e8d4d4b58e573806667f9.png)](https://gyazo.com/219e7b0c7a3e8d4d4b58e573806667f9)
