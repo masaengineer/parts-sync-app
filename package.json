@@ -16,8 +16,8 @@
     "tailwindcss": "^3.4.1"
   },
   "scripts": {
-    "build": "esbuild app/javascript/*.* --bundle --sourcemap --outdir=app/assets/javascripts --public-path=/assets --format=esm",
-    "build:watch": "esbuild app/javascript/*.* --bundle --sourcemap --outdir=app/assets/javascripts --public-path=/assets --format=esm --watch",
+    "build": "esbuild app/javascript/*.* --bundle --sourcemap --outdir=app/assets/builds --public-path=/assets --format=esm",
+    "build:watch": "esbuild app/javascript/*.* --bundle --sourcemap --outdir=app/assets/builds --public-path=/assets --format=esm --watch",
     "build:css": "tailwindcss -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/stylesheets/application.css --minify",
     "build:css:watch": "tailwindcss -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/stylesheets/application.css --watch"
   }
