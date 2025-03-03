@@ -19,6 +19,6 @@ class Sale < ApplicationRecord
   end
 
   def self.ransackable_associations(auth_object = nil)
-    %w[order currency]
+    %w[order] # currencyを削除してテスト期待値に合わせる
   end
 end

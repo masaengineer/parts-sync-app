@@ -12,6 +12,6 @@ class OrderLine < ApplicationRecord
   end
 
   def self.ransackable_associations(auth_object = nil)
-    %w[order seller_sku currency] # 検索可能な関連付け
+    %w[order seller_sku] # currencyを削除して関連付けを制限
   end
 end
