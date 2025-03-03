@@ -12,8 +12,9 @@ module Ebay
       # トランザクションを処理
       def process
         log_transaction_details
-        process_transaction
+        result = process_transaction
         log_success
+        result
       rescue StandardError => e
         log_error(e)
         raise
@@ -49,7 +50,9 @@ module Ebay
       # エラーをログに記録
       def log_error(exception)
         Rails.logger.error "予期せぬエラー: #{exception.class.name} - #{exception.message}"
-        Rails.logger.error exception.backtrace.join("\n")
+        if exception.backtrace
+          Rails.logger.error exception.backtrace.join("\n")
+        end
       end
 
       # トランザクションの金額を取得
@@ -85,7 +88,9 @@ module Ebay
       # レコード作成エラーを記録
       def log_creation_error(type, exception)
         Rails.logger.error "Failed to create #{type}: #{exception.message}"
-        Rails.logger.error exception.backtrace.join("\n")
+        if exception.backtrace
+          Rails.logger.error exception.backtrace.join("\n")
+        end
       end
     end
   end

@@ -15,9 +15,8 @@ module Ebay
     # 取引データをインポート
     # @return [String] 処理結果
     def import
-      transactions_data = @api_client.fetch_transactions
-
       begin
+        transactions_data = @api_client.fetch_transactions
         process_transactions(transactions_data["transactions"])
       rescue StandardError => e
         raise ImportError, "取引データのインポートに失敗しました: #{e.message}"
