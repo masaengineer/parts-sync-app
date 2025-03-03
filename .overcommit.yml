@@ -1,5 +1,6 @@
 PreCommit:
   RuboCop:
     enabled: true
-    command: ['bundle', 'exec', 'rubocop', '-A']
+    command:
+      ['docker', 'compose', 'exec', 'web', 'bundle', 'exec', 'rubocop', '-A']
     on_warn: fail
