@@ -40,8 +40,9 @@
 
 /vendor/bundle
 
+# macOS関連ファイル
 .DS_Store
-
+**/.DS_Store
 
 # my rules
 .cursorrules
