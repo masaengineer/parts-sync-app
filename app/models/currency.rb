@@ -1,13 +1,13 @@
 class Currency < ApplicationRecord
   # 通貨コードのenum定義
-  enum code: {
+  enum :code, {
     usd: "USD", # 米ドル
     jpy: "JPY", # 日本円
     eur: "EUR", # ユーロ
     gbp: "GBP", # 英ポンド
     cad: "CAD", # カナダドル
     aud: "AUD"  # オーストラリアドル
-  }, _prefix: true, _suffix: :code
+  }, prefix: true, suffix: :code
 
   # 関連付け
   has_many :orders
