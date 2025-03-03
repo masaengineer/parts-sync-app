@@ -26,7 +26,7 @@ RSpec.describe 'CSVインポート機能', type: :system do
 
         # CSVインポートフォームが存在することを確認
         expect(page).to have_selector('#csv_import')
-        
+
         # インポートボタンの存在を確認
         expect(page).to have_button(I18n.t('sales_reports.csv_import.submit'))
       end

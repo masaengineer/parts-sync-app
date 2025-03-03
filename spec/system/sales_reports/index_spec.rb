@@ -24,14 +24,14 @@ RSpec.describe '売上レポート', type: :system do
   describe '検索機能' do
     it '商品コードで検索できる' do
       visit sales_reports_path
-      
+
       # 検索フォームの存在だけを確認
       expect(page).to have_selector('#order_filter')
     end
 
     it '検索条件をクリアできる' do
       visit sales_reports_path
-      
+
       # クリアリンクの存在を確認
       expect(page).to have_link(I18n.t('sales_reports.search.reset'))
     end

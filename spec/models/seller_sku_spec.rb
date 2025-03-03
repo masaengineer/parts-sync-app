@@ -54,7 +54,7 @@ RSpec.describe SellerSku, type: :model do
   describe 'スコープ' do
     it 'SKUコードで検索できること' do
       sku = create(:seller_sku, sku_code: 'OIL-001')
-      
+
       # メソッド名を確認して使用する
       if SellerSku.respond_to?(:by_code)
         result = SellerSku.by_code('OIL')
