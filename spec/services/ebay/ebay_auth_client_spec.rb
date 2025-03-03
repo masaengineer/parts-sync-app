@@ -7,6 +7,14 @@ RSpec.describe Ebay::EbayAuthClient do
   let(:mock_access_token) { instance_double(OAuth2::AccessToken, token: 'dummy_token', expires_at: Time.now + 1.hour, expires_in: 3600) }
 
   before do
+    # Rails.application.credentialsのebayをモック
+    mock_ebay_credentials = OpenStruct.new(
+      client_id: 'test_client_id',
+      client_secret: 'test_client_secret',
+      refresh_token: 'test_refresh_token'
+    )
+    allow(Rails.application.credentials).to receive(:ebay).and_return(mock_ebay_credentials)
+
     allow(OAuth2::Client).to receive(:new).and_return(mock_oauth_client)
     allow(mock_oauth_client).to receive(:get_token).and_return(mock_access_token)
   end

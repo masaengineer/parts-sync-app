@@ -9,9 +9,13 @@ module Ebay
     ].freeze
 
     def initialize
-      @client_id = Rails.application.credentials.ebay.client_id
-      @client_secret = Rails.application.credentials.ebay.client_secret
-      @refresh_token = Rails.application.credentials.ebay.refresh_token
+      @client_id = ENV['EBAY_CLIENT_ID'] || Rails.application.credentials.dig(:ebay, :client_id)
+      @client_secret = ENV['EBAY_CLIENT_SECRET'] || Rails.application.credentials.dig(:ebay, :client_secret)
+      @refresh_token = ENV['EBAY_REFRESH_TOKEN'] || Rails.application.credentials.dig(:ebay, :refresh_token)
+
+      # 認証情報が設定されているか確認
+      raise AuthError, "eBay認証情報（client_id, client_secret, refresh_token）が設定されていません" unless @client_id && @client_secret && @refresh_token
+
       @auth_token = nil
     end
 

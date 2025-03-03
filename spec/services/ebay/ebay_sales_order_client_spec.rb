@@ -9,6 +9,14 @@ RSpec.describe Ebay::EbaySalesOrderClient do
   let(:current_user) { instance_double('User', ebay_orders_last_synced_at: nil) }
 
   before do
+    # Rails.application.credentialsのebayをモック
+    mock_ebay_credentials = OpenStruct.new(
+      client_id: 'test_client_id',
+      client_secret: 'test_client_secret',
+      refresh_token: 'test_refresh_token'
+    )
+    allow(Rails.application.credentials).to receive(:ebay).and_return(mock_ebay_credentials)
+
     allow(Ebay::EbayAuthClient).to receive(:new).and_return(mock_auth_service)
 
     # Faradayの初期化のモック
