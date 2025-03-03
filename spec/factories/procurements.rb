@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :procurement do
-    association :order
+    order
     purchase_price { 800 }
     forwarding_fee { 200 }
     option_fee { 100 }

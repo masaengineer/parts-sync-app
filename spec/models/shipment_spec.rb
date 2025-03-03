@@ -39,14 +39,9 @@ RSpec.describe Shipment, type: :model do
     it 'トラッキング番号でレコードを検索できること' do
       shipment = create(:shipment, tracking_number: 'TRACK001')
 
-      # Shipmentモデルにby_tracking_numberスコープが実装されていなければ、
-      # このテストをスキップします
-      if Shipment.respond_to?(:by_tracking_number)
-        result = Shipment.by_tracking_number('TRACK001')
-        expect(result).to include(shipment)
-      else
-        pending 'by_tracking_numberスコープが実装されていません'
-      end
+      # by_tracking_numberスコープが実装されたので、通常のテストとして実行
+      result = Shipment.by_tracking_number('TRACK001')
+      expect(result).to include(shipment)
     end
   end
 end

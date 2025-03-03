@@ -23,11 +23,11 @@ RSpec.describe CpassDataSheetImporter do
     context '有効なCSVデータの場合' do
       before do
         # テスト用の注文と出荷情報を作成
-        order1 = create(:order, user: user)
-        order_line1 = create(:order_line, order: order1, merchant_order_id: 'ORDER001')
+        order1 = create(:order, order_number: 'ORDER001', user: user)
+        order_line1 = create(:order_line, order: order1)
 
-        order2 = create(:order, user: user)
-        order_line2 = create(:order_line, order: order2, merchant_order_id: 'ORDER002')
+        order2 = create(:order, order_number: 'ORDER002', user: user)
+        order_line2 = create(:order_line, order: order2)
 
         # 有効なCSVファイルを作成
         valid_csv_content = <<~CSV
@@ -49,19 +49,19 @@ RSpec.describe CpassDataSheetImporter do
         expect(procurement2).to be_present
 
         # 関連する注文を確認
-        order_line1 = OrderLine.find_by(merchant_order_id: 'ORDER001')
-        expect(procurement1.order_id).to eq(order_line1.order_id)
+        order1 = Order.find_by(order_number: 'ORDER001')
+        expect(procurement1.order_id).to eq(order1.id)
 
-        order_line2 = OrderLine.find_by(merchant_order_id: 'ORDER002')
-        expect(procurement2.order_id).to eq(order_line2.order_id)
+        order2 = Order.find_by(order_number: 'ORDER002')
+        expect(procurement2.order_id).to eq(order2.id)
       end
     end
 
     context '購入価格が欠損している場合' do
       before do
         # テスト用の注文と出荷情報を作成
-        order = create(:order, user: user)
-        create(:order_line, order: order, merchant_order_id: 'ORDER001')
+        order = create(:order, order_number: 'ORDER001', user: user)
+        create(:order_line, order: order)
 
         # 購入価格が空のCSVファイルを作成
         invalid_csv_content = <<~CSV
@@ -95,8 +95,8 @@ RSpec.describe CpassDataSheetImporter do
     context 'SKUが欠損している場合' do
       before do
         # テスト用の注文と出荷情報を作成
-        order = create(:order, user: user)
-        create(:order_line, order: order, merchant_order_id: 'ORDER001')
+        order = create(:order, order_number: 'ORDER001', user: user)
+        create(:order_line, order: order)
 
         # SKUが空のCSVファイルを作成
         invalid_csv_content = <<~CSV
@@ -115,8 +115,8 @@ RSpec.describe CpassDataSheetImporter do
     context '既存の調達レコードがある場合' do
       before do
         # テスト用の注文と出荷情報を作成
-        order = create(:order, user: user)
-        create(:order_line, order: order, merchant_order_id: 'ORDER001')
+        order = create(:order, order_number: 'ORDER001', user: user)
+        create(:order_line, order: order)
 
         # 既存の調達レコードを作成
         create(:procurement, order: order, purchase_price: 500)

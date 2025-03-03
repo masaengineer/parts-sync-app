@@ -36,7 +36,7 @@ RSpec.describe SkuMapping, type: :model do
       # 同じ組み合わせの2つ目のマッピングは無効
       duplicate_mapping = build(:sku_mapping, seller_sku: seller_sku, manufacturer_sku: manufacturer_sku)
       expect(duplicate_mapping).not_to be_valid
-      expect(duplicate_mapping.errors[:seller_sku_id]).to include('has already been taken')
+      expect(duplicate_mapping.errors[:seller_sku_id]).to include('は既に使用されています。')
     end
 
     it '異なるseller_skuとmanufacturer_skuの組み合わせは有効であること' do
@@ -72,13 +72,13 @@ RSpec.describe SkuMapping, type: :model do
 
     # by_manufacturer_skuスコープが存在する場合のテスト
     it 'メーカーSKUでマッピングを検索できること', skip: !SkuMapping.respond_to?(:by_manufacturer_sku) do
-      manu_sku = create(:manufacturer_sku)
-      other_manu_sku = create(:manufacturer_sku)
+      manufacturer_sku = create(:manufacturer_sku)
+      other_manufacturer_sku = create(:manufacturer_sku)
 
-      mapping1 = create(:sku_mapping, manufacturer_sku: manu_sku)
-      mapping2 = create(:sku_mapping, manufacturer_sku: other_manu_sku)
+      mapping1 = create(:sku_mapping, manufacturer_sku: manufacturer_sku)
+      mapping2 = create(:sku_mapping, manufacturer_sku: other_manufacturer_sku)
 
-      result = SkuMapping.by_manufacturer_sku(manu_sku.id)
+      result = SkuMapping.by_manufacturer_sku(manufacturer_sku.id)
       expect(result).to include(mapping1)
       expect(result).not_to include(mapping2)
     end
