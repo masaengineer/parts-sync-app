@@ -6,6 +6,8 @@ class Order < ApplicationRecord
   has_one :procurement, dependent: :destroy
   has_many :sales
   has_one :shipment
+  has_many :skus, through: :order_lines, source: :seller_sku
+  has_one :sale, -> { order(created_at: :desc) }, class_name: 'Sale'
 
   validates :order_number, presence: true, uniqueness: true
 
@@ -16,12 +18,11 @@ class Order < ApplicationRecord
       created_at
       updated_at
       user_id
-      currency_id
     ]
   end
 
   def self.ransackable_associations(auth_object = nil)
-    %w[user currency order_lines payment_fees procurement sales shipment]
+    %w[user sale order_lines skus procurement shipment payment_fees]
   end
 
   # 注文に関連する仕入れコストの合計を計算

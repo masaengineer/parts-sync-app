@@ -76,6 +76,11 @@ RSpec.configure do |config|
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
 
+  # テスト実行時のロケールを日本語に設定
+  config.before(:each) do
+    I18n.locale = :ja
+  end
+
   # システムスペックの設定
   config.before(:each, type: :system) do
     driven_by :rack_test
@@ -108,7 +113,8 @@ RSpec.configure do |config|
 
   # 失敗したテストのスクリーンショットを保存
   config.after(:each, type: :system) do |example|
-    if example.exception
+    if example.exception && defined?(page) && page.respond_to?(:driver) && page.driver.respond_to?(:save_screenshot)
+      # スクリーンショットが取得できる場合のみ実行
       page.save_screenshot(Rails.root.join("tmp/screenshots/#{example.full_description.gsub(/[^0-9A-Za-z]/, '_')}.png"))
     end
   end

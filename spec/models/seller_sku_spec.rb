@@ -24,7 +24,7 @@ RSpec.describe SellerSku, type: :model do
     it 'sku_codeがなければ無効であること' do
       seller_sku = build(:seller_sku, sku_code: nil)
       expect(seller_sku).not_to be_valid
-      expect(seller_sku.errors[:sku_code]).to include("can't be blank")
+      expect(seller_sku.errors[:sku_code]).to include("が入力されていません。")
     end
 
     context '一意性の検証' do
@@ -33,7 +33,7 @@ RSpec.describe SellerSku, type: :model do
       it '同じsku_codeで作成しようとすると無効であること' do
         seller_sku = build(:seller_sku, sku_code: 'SKU001')
         expect(seller_sku).not_to be_valid
-        expect(seller_sku.errors[:sku_code]).to include('has already been taken')
+        expect(seller_sku.errors[:sku_code]).to include("は既に使用されています。")
       end
 
       it '異なるsku_codeであれば有効であること' do
@@ -54,14 +54,13 @@ RSpec.describe SellerSku, type: :model do
   describe 'スコープ' do
     it 'SKUコードで検索できること' do
       sku = create(:seller_sku, sku_code: 'OIL-001')
-
-      # SellerSkuモデルにsearch_by_codeスコープが実装されていなければ、
-      # このテストをスキップします
-      if SellerSku.respond_to?(:search_by_code)
-        result = SellerSku.search_by_code('OIL')
+      
+      # メソッド名を確認して使用する
+      if SellerSku.respond_to?(:by_code)
+        result = SellerSku.by_code('OIL')
         expect(result).to include(sku)
       else
-        pending 'search_by_codeスコープが実装されていません'
+        pending 'コードによる検索スコープが実装されていません'
       end
     end
   end

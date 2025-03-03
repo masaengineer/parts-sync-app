@@ -12,7 +12,7 @@ RSpec.describe "DataImports", type: :request do
   describe "POST /import" do
     context "with no file selected" do
       it "redirects with an alert message" do
-        post data_imports_import_path, params: { file: nil, import_type: "wisewill_data_sheet" }
+        post import_data_imports_path, params: { file: nil, import_type: "wisewill_data_sheet" }
 
         expect(response).to redirect_to(sales_reports_path)
         expect(flash[:alert]).to eq("ファイルを選択してください。")
@@ -23,7 +23,7 @@ RSpec.describe "DataImports", type: :request do
       it "redirects with an error message" do
         file = fixture_file_upload(Rails.root.join('spec/fixtures/files/valid_wisewill_sheet.xlsx'), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
-        post data_imports_import_path, params: { file: file, import_type: "unknown_type" }
+        post import_data_imports_path, params: { file: file, import_type: "unknown_type" }
 
         expect(response).to redirect_to(sales_reports_path)
         expect(flash[:alert]).to eq("不明なインポートタイプです。")
@@ -37,7 +37,7 @@ RSpec.describe "DataImports", type: :request do
 
         file = fixture_file_upload(Rails.root.join('spec/fixtures/files/valid_wisewill_sheet.xlsx'), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
-        post data_imports_import_path, params: { file: file, import_type: "wisewill_data_sheet" }
+        post import_data_imports_path, params: { file: file, import_type: "wisewill_data_sheet" }
 
         expect(response).to redirect_to(sales_reports_path)
         expect(flash[:notice]).to eq("Wisewill委託分シートのインポートが完了しました。")
@@ -51,7 +51,7 @@ RSpec.describe "DataImports", type: :request do
 
         file = fixture_file_upload(Rails.root.join('spec/fixtures/files/valid_cpass_sheet.xlsx'), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
-        post data_imports_import_path, params: { file: file, import_type: "cpass_data_sheet" }
+        post import_data_imports_path, params: { file: file, import_type: "cpass_data_sheet" }
 
         expect(response).to redirect_to(sales_reports_path)
         expect(flash[:notice]).to eq("CPaSS委託分シートのインポートが完了しました。")
@@ -67,7 +67,7 @@ RSpec.describe "DataImports", type: :request do
 
         file = fixture_file_upload(Rails.root.join('spec/fixtures/files/valid_wisewill_sheet.xlsx'), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
-        post data_imports_import_path, params: { file: file, import_type: "wisewill_data_sheet" }
+        post import_data_imports_path, params: { file: file, import_type: "wisewill_data_sheet" }
 
         expect(response).to redirect_to(sales_reports_path)
         expect(flash[:alert]).to eq("インポートエラー: 未登録のSKUが含まれています")
@@ -83,7 +83,7 @@ RSpec.describe "DataImports", type: :request do
 
         file = fixture_file_upload(Rails.root.join('spec/fixtures/files/valid_cpass_sheet.xlsx'), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
-        post data_imports_import_path, params: { file: file, import_type: "cpass_data_sheet" }
+        post import_data_imports_path, params: { file: file, import_type: "cpass_data_sheet" }
 
         expect(response).to redirect_to(sales_reports_path)
         expect(flash[:alert]).to eq("インポートエラー: 割引がマイナス値ではありません")
@@ -99,7 +99,7 @@ RSpec.describe "DataImports", type: :request do
 
         file = fixture_file_upload(Rails.root.join('spec/fixtures/files/valid_wisewill_sheet.xlsx'), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
-        post data_imports_import_path, params: { file: file, import_type: "wisewill_data_sheet" }
+        post import_data_imports_path, params: { file: file, import_type: "wisewill_data_sheet" }
 
         expect(response).to redirect_to(sales_reports_path)
         expect(flash[:alert]).to eq("CSVファイルの形式が正しくないか、必要なデータが含まれていません。")

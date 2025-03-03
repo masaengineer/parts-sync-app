@@ -36,6 +36,8 @@ services:
     command: bash -c "RAILS_ENV=test bundle exec rails db:create db:migrate && bundle exec rspec"
     tty: true
     stdin_open: true
+    ports:
+      - "4000:4000"  # Capybaraサーバーのポート
     volumes:
       - .:/app
       - bundle_test_data:/usr/local/bundle:cached

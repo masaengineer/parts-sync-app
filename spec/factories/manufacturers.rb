@@ -1,5 +1,5 @@
 FactoryBot.define do
   factory :manufacturer do
-    sequence(:name) { |n| "メーカー#{n}" }
+    sequence(:name) { |n| Manufacturer.names.keys.sample }
   end
 end

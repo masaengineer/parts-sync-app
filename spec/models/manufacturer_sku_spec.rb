@@ -68,9 +68,9 @@ RSpec.describe ManufacturerSku, type: :model do
       # codeに対するバリデーションが存在するかどうか確認
       if ManufacturerSku.validators_on(:code).any? { |v| v.is_a?(ActiveRecord::Validations::PresenceValidator) }
         expect(manufacturer_sku).not_to be_valid
-        expect(manufacturer_sku.errors[:code]).to include("can't be blank")
+        expect(manufacturer_sku.errors[:code]).to include("が入力されていません。")
       else
-        skip "codeに対する存在性バリデーションがありません"
+        skip 'codeに存在性バリデーションがありません'
       end
     end
   end

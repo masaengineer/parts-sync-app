@@ -48,14 +48,14 @@ RSpec.describe ExchangeRateConcern do
       original_rate = ENV['USD_TO_JPY_RATE']
 
       begin
-        ENV['USD_TO_JPY_RATE'] = '170.0'
+        ENV['USD_TO_JPY_RATE'] = '150.0'
         # DummyClassを再定義して新しい環境変数の値を反映させる
         Object.send(:remove_const, :DummyClass)
         class DummyClass
           include ExchangeRateConcern
         end
 
-        expect(DummyClass::USD_TO_JPY_RATE).to eq(170.0)
+        expect(DummyClass::USD_TO_JPY_RATE).to eq(150.0)
       ensure
         # テスト後に元の環境変数を復元
         if original_rate

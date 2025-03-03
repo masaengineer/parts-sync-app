@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe Procurement, type: :model do
   describe 'ファクトリー' do
     it '有効なファクトリーを持つこと' do
-      expect(build(:procurement)).to be_valid
+      expect(build(:procurement, order: create(:order))).to be_valid
     end
   end
 
@@ -15,20 +15,20 @@ RSpec.describe Procurement, type: :model do
 
   describe 'バリデーション' do
     it '購入価格があれば有効であること' do
-      procurement = build(:procurement, purchase_price: 5000)
+      procurement = build(:procurement, order: create(:order), purchase_price: 5000)
       expect(procurement).to be_valid
     end
 
     it '購入価格がなければ無効であること' do
-      procurement = build(:procurement, purchase_price: nil)
+      procurement = build(:procurement, order: create(:order), purchase_price: nil)
       expect(procurement).not_to be_valid
-      expect(procurement.errors[:purchase_price]).to include("can't be blank")
+      expect(procurement.errors[:purchase_price]).to include("が入力されていません。")
     end
 
     it '注文IDがなければ無効であること' do
       procurement = build(:procurement, order_id: nil)
       expect(procurement).not_to be_valid
-      expect(procurement.errors[:order_id]).to include("can't be blank")
+      expect(procurement.errors[:order_id]).to include("が入力されていません。")
     end
   end
 

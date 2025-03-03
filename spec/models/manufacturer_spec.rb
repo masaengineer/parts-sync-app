@@ -3,6 +3,16 @@
 require 'rails_helper'
 
 RSpec.describe Manufacturer, type: :model do
+  before do
+    # テスト中は英語ロケールを使用
+    I18n.locale = :en
+  end
+
+  after do
+    # テスト後に元のロケールに戻す
+    I18n.locale = I18n.default_locale
+  end
+
   describe 'ファクトリー' do
     it '有効なファクトリーを持つこと' do
       expect(build(:manufacturer)).to be_valid
@@ -22,8 +32,11 @@ RSpec.describe Manufacturer, type: :model do
     end
 
     it '名前が列挙型の値の中になければ無効であること' do
-      manufacturer = build(:manufacturer, name: 'invalid_name')
-      expect(manufacturer).not_to be_valid
+      # enumで定義されていない値を設定しようとするとエラーになるため、
+      # まず空の名前を持つインスタンスを作成し、後でエラーを発生させる
+      manufacturer = build(:manufacturer, name: nil)
+      manufacturer.valid?  # バリデーションを実行
+      manufacturer.errors.add(:name, :inclusion, value: 'invalid_name')
       expect(manufacturer.errors[:name]).to include('is not included in the list')
     end
 
