@@ -30,7 +30,7 @@ RSpec.describe Ebay::EbaySalesOrderClient do
         Faraday::Response,
         status: 200,
         body: {
-          orders: [{ orderId: '12345' }],
+          orders: [ { orderId: '12345' } ],
           total: 1
         }.to_json
       )
@@ -57,7 +57,7 @@ RSpec.describe Ebay::EbaySalesOrderClient do
     end
 
     context 'APIエラーが発生した場合' do
-      let(:error_response) { { status: 401, body: { errors: [{ message: 'Unauthorized' }] }.to_json } }
+      let(:error_response) { { status: 401, body: { errors: [ { message: 'Unauthorized' } ] }.to_json } }
 
       before do
         allow(mock_conn).to receive(:get).and_raise(
@@ -107,7 +107,7 @@ RSpec.describe Ebay::EbaySalesOrderClient do
     end
   end
 
-  # 以下のテストは実装に存在しないメソッドなのでスキップまたはコメントアウト
+# 以下のテストは実装に存在しないメソッドなのでスキップまたはコメントアウト
 =begin
   describe '#extract_order_data' do
     let(:order_data) do

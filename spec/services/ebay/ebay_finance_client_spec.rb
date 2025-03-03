@@ -54,7 +54,7 @@ RSpec.describe Ebay::EbayFinanceClient do
     end
 
     context 'エラーレスポンスを受け取った場合' do
-      let(:error_response) { OpenStruct.new(status: 400, body: { errors: [{ message: 'API error' }] }.to_json) }
+      let(:error_response) { OpenStruct.new(status: 400, body: { errors: [ { message: 'API error' } ] }.to_json) }
 
       before do
         faraday_error = Faraday::BadRequestError.new('Bad Request', error_response)

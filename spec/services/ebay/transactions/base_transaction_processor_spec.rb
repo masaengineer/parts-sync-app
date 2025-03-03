@@ -89,7 +89,7 @@ RSpec.describe Ebay::Transactions::BaseTransactionProcessor do
 
     it 'backtrace付きのエラーをログに記録する' do
       exception = StandardError.new('テスト例外')
-      allow(exception).to receive(:backtrace).and_return(['line1', 'line2'])
+      allow(exception).to receive(:backtrace).and_return([ 'line1', 'line2' ])
       expect(Rails.logger).to receive(:error).with(/予期せぬエラー: StandardError/)
       expect(Rails.logger).to receive(:error).with("line1\nline2")
       processor.send(:log_error, exception)
@@ -149,7 +149,7 @@ RSpec.describe Ebay::Transactions::BaseTransactionProcessor do
 
     it 'backtrace付きの作成エラーをログに記録する' do
       exception = StandardError.new('作成失敗')
-      allow(exception).to receive(:backtrace).and_return(['line1', 'line2'])
+      allow(exception).to receive(:backtrace).and_return([ 'line1', 'line2' ])
       expect(Rails.logger).to receive(:error).with("Failed to create テストレコード: 作成失敗")
       expect(Rails.logger).to receive(:error).with("line1\nline2")
       processor.send(:log_creation_error, 'テストレコード', exception)

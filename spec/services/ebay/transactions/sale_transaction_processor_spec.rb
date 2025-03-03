@@ -55,7 +55,7 @@ RSpec.describe Ebay::Transactions::SaleTransactionProcessor do
       payment_fee_class = class_double('PaymentFee').as_stubbed_const
       allow(payment_fee_class).to receive(:create!).and_return(instance_double('PaymentFee'))
       allow(payment_fee_class).to receive(:exists?).and_return(false)
-      allow(payment_fee_class).to receive(:fee_categories).and_return({'insertion' => 'INSERTION', 'final_value' => 'FINAL_VALUE'})
+      allow(payment_fee_class).to receive(:fee_categories).and_return({ 'insertion' => 'INSERTION', 'final_value' => 'FINAL_VALUE' })
     end
 
     it '手数料を処理する' do
@@ -106,7 +106,7 @@ RSpec.describe Ebay::Transactions::SaleTransactionProcessor do
       payment_fee_class = class_double('PaymentFee').as_stubbed_const
       allow(payment_fee_class).to receive(:create!).and_return(instance_double('PaymentFee'))
       allow(payment_fee_class).to receive(:exists?).and_return(false)
-      allow(payment_fee_class).to receive(:fee_categories).and_return({'insertion' => 'INSERTION'})
+      allow(payment_fee_class).to receive(:fee_categories).and_return({ 'insertion' => 'INSERTION' })
       allow(processor).to receive(:determine_fee_category).and_return('insertion')
     end
 
@@ -131,7 +131,7 @@ RSpec.describe Ebay::Transactions::SaleTransactionProcessor do
 
   describe '#determine_fee_category' do
     before do
-      allow(PaymentFee).to receive(:fee_categories).and_return({'insertion' => 'INSERTION', 'final_value' => 'FINAL_VALUE'})
+      allow(PaymentFee).to receive(:fee_categories).and_return({ 'insertion' => 'INSERTION', 'final_value' => 'FINAL_VALUE' })
     end
 
     it '有効な手数料カテゴリを返す' do
