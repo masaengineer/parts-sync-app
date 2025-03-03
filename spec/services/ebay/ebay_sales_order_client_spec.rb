@@ -31,10 +31,13 @@ RSpec.describe Ebay::EbaySalesOrderClient do
 
     # validate_auth_tokenが呼ばれた時のを確実に値を返すように
     allow_any_instance_of(described_class).to receive(:validate_auth_token).and_return('dummy_token')
+
+    # クライアントをbeforeブロック内で初期化
+    @client = described_class.new
   end
 
-  # モック設定後にクライアントを初期化
-  let(:client) { described_class.new }
+  # letの代わりにbeforeブロックで初期化したインスタンス変数を使用
+  let(:client) { @client }
 
   describe '#fetch_orders' do
     let(:orders_response) do

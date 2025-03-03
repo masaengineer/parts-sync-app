@@ -45,10 +45,13 @@ RSpec.describe Ebay::EbayFinanceClient do
     allow(Rails.logger).to receive(:debug)
     allow(Rails.logger).to receive(:info)
     allow(Rails.logger).to receive(:error)
+
+    # クライアントをbeforeブロック内で初期化
+    @client = described_class.new
   end
 
-  # モック設定後にクライアントを初期化
-  let(:client) { described_class.new }
+  # letの代わりにbeforeブロックで初期化したインスタンス変数を使用
+  let(:client) { @client }
 
   describe '#fetch_transactions' do
     it '正常にトランザクションを取得する' do

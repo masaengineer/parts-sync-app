@@ -18,10 +18,13 @@ RSpec.describe Ebay::EbayAuthClient do
 
     allow(OAuth2::Client).to receive(:new).and_return(mock_oauth_client)
     allow(mock_oauth_client).to receive(:get_token).and_return(mock_access_token)
+
+    # クライアントをbeforeブロック内で初期化
+    @client = described_class.new
   end
 
-  # モック設定後にクライアントを初期化
-  let(:client) { described_class.new }
+  # letの代わりにbeforeブロックで初期化したインスタンス変数を使用
+  let(:client) { @client }
 
   describe '#access_token' do
     context 'トークンがキャッシュされていない場合' do
