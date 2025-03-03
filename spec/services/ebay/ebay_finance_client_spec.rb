@@ -2,12 +2,13 @@ require 'rails_helper'
 require 'ostruct'
 
 RSpec.describe Ebay::EbayFinanceClient do
-  let(:client) { described_class.new }
+  # モックオブジェクトを先に準備
   let(:mock_auth_service) { instance_double(Ebay::EbayAuthClient, access_token: 'dummy_token') }
   let(:mock_conn) { instance_double(Faraday::Connection) }
   let(:mock_response) { instance_double(Faraday::Response, status: 200, body: { transactions: [], total: 0 }.to_json) }
   let(:mock_faraday) { double('Faraday') }
 
+  # 重要: credentialsのモック設定を先に行う
   before do
     # Rails.application.credentialsのebayをモック
     mock_ebay_credentials = OpenStruct.new(
@@ -45,6 +46,9 @@ RSpec.describe Ebay::EbayFinanceClient do
     allow(Rails.logger).to receive(:info)
     allow(Rails.logger).to receive(:error)
   end
+
+  # モック設定後にクライアントを初期化
+  let(:client) { described_class.new }
 
   describe '#fetch_transactions' do
     it '正常にトランザクションを取得する' do

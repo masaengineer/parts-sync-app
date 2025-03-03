@@ -2,12 +2,13 @@ require 'rails_helper'
 require 'ostruct'
 
 RSpec.describe Ebay::EbaySalesOrderClient do
-  let(:client) { described_class.new }
+  # モックオブジェクトを先に準備
   let(:mock_auth_service) { instance_double(Ebay::EbayAuthClient, access_token: 'dummy_token') }
   let(:mock_conn) { instance_double(Faraday::Connection) }
   let(:mock_faraday) { double('Faraday') }
   let(:current_user) { instance_double('User', ebay_orders_last_synced_at: nil) }
 
+  # 重要: credentialsのモック設定を先に行う
   before do
     # Rails.application.credentialsのebayをモック
     mock_ebay_credentials = OpenStruct.new(
@@ -31,6 +32,9 @@ RSpec.describe Ebay::EbaySalesOrderClient do
     # validate_auth_tokenが呼ばれた時のを確実に値を返すように
     allow_any_instance_of(described_class).to receive(:validate_auth_token).and_return('dummy_token')
   end
+
+  # モック設定後にクライアントを初期化
+  let(:client) { described_class.new }
 
   describe '#fetch_orders' do
     let(:orders_response) do

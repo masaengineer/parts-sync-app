@@ -2,10 +2,11 @@ require 'rails_helper'
 require 'ostruct'
 
 RSpec.describe Ebay::EbayAuthClient do
-  let(:client) { described_class.new }
+  # モックオブジェクトを先に準備
   let(:mock_oauth_client) { instance_double(OAuth2::Client) }
   let(:mock_access_token) { instance_double(OAuth2::AccessToken, token: 'dummy_token', expires_at: Time.now + 1.hour, expires_in: 3600) }
 
+  # 重要: credentialsのモック設定を先に行う
   before do
     # Rails.application.credentialsのebayをモック
     mock_ebay_credentials = OpenStruct.new(
@@ -18,6 +19,9 @@ RSpec.describe Ebay::EbayAuthClient do
     allow(OAuth2::Client).to receive(:new).and_return(mock_oauth_client)
     allow(mock_oauth_client).to receive(:get_token).and_return(mock_access_token)
   end
+
+  # モック設定後にクライアントを初期化
+  let(:client) { described_class.new }
 
   describe '#access_token' do
     context 'トークンがキャッシュされていない場合' do
