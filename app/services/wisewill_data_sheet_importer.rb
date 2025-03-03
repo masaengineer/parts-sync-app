@@ -38,7 +38,7 @@ class WisewillDataSheetImporter
     end
 
     Rails.logger.info "[WisewillDataSheetImporter] インポート完了: #{imported_count}件の調達情報を登録/更新しました"
-    return imported_count
+    imported_count
   rescue StandardError => e
     Rails.logger.error "[WisewillDataSheetImporter] エラー発生: #{e.message}"
     Rails.logger.error e.backtrace.join("\n")
@@ -56,7 +56,7 @@ class WisewillDataSheetImporter
       end
     end
   end
-  
+
   # SKUの存在チェック
   def validate_sku(csv)
     csv.each_with_index do |row, index|
@@ -85,7 +85,7 @@ class WisewillDataSheetImporter
 
     # 1. トラッキング番号からShipmentを検索
     shipment = Shipment.find_by(tracking_number: tracking_number)
-    
+
     # Shipmentが見つからない場合
     unless shipment
       Rails.logger.warn "[WisewillDataSheetImporter] トラッキング番号 #{tracking_number} に対応する出荷情報が見つかりません"
@@ -97,7 +97,7 @@ class WisewillDataSheetImporter
 
     # 3. 既存のorderを使ってProcurementレコードを作成
     create_procurement(order, purchase_price, handling_fee, option_fee, forwarding_fee)
-    return true
+    true
   end
 
   # Procurementレコードの作成
@@ -112,15 +112,15 @@ class WisewillDataSheetImporter
       option_fee: option_fee,
       forwarding_fee: forwarding_fee
     )
-    
-    return true
+
+    true
   end
 
   # 文字列をBigDecimalに変換
   def to_decimal(value)
     return nil if value.nil? || value.to_s.strip.empty?
     # カンマを取り除いて変換
-    BigDecimal(value.to_s.gsub(',', ''))
+    BigDecimal(value.to_s.gsub(",", ""))
   rescue ArgumentError
     nil
   end
