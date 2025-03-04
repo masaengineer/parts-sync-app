@@ -159,6 +159,11 @@ jobs:
       - name: Prepare assets in Docker
         run: docker compose -f compose.test.yml run --rm test bash -c "mkdir -p app/assets/builds && yarn build && bundle exec rails assets:precompile"
 
+      - name: Setup Database in Docker
+        run: |
+          docker compose -f compose.test.yml run --rm test bundle exec rails db:create RAILS_ENV=test
+          docker compose -f compose.test.yml run --rm test bundle exec rails db:schema:load RAILS_ENV=test
+
       - name: Run Fast Tests in Docker
         run: docker compose -f compose.test.yml run --rm test bundle exec rspec spec/models spec/services spec/requests
 
