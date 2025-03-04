@@ -145,19 +145,8 @@ jobs:
                     "title": "ブランチ",
                     "value": "${{ github.ref_name }}",
                     "short": true
-                  },
-                  {
-                    "title": "コミッター",
-                    "value": "${{ github.actor }}",
-                    "short": true
-                  },
-                  {
-                    "title": "コミットメッセージ",
-                    "value": "${{ github.event.head_commit.message }}",
-                    "short": false
                   }
                 ],
-                "footer": "デプロイ時刻: ${{ github.event.head_commit.timestamp }}"
               }]
             }
         env:
