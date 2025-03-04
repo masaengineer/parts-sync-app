@@ -7,7 +7,7 @@ class Order < ApplicationRecord
   has_many :sales
   has_one :shipment
   has_many :skus, through: :order_lines, source: :seller_sku
-  has_one :sale, -> { order(created_at: :desc) }, class_name: 'Sale'
+  has_one :sale, -> { order(created_at: :desc) }, class_name: "Sale"
 
   validates :order_number, presence: true, uniqueness: true
 

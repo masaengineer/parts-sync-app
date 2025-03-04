@@ -2,13 +2,34 @@ require 'rails_helper'
 require 'ostruct'
 
 RSpec.describe Ebay::EbayFinanceClient do
-  let(:client) { described_class.new }
+  # モックオブジェクトを先に準備
   let(:mock_auth_service) { instance_double(Ebay::EbayAuthClient, access_token: 'dummy_token') }
   let(:mock_conn) { instance_double(Faraday::Connection) }
   let(:mock_response) { instance_double(Faraday::Response, status: 200, body: { transactions: [], total: 0 }.to_json) }
   let(:mock_faraday) { double('Faraday') }
 
+  # 重要: credentialsのモック設定を先に行う
   before do
+    # 環境変数を使用してテストを実行
+    ENV["EBAY_CLIENT_ID"] = "test_client_id"
+    ENV["EBAY_CLIENT_SECRET"] = "test_client_secret"
+    ENV["EBAY_REFRESH_TOKEN"] = "test_refresh_token"
+
+    # Rails.application.credentialsのモックも念のために設定
+    # digメソッドが呼ばれた場合にも適切な値を返せるように
+    allow(Rails.application.credentials).to receive(:dig).with(:ebay, :client_id).and_return("test_client_id")
+    allow(Rails.application.credentials).to receive(:dig).with(:ebay, :client_secret).and_return("test_client_secret")
+    allow(Rails.application.credentials).to receive(:dig).with(:ebay, :refresh_token).and_return("test_refresh_token")
+
+    # 念のため従来のモックも残しておく
+    # Rails.application.credentialsのebayをモック
+    mock_ebay_credentials = OpenStruct.new(
+      client_id: 'test_client_id',
+      client_secret: 'test_client_secret',
+      refresh_token: 'test_refresh_token'
+    )
+    allow(Rails.application.credentials).to receive(:ebay).and_return(mock_ebay_credentials)
+
     allow(Ebay::EbayAuthClient).to receive(:new).and_return(mock_auth_service)
 
     # Faradayの初期化のモック
@@ -36,7 +57,13 @@ RSpec.describe Ebay::EbayFinanceClient do
     allow(Rails.logger).to receive(:debug)
     allow(Rails.logger).to receive(:info)
     allow(Rails.logger).to receive(:error)
+
+    # クライアントをbeforeブロック内で初期化
+    @client = described_class.new
   end
+
+  # letの代わりにbeforeブロックで初期化したインスタンス変数を使用
+  let(:client) { @client }
 
   describe '#fetch_transactions' do
     it '正常にトランザクションを取得する' do

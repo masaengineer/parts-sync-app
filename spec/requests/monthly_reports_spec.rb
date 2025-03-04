@@ -22,7 +22,7 @@ RSpec.describe "MonthlyReports", type: :request do
 
         # 2022年のデータ
         create_orders_for_year(user, 2022)
-        
+
         # 現在年のデータも作成
         create_orders_for_year(user, current_year)
       end
@@ -86,18 +86,18 @@ RSpec.describe "MonthlyReports", type: :request do
         it "指定された年度のデータを表示すること" do
           get monthly_reports_path, params: { year: 2023 }
           expect(assigns(:selected_year)).to eq(2023)
-          
+
           # MonthlyReportCalculator内のレート計算をデバッグする
           monthly_data = assigns(:monthly_data)
           puts "Debug: Monthly data for 2023 - #{monthly_data.inspect}"
-          
+
           # データがある場合は全ての月をチェック
           if monthly_data.any?
             found_month = monthly_data.find { |d| d[:revenue] > 0 }
             month_num = found_month ? found_month[:month] : 0
-            
+
             skip("月次データに収益が0より大きい月がありません") unless found_month
-            
+
             # 収益のある月をチェック
             expect(found_month[:revenue]).to be > 0
           else
@@ -120,14 +120,14 @@ RSpec.describe "MonthlyReports", type: :request do
 
         # データが12ヶ月分あること
         expect(monthly_data.size).to eq(12)
-        
+
         # 月次データをデバッグ表示
-        puts "Debug: Monthly data revenues: " + 
+        puts "Debug: Monthly data revenues: " +
              monthly_data.map { |d| "Month #{d[:month]}: #{d[:revenue]}" }.join(", ")
 
         # 各メトリクスが計算されていること - 2月または値が0より大きい最初の月を確認
         test_month_data = monthly_data.find { |d| d[:revenue] > 0 } || monthly_data[1]
-        
+
         if test_month_data[:revenue] > 0
           expect(test_month_data[:procurement_cost]).to be_present
           expect(test_month_data[:gross_profit]).to be_present
