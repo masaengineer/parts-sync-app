@@ -134,7 +134,30 @@ jobs:
             {
               "attachments": [{
                 "color": "good",
-                "text": "本番環境へのデプロイが完了しました :rocket:\nURL: https://parts-sync.site"
+                "text": "本番環境へのデプロイが完了しました :rocket:\nURL: https://parts-sync.site",
+                "fields": [
+                  {
+                    "title": "コミット",
+                    "value": "${{ github.sha }}",
+                    "short": true
+                  },
+                  {
+                    "title": "ブランチ",
+                    "value": "${{ github.ref_name }}",
+                    "short": true
+                  },
+                  {
+                    "title": "コミッター",
+                    "value": "${{ github.actor }}",
+                    "short": true
+                  },
+                  {
+                    "title": "コミットメッセージ",
+                    "value": "${{ github.event.head_commit.message }}",
+                    "short": false
+                  }
+                ],
+                "footer": "デプロイ時刻: ${{ github.event.head_commit.timestamp }}"
               }]
             }
         env:
