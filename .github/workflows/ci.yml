@@ -74,6 +74,15 @@ jobs:
           bundle install
           yarn install
 
+      - name: Prepare assets
+        env:
+          RAILS_ENV: test
+          NODE_ENV: test
+        run: |
+          mkdir -p app/assets/builds
+          yarn build
+          bundle exec rails assets:precompile
+
       - name: Setup Database
         env:
           RAILS_ENV: test
@@ -146,6 +155,9 @@ jobs:
 
       - name: Build Docker Images
         run: docker compose -f compose.test.yml build
+
+      - name: Prepare assets in Docker
+        run: docker compose -f compose.test.yml run --rm test bash -c "mkdir -p app/assets/builds && yarn build && bundle exec rails assets:precompile"
 
       - name: Run Fast Tests in Docker
         run: docker compose -f compose.test.yml run --rm test bundle exec rspec spec/models spec/services spec/requests
