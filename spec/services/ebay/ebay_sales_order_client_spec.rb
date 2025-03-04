@@ -10,6 +10,18 @@ RSpec.describe Ebay::EbaySalesOrderClient do
 
   # 重要: credentialsのモック設定を先に行う
   before do
+    # 環境変数を使用してテストを実行
+    ENV["EBAY_CLIENT_ID"] = "test_client_id"
+    ENV["EBAY_CLIENT_SECRET"] = "test_client_secret"
+    ENV["EBAY_REFRESH_TOKEN"] = "test_refresh_token"
+
+    # Rails.application.credentialsのモックも念のために設定
+    # digメソッドが呼ばれた場合にも適切な値を返せるように
+    allow(Rails.application.credentials).to receive(:dig).with(:ebay, :client_id).and_return("test_client_id")
+    allow(Rails.application.credentials).to receive(:dig).with(:ebay, :client_secret).and_return("test_client_secret")
+    allow(Rails.application.credentials).to receive(:dig).with(:ebay, :refresh_token).and_return("test_refresh_token")
+
+    # 念のため従来のモックも残しておく
     # Rails.application.credentialsのebayをモック
     mock_ebay_credentials = OpenStruct.new(
       client_id: 'test_client_id',
