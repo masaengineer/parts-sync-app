@@ -4,7 +4,9 @@
     <tr class="font-medium cursor-pointer hover:bg-base-200/40">
       <% table_columns.each do |column| %>
         <td class="<%= get_column_class(column, :cell) %>">
-          <%= render_cell_value(data, column) %>
+          <%= link_to render_cell_value(data, column), sales_report_path(data[:order].id),
+            data: { turbo_frame: "modal" }
+          %>
         </td>
       <% end %>
     </tr>

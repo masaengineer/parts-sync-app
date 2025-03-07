@@ -22,4 +22,8 @@ class SalesReportsController < ApplicationController
       SalesReportCalculator.new(order).calculate
     end
   end
+
+  def show
+    @order = current_user.orders.find(params[:id])
+  end
 end
