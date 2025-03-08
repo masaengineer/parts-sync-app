@@ -1,8 +1,0 @@
-<tr>
-  <th class="text-sm font-medium text-base-content/80">項目</th>
-  <% @monthly_data.each do |data| %>
-    <th class="text-sm font-medium text-base-content/80">
-      <%= t("monthly_reports.index.table.month", month: data[:month]) %>
-    </th>
-  <% end %>
-</tr>
