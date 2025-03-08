@@ -5,8 +5,6 @@ class WisewillDataSheetImporter
   class MissingSkusError < StandardError; end
   class OrderNotFoundError < StandardError; end # Orderが見つからない場合のエラー
   class MissingPurchasePriceError < StandardError; end # purchase_priceが空の場合のエラー
-  class MissingSkuError < StandardError; end # SKUが空の場合のエラー
-  class ShipmentNotFoundError < StandardError; end # 出荷情報が見つからない場合のエラー
 
   def initialize(csv_path, user)
     @csv_path = csv_path
@@ -24,21 +22,21 @@ class WisewillDataSheetImporter
 
     # purchase_priceの存在チェック
     validate_purchase_price(csv)
-    # SKUの存在チェック
-    validate_sku(csv)
 
-    imported_count = 0
+
+
+
     ActiveRecord::Base.transaction do
       csv.each_with_index do |row, i|
-        Rails.logger.info "[WisewillDataSheetImporter] 行 #{i + 1}: #{row.to_h.inspect}"
-        if import_row(row)
-          imported_count += 1
-        end
+        Rails.logger.info "[Filtere] 行 #{i + 1}: #{row.to_h.inspect}"
+        import_row(row)
+
+
       end
     end
 
-    Rails.logger.info "[WisewillDataSheetImporter] インポート完了: #{imported_count}件の調達情報を登録/更新しました"
-    imported_count
+
+
   rescue StandardError => e
     Rails.logger.error "[WisewillDataSheetImporter] エラー発生: #{e.message}"
     Rails.logger.error e.backtrace.join("\n")
@@ -57,70 +55,61 @@ class WisewillDataSheetImporter
     end
   end
 
-  # SKUの存在チェック
-  def validate_sku(csv)
-    csv.each_with_index do |row, index|
-      if row["sku_code"].blank?
-        # エラーメッセージに行番号を含める
-        raise MissingSkuError, "CSVの#{index + 2}行目: sku_codeが空です。"
-      end
-    end
-  end
-
   # 行ごとの処理
   def import_row(row)
     # CSVの各カラムを取得
-    tracking_number   = row["tracking_number"]&.strip
-    sku_code          = row["sku_code"]&.strip
+    order_number      = row["order_number"]&.strip
+    manufacturer_name = row["manufacturer_name"]&.strip
     purchase_price    = to_decimal(row["purchase_price"])
     handling_fee      = to_decimal(row["handling_fee"])
-    option_fee        = to_decimal(row["option_fee"])
-    forwarding_fee    = to_decimal(row["forwarding_fee"])
-
-    # トラッキング番号の確認
-    if tracking_number.blank?
-      Rails.logger.warn "[WisewillDataSheetImporter] トラッキング番号が空のため、この行をスキップします: #{row.to_h.inspect}"
-      return false
+    option_fee         = to_decimal(row["option_fee"])
+すがな
+    # 必須項目のバリデーション
+    if order_number.blank?
+      Rails.logger.warn "[WisewillDataSheetImporter] order_numberが空のため、この行をスキップします: #{row.to_h.inspect}"
+      return
     end
 
-    # 1. トラッキング番号からShipmentを検索
-    shipment = Shipment.find_by(tracking_number: tracking_number)
+    # 1. Orderレコードを検索
+    order = @user.orders.find_by(order_number: order_number)
 
-    # Shipmentが見つからない場合
-    unless shipment
-      Rails.logger.warn "[WisewillDataSheetImporter] トラッキング番号 #{tracking_number} に対応する出荷情報が見つかりません"
-      return false
+    # Orderが見つからない場合はエラー
+    unless order
+      raise OrderNotFoundError, "Order with order_number #{order_number} not found"
+
     end
 
-    # 2. Shipmentから関連するOrderを取得
-    order = shipment.order
+    # 2. Manufacturerレコードを作成または検索（必要な場合）
+    if manufacturer_name.present?
+      Manufacturer.find_or_create_by!(name: manufacturer_name)
+    end
 
     # 3. 既存のorderを使ってProcurementレコードを作成
-    create_procurement(order, purchase_price, handling_fee, option_fee, forwarding_fee)
-    true
+    create_procurement(order, purchase_price, handling_fee, option_fee)
+
   end
 
   # Procurementレコードの作成
-  def create_procurement(order, purchase_price, handling_fee, option_fee, forwarding_fee)
-    return false unless purchase_price
+  def create_procurement(order, purchase_price, handling_fee, option_fee)
+    return unless purchase_price || handling_fee || option_fee
 
     # 既存のProcurementレコードを更新するか、新しいものを作成
     procurement = order.procurement || order.build_procurement
     procurement.update!(
       purchase_price: purchase_price,
       handling_fee: handling_fee,
-      option_fee: option_fee,
-      forwarding_fee: forwarding_fee
+      option_fee: option_fee
+
     )
 
-    true
+
   end
 
   # 文字列をBigDecimalに変換
   def to_decimal(value)
-    return nil if value.nil? || value.to_s.strip.empty?
-    # カンマを取り除いて変換
-    BigDecimal(value.to_s.gsub(",", ""))
+    return nil if value.nil? || value.strip.empty?
+    BigDecimal(value)
+
   rescue ArgumentError
     nil
   end
