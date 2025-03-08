@@ -8,7 +8,7 @@ class SalesReportCalculator
     order_revenue_usd = @order.sales.sum(&:order_gross_amount).to_f
 
     # --- 為替レート ---
-    exchange_rate = @order.sales.map(&:exchangerate).first.to_f
+    exchange_rate = @order.sales.map(&:to_usd_rate).first.to_f
     exchange_rate = 1.0 if exchange_rate.zero? # レートが無い場合はデフォルト値
 
     # --- 手数料合計 ---
@@ -22,7 +22,7 @@ class SalesReportCalculator
     # --- 調達コスト(円)とSKU合計数量 ---
     procurement_data = calculate_procurement_data(@order)
 
-    # --- USD売上の計算（order_gross_amount × exchangerate） ---
+    # --- USD売上の計算（order_gross_amount × to_usd_rate） ---
     usd_revenue = order_revenue_usd * exchange_rate
 
     # --- 手数料をUSDで計算 ---
@@ -33,7 +33,7 @@ class SalesReportCalculator
     # 固定レート 1 USD = 150 JPY を使用
     usd_to_jpy_rate = 150.0
 
-    # --- USD売上の計算（order_gross_amount × exchangerate） ---
+    # --- USD売上の計算（order_gross_amount × to_usd_rate） ---
     usd_revenue = order_revenue_usd * exchange_rate
 
     # --- 手数料をUSDで計算 ---

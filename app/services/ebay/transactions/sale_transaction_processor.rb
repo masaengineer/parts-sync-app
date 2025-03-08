@@ -116,7 +116,7 @@ module Ebay
             order: order,
             order_net_amount: transaction_amount,
             order_gross_amount: total_fee_basis_amount,
-            exchangerate: exchange_rate
+            to_usd_rate: exchange_rate
           )
           Rails.logger.debug "Created Sale: #{sale.id}"
         rescue ActiveRecord::RecordNotUnique => e
