@@ -63,7 +63,6 @@ class WisewillDataSheetImporter
     purchase_price    = to_decimal(row["purchase_price"])
     handling_fee      = to_decimal(row["handling_fee"])
     option_fee         = to_decimal(row["option_fee"])
-すがな
     # 必須項目のバリデーション
     if order_number.blank?
       Rails.logger.warn "[WisewillDataSheetImporter] order_numberが空のため、この行をスキップします: #{row.to_h.inspect}"
