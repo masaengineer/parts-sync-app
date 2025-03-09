@@ -22,9 +22,8 @@ class WisewillDataSheetImporter
 
     # purchase_priceの存在チェック
     validate_purchase_price(csv)
-
-
-
+    # SKUの存在チェック
+    validate_skus(csv)
 
     ActiveRecord::Base.transaction do
       csv.each_with_index do |row, i|
@@ -32,8 +31,6 @@ class WisewillDataSheetImporter
         import_row(row)
       end
     end
-
-
 
   rescue StandardError => e
     Rails.logger.error "[WisewillDataSheetImporter] エラー発生: #{e.message}"
@@ -49,6 +46,16 @@ class WisewillDataSheetImporter
       if row["purchase_price"].blank?
         # エラーメッセージに行番号を含める
         raise MissingPurchasePriceError, "CSVの#{index + 2}行目: purchase_priceが空です。"
+      end
+    end
+  end
+
+  # SKUの存在チェック
+  def validate_skus(csv)
+    csv.each_with_index do |row, index|
+      if row["sku_code"].blank?
+        # エラーメッセージに行番号を含める
+        raise MissingSkusError, "CSVの#{index + 2}行目: sku_codeが空です。"
       end
     end
   end
@@ -73,7 +80,6 @@ class WisewillDataSheetImporter
     # Orderが見つからない場合はエラー
     unless order
       raise OrderNotFoundError, "Order with order_number #{order_number} not found"
-
     end
 
     # 2. Manufacturerレコードを作成または検索（必要な場合）
@@ -95,15 +101,15 @@ class WisewillDataSheetImporter
       purchase_price: purchase_price,
       handling_fee: handling_fee,
       option_fee: option_fee
-
     )
   end
 
   # 文字列をBigDecimalに変換
   def to_decimal(value)
     return nil if value.nil? || value.strip.empty?
-    BigDecimal(value)
-
+    # カンマを削除してから変換
+    cleaned = value.to_s.gsub(/["',]/, "")
+    BigDecimal(cleaned)
   rescue ArgumentError
     nil
   end
