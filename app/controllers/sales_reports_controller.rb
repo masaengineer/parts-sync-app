@@ -17,9 +17,9 @@ class SalesReportsController < ApplicationController
                 .page(params[:page])
                 .per(@per_page)
 
-    # SalesReportCalculatorを用いて計算を行う
+    # SalesReport::Serviceを用いて計算を行う
     @orders_data = @orders.map do |order|
-      SalesReportCalculator.new(order).calculate
+      SalesReport::Service.new(order).calculate
     end
   end
 

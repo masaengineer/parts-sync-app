@@ -1,21 +1,28 @@
 <%# app/views/monthly_reports/_table.html.erb %>
-<% metrics = [
-  {key: :revenue, label: t("monthly_reports.index.metrics.revenue")},
-  {key: :procurement_cost, label: t("monthly_reports.index.metrics.procurement_cost")},
-  {key: :gross_profit, label: t("monthly_reports.index.metrics.gross_profit")},
-  {key: :expenses, label: t("monthly_reports.index.metrics.expenses")},
-  {key: :contribution_margin, label: t("monthly_reports.index.metrics.contribution_margin")},
-  {key: :contribution_margin_rate, label: t("monthly_reports.index.metrics.contribution_margin_rate")}
-] %>
-
 <div class="card card-bordered bg-base-100 shadow-sm mt-5 overflow-x-auto">
   <div class="card-body p-0">
-    <table class="table rounded-box w-full">
+    <table class="table rounded-box w-full whitespace-nowrap">
       <thead>
-        <%= render 'table_header' %>
+        <tr>
+          <th>項目</th>
+          <% @table_data[:headers].each do |header| %>
+            <th><%= header %></th>
+          <% end %>
+          <th class="bg-base-200">合計</th>
+        </tr>
       </thead>
       <tbody>
-        <%= render 'table_body', metrics: metrics %>
+        <% @table_data[:metrics].each do |metric| %>
+          <tr class="font-medium hover:bg-base-200/40">
+            <td><%= metric_label(metric[:key]) %></td>
+            <% metric[:values].each do |value| %>
+              <td><%= format_metric_cell(value, metric[:format]) %></td>
+            <% end %>
+            <td class="bg-base-200">
+              <%= format_total_cell(@totals[metric[:key]], metric[:format]) %>
+            </td>
+          </tr>
+        <% end %>
       </tbody>
     </table>
   </div>

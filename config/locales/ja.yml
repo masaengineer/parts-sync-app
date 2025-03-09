@@ -92,10 +92,20 @@ ja:
 
   ebay_orders:
     index:
-      title: "eBay 受注一覧"
-      import_button: "eBay 受注データ取込"
-      order_count: "受注件数: %{count}件"
-      no_orders: "取得できるeBay受注情報はありません。"
-      order_id: "注文ID"
-      creation_date: "作成日"
-    import_success: "eBay受注データをDBに保存しました。"
+      title: 'eBay 受注一覧'
+      import_button: 'eBay 受注データ取込'
+      order_count: '受注件数: %{count}件'
+      no_orders: '取得できるeBay受注情報はありません。'
+      order_id: '注文ID'
+      creation_date: '作成日'
+    import_success: 'eBay受注データをDBに保存しました。'
+
+  monthly_reports:
+    metrics:
+      revenue: '売上'
+      revenue_by_currency: '通貨別売上'
+      procurement_cost: '原価'
+      gross_profit: '粗利益'
+      expenses: '販管費'
+      contribution_margin: '限界利益'
+      contribution_margin_rate: '限界利益率'

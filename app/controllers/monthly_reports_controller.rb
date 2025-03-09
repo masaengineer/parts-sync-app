@@ -17,7 +17,18 @@ class MonthlyReportsController < ApplicationController
     # 年度に存在するデータがない場合は直近の年度を選択
     @selected_year = @available_years.first if @available_years.present? && !@available_years.include?(@selected_year)
 
-    # 月次データを取得（サービスクラスを利用）
-    @monthly_data = MonthlyReportCalculator.new(current_user, @selected_year).calculate
+    # 月次レポート計算サービスを初期化
+    start_date = Date.new(@selected_year, 1, 1)
+    end_date = Date.new(@selected_year, 12, 31)
+    calculator = MonthlyReport::Service.new(current_user, start_date, end_date)
+
+    # 月次データを取得
+    @monthly_data = calculator.calculate_by_month
+
+    @chart_data = calculator.chart_data
+    @table_data = calculator.table_data
+
+    # 合計データを取得
+    @totals = calculator.calculate_total
   end
 end

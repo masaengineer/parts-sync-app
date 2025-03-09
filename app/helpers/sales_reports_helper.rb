@@ -48,7 +48,7 @@ module SalesReportsHelper
     when :profit_rate
       "#{number_with_precision(data[:profit_rate], precision: 1)}%"
     when :tracking_number
-      data[:tracking_number]
+      data[:tracking_number].presence || ""
     end
   end
 

@@ -158,7 +158,7 @@ RSpec.describe Ebay::Transactions::SaleTransactionProcessor do
         order: order,
         order_net_amount: 100.0,
         order_gross_amount: 120.0,
-        exchangerate: nil
+        to_usd_rate: nil
       )
       processor.send(:create_sale_record)
     end
@@ -189,7 +189,7 @@ RSpec.describe Ebay::Transactions::SaleTransactionProcessor do
           order: order,
           order_net_amount: 100.0,
           order_gross_amount: 120.0,
-          exchangerate: 110.5
+          to_usd_rate: 110.5
         )
         processor.send(:create_sale_record)
       end
