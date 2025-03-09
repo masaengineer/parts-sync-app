@@ -1,18 +1,3 @@
-<%
-chart_data = {
-  series: [
-    {
-      name: t("monthly_reports.index.metrics.revenue"),
-      data: @monthly_data.map { |d| d[:revenue] }
-    },
-    {
-      name: t("monthly_reports.index.metrics.contribution_margin"),
-      data: @monthly_data.map { |d| d[:contribution_margin] }
-    }
-  ],
-  categories: @monthly_data.map { |d| t("monthly_reports.index.table.month", month: d[:month]) }
-} %>
-
 <%# 年度選択とチャート %>
 <div class="card card-bordered bg-base-100 shadow-sm mt-5">
   <div class="card-body p-5">
@@ -35,7 +20,10 @@ chart_data = {
     </div>
 
     <%# チャート %>
-    <div data-chart-data="<%= chart_data.to_json %>">
+    <div data-chart-data="<%= {
+        series: @chart_data[:datasets].map { |ds| { name: ds[:label], data: ds[:data] } },
+        categories: @chart_data[:labels]
+      }.to_json %>">
       <div
         data-controller="chart"
         data-chart-target="chart"

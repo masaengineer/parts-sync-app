@@ -44,7 +44,7 @@ RSpec.describe "MonthlyReports", type: :request do
             create(:sale,
               order: order,
               order_net_amount: amount,
-              exchangerate: 1.0
+              to_usd_rate: 1.0
             )
 
             # 原価データを作成
@@ -87,7 +87,7 @@ RSpec.describe "MonthlyReports", type: :request do
           get monthly_reports_path, params: { year: 2023 }
           expect(assigns(:selected_year)).to eq(2023)
 
-          # MonthlyReportCalculator内のレート計算をデバッグする
+          # Reports::Monthly::MonthlyReportService内のレート計算をデバッグする
           monthly_data = assigns(:monthly_data)
           puts "Debug: Monthly data for 2023 - #{monthly_data.inspect}"
 

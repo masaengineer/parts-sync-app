@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe MonthlyReportCalculator do
+RSpec.describe MonthlyReport::Service do
   let(:user) { create(:user) }
   let(:year) { 2023 }
   let(:month) { 1 }

@@ -30,8 +30,6 @@ class WisewillDataSheetImporter
       csv.each_with_index do |row, i|
         Rails.logger.info "[Filtere] 行 #{i + 1}: #{row.to_h.inspect}"
         import_row(row)
-
-
       end
     end
 
@@ -85,7 +83,6 @@ class WisewillDataSheetImporter
 
     # 3. 既存のorderを使ってProcurementレコードを作成
     create_procurement(order, purchase_price, handling_fee, option_fee)
-
   end
 
   # Procurementレコードの作成
@@ -100,8 +97,6 @@ class WisewillDataSheetImporter
       option_fee: option_fee
 
     )
-
-
   end
 
   # 文字列をBigDecimalに変換
