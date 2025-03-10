@@ -7,7 +7,6 @@
   <body class="flex flex-col min-h-screen bg-[--main-content-background]">
     <%= render 'components/navigation/header' %>
     <main class="flex-grow pt-16">
-      <%= turbo_frame_tag 'modal' %>
       <%= render 'shared/flash_messages' %>
       <%= yield %>
     </main>

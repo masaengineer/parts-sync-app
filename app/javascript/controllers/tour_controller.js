@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-
+console.log('tour_controller connect');
 // ツアー内容
 const steps = [
   {
