@@ -33,14 +33,17 @@
             <% image_path = get_product_image_path(@order.order_lines.first.seller_sku) %>
             <% if image_path.present? %>
               <div class="relative group">
-                <!-- eBay APIから取得した実際の商品画像 -->
-                <%= image_tag(image_path, alt: @order.order_lines.first.line_item_name, class: "w-32 h-32 object-cover rounded shadow-sm border border-primary group-hover:border-primary-focus transition-all") %>
-                <div class="absolute top-0 right-0 bg-primary text-white text-xs p-1 rounded-bl">
-                  <span class="text-xs">eBay</span>
-                </div>
-                <div class="absolute bottom-0 left-0 right-0 bg-base-100/75 text-xs p-1 text-center truncate">
-                  <%= @order.order_lines.first.seller_sku.sku_code %>
-                </div>
+                <!-- クリック可能な画像、eBayの注文詳細ページに遷移 -->
+                <%= link_to @order.ebay_order_url, target: "_blank", rel: "noopener noreferrer" do %>
+                  <%= image_tag(image_path, alt: @order.order_lines.first.line_item_name, 
+                      class: "w-48 h-48 object-cover rounded shadow-sm border border-primary group-hover:border-primary-focus transition-all cursor-pointer") %>
+                  <div class="absolute top-0 right-0 bg-primary text-white text-xs p-1 rounded-bl">
+                    <span class="text-xs">eBay</span>
+                  </div>
+                  <div class="absolute bottom-0 left-0 right-0 bg-base-100/75 text-xs p-1 text-center truncate">
+                    <%= @order.order_lines.first.seller_sku.sku_code %>
+                  </div>
+                <% end %>
               </div>
             <% end %>
           <% end %>
