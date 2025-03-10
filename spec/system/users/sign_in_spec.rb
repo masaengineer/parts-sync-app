@@ -8,8 +8,8 @@ RSpec.describe 'ユーザーログイン', type: :system do
       it 'ログインできること' do
         visit new_user_session_path
 
-        fill_in 'user[email]', with: user.email
-        fill_in 'user[password]', with: 'password123'
+        fill_in 'user_email', with: user.email
+        fill_in 'user_password', with: 'password123'
 
         click_button 'ログイン'
 
@@ -23,8 +23,8 @@ RSpec.describe 'ユーザーログイン', type: :system do
       it 'ログインできないこと' do
         visit new_user_session_path
 
-        fill_in 'user[email]', with: user.email
-        fill_in 'user[password]', with: 'wrong_password'
+        fill_in 'user_email', with: user.email
+        fill_in 'user_password', with: 'wrong_password'
 
         click_button 'ログイン'
 

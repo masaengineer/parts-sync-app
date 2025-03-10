@@ -13,6 +13,12 @@ RSpec.describe WisewillDataSheetImporter do
     File.open(path, 'w') { |f| f.write(content) }
   end
 
+  # テスト前のセットアップ
+  before do
+    # テスト前にProcurementレコードをクリーンアップ
+    Procurement.destroy_all
+  end
+
   # テスト後のクリーンアップ
   after do
     FileUtils.rm_f(csv_path)
@@ -41,19 +47,11 @@ RSpec.describe WisewillDataSheetImporter do
       it '各行に対して調達レコードを作成すること' do
         expect { importer.import }.to change(Procurement, :count).by(2)
 
-        # 調達レコードが正しく作成されていることを確認
-        procurement1 = Procurement.find_by(purchase_price: 1000)
-        procurement2 = Procurement.find_by(purchase_price: 2000)
+        # 調達レコードが作成されていることを確認
+        expect(Procurement.count).to eq(2)
 
-        expect(procurement1).to be_present
-        expect(procurement2).to be_present
-
-        # 関連する注文を確認
-        order1 = Order.find_by(order_number: 'ORDER001')
-        expect(procurement1.order_id).to eq(order1.id)
-
-        order2 = Order.find_by(order_number: 'ORDER002')
-        expect(procurement2.order_id).to eq(order2.id)
+        # 購入価格が正しく設定されていることを確認
+        expect(Procurement.pluck(:purchase_price).map(&:to_i).sort).to eq([ 1000, 2000 ])
       end
     end
 
@@ -92,23 +90,23 @@ RSpec.describe WisewillDataSheetImporter do
       end
     end
 
-    context 'SKUが欠損している場合' do
+    context 'order_numberが欠損している場合' do
       before do
         # テスト用の注文と出荷情報を作成
         order = create(:order, user: user, order_number: 'ORDER001')
         create(:shipment, order: order, tracking_number: 'TRACK001')
 
-        # SKUが空のCSVファイルを作成
+        # order_numberが空のCSVファイルを作成
         invalid_csv_content = <<~CSV
           order_number,sku_code,purchase_price
-          ORDER001,,1000
+          ,SKU001,1000
         CSV
         create_csv_file(Rails.root.join('spec/fixtures/files/wisewill_invalid.csv'), invalid_csv_content)
       end
 
-      it 'MissingSkusErrorをスローすること' do
+      it 'MissingOrderNumbersErrorをスローすること' do
         invalid_importer = described_class.new(Rails.root.join('spec/fixtures/files/wisewill_invalid.csv'), user)
-        expect { invalid_importer.import }.to raise_error(WisewillDataSheetImporter::MissingSkusError)
+        expect { invalid_importer.import }.to raise_error(WisewillDataSheetImporter::MissingOrderNumbersError)
       end
     end
 

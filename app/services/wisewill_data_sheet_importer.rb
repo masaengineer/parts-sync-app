@@ -2,7 +2,7 @@ require "csv"
 
 class WisewillDataSheetImporter
   # カスタムエラークラスの定義
-  class MissingSkusError < StandardError; end
+  class MissingOrderNumbersError < StandardError; end
   class OrderNotFoundError < StandardError; end # Orderが見つからない場合のエラー
   class MissingPurchasePriceError < StandardError; end # purchase_priceが空の場合のエラー
 
@@ -22,8 +22,8 @@ class WisewillDataSheetImporter
 
     # purchase_priceの存在チェック
     validate_purchase_price(csv)
-    # SKUの存在チェック
-    validate_skus(csv)
+    # order_numberの存在チェック
+    validate_order_numbers(csv)
 
     ActiveRecord::Base.transaction do
       csv.each_with_index do |row, i|
@@ -50,12 +50,12 @@ class WisewillDataSheetImporter
     end
   end
 
-  # SKUの存在チェック
-  def validate_skus(csv)
+  # order_numberの存在チェック
+  def validate_order_numbers(csv)
     csv.each_with_index do |row, index|
-      if row["sku_code"].blank?
+      if row["order_number"].blank?
         # エラーメッセージに行番号を含める
-        raise MissingSkusError, "CSVの#{index + 2}行目: sku_codeが空です。"
+        raise MissingOrderNumbersError, "CSVの#{index + 2}行目: order_numberが空です。"
       end
     end
   end

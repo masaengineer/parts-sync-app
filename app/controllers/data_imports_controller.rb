@@ -18,7 +18,7 @@ class DataImportsController < ApplicationController
       else
         flash[:alert] = "不明なインポートタイプです。"
       end
-    rescue WisewillDataSheetImporter::MissingSkusError => e
+    rescue WisewillDataSheetImporter::MissingOrderNumbersError => e
       flash[:alert] = "インポートエラー: #{e.message}"
     rescue CpassDataSheetImporter::PositiveDiscountError => e
       flash[:alert] = "インポートエラー: #{e.message}"

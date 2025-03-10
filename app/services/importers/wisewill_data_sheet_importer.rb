@@ -3,7 +3,7 @@ require "csv"
 module Importers
   class WisewillDataSheetImporter
     # カスタムエラークラスの定義
-    class MissingSkusError < StandardError; end
+    class MissingOrderNumbersError < StandardError; end
     class OrderNotFoundError < StandardError; end # Orderが見つからない場合のエラー
     class MissingPurchasePriceError < StandardError; end # purchase_priceが空の場合のエラー
 
