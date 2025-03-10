@@ -11,7 +11,7 @@ class SellerSku < ApplicationRecord
   def self.ransackable_attributes(auth_object = nil)
     %w[created_at id sku_code updated_at item_id]
   end
-  
+
   # eBay商品ページのURLを取得
   def ebay_item_url
     return nil unless item_id.present?

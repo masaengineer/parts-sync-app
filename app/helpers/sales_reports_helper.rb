@@ -18,21 +18,21 @@ module SalesReportsHelper
         # eBay商品ページのURLを構築
         item_url = seller_sku.ebay_item_url
         # URLからHTMLを取得
-        require 'open-uri'
-        require 'nokogiri'
+        require "open-uri"
+        require "nokogiri"
 
         html = URI.open(item_url).read
         doc = Nokogiri::HTML(html)
 
         # メタデータから画像URLを抽出
-        og_image = doc.at('meta[property="og:image"]')&.attr('content')
+        og_image = doc.at('meta[property="og:image"]')&.attr("content")
 
         # 商品画像を見つける
-        image_element = doc.at('div#mainImgHldr img') ||
-                        doc.at('div.ux-image-carousel-item img') ||
-                        doc.at('img.img.img500')
+        image_element = doc.at("div#mainImgHldr img") ||
+                        doc.at("div.ux-image-carousel-item img") ||
+                        doc.at("img.img.img500")
 
-        image_url = og_image || image_element&.attr('src')
+        image_url = og_image || image_element&.attr("src")
         image_url
       end
 
