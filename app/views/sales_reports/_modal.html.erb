@@ -99,10 +99,10 @@
                         <tr class="hover:bg-base-200/30 <%= sale.transaction_type == 'REFUND' ? 'text-error' : 'text-base-content' %>">
                           <td><%= sale.transaction_type %></td>
                           <td class="text-right">
-                            <%= number_to_currency(sale.order_gross_amount, unit: "$", precision: 2) %>
+                            <%= format_currency(sale.order_gross_amount, @order.currency) %>
                             <% if sale.to_usd_rate.present? && sale.to_usd_rate != 1.0 %>
                               <div class="text-xs text-base-content/60">
-                                <%= number_to_currency(sale.order_gross_amount * sale.to_usd_rate * 150, unit: "¥", precision: 0) %>
+                                <%= format_jpy_currency(sale.order_gross_amount * sale.to_usd_rate * 150) %>
                               </div>
                             <% end %>
                           </td>
@@ -114,10 +114,10 @@
                       <tr class="font-bold text-base-content border-t">
                         <td><%= t('.total') %></td>
                         <td class="text-right" colspan="2">
-                          <%= number_to_currency(@order.sales.sum(&:order_gross_amount), unit: "$", precision: 2) %>
+                          <%= format_currency(@order.sales.sum(&:order_gross_amount), @order.currency) %>
                           <% if @order.sales.first&.to_usd_rate.present? %>
                             <div class="text-xs">
-                              <%= number_to_currency(@order.sales.sum(&:order_gross_amount) * @order.sales.first.to_usd_rate * 150, unit: "¥", precision: 0) %>
+                              <%= format_jpy_currency(@order.sales.sum(&:order_gross_amount) * @order.sales.first.to_usd_rate * 150) %>
                             </div>
                           <% end %>
                         </td>
@@ -150,7 +150,7 @@
                           <td><%= fee.transaction_type %></td>
                           <td><%= fee.fee_category %></td>
                           <td class="text-right <%= fee.fee_amount < 0 ? 'text-error' : '' %>">
-                            <%= number_to_currency(fee.fee_amount, unit: "$", precision: 2) %>
+                            <%= format_currency(fee.fee_amount, @order.currency) %>
                           </td>
                           <td class="text-right"><%= l(@order.sale_date, format: :short) if @order.sale_date %></td>
                         </tr>
@@ -160,7 +160,7 @@
                       <tr class="font-bold text-base-content border-t">
                         <td colspan="2"><%= t('.total_fees') %></td>
                         <td class="text-right <%= @order.payment_fees.sum(&:fee_amount) < 0 ? 'text-error' : '' %>">
-                          <%= number_to_currency(@order.payment_fees.sum(&:fee_amount), unit: "$", precision: 2) %>
+                          <%= format_currency(@order.payment_fees.sum(&:fee_amount), @order.currency) %>
                         </td>
                         <td></td>
                       </tr>
@@ -192,14 +192,14 @@
                         <tr class="hover:bg-base-200/30">
                           <td><%= t('.purchase_price') %></td>
                           <td class="text-right text-error">
-                            <%= number_to_currency(@order.procurement.purchase_price, unit: "¥", precision: 0) %>
+                            <%= format_jpy_currency(@order.procurement.purchase_price) %>
                           </td>
                         </tr>
                         <% if @order.procurement.forwarding_fee.present? && @order.procurement.forwarding_fee > 0 %>
                           <tr class="hover:bg-base-200/30">
                             <td><%= t('.forwarding_fee') %></td>
                             <td class="text-right text-error">
-                              <%= number_to_currency(@order.procurement.forwarding_fee, unit: "¥", precision: 0) %>
+                              <%= format_jpy_currency(@order.procurement.forwarding_fee) %>
                             </td>
                           </tr>
                         <% end %>
@@ -207,7 +207,7 @@
                           <tr class="hover:bg-base-200/30">
                             <td><%= t('.option_fee') %></td>
                             <td class="text-right text-error">
-                              <%= number_to_currency(@order.procurement.option_fee, unit: "¥", precision: 0) %>
+                              <%= format_jpy_currency(@order.procurement.option_fee) %>
                             </td>
                           </tr>
                         <% end %>
@@ -215,7 +215,7 @@
                           <tr class="hover:bg-base-200/30">
                             <td><%= t('.handling_fee') %></td>
                             <td class="text-right text-error">
-                              <%= number_to_currency(@order.procurement.handling_fee, unit: "¥", precision: 0) %>
+                              <%= format_jpy_currency(@order.procurement.handling_fee) %>
                             </td>
                           </tr>
                         <% end %>
@@ -224,7 +224,7 @@
                         <tr class="font-bold text-base-content border-t">
                           <td><%= t('.total_procurement') %></td>
                           <td class="text-right text-error">
-                            <%= number_to_currency(@order.procurement.total_cost, unit: "¥", precision: 0) %>
+                            <%= format_jpy_currency(@order.procurement.total_cost) %>
                           </td>
                         </tr>
                       </tfoot>
@@ -247,7 +247,7 @@
                         <tr class="hover:bg-base-200/30">
                           <td><%= t('.international_shipping') %></td>
                           <td class="text-right text-error">
-                            <%= number_to_currency(@order.shipment.customer_international_shipping, unit: "¥", precision: 0) %>
+                            <%= format_jpy_currency(@order.shipment.customer_international_shipping) %>
                           </td>
                         </tr>
                       </tbody>
@@ -278,15 +278,15 @@
                   <div class="space-y-2">
                     <div class="flex justify-between">
                       <span class="text-sm font-medium text-base-content/70"><%= t('.revenue') %>:</span>
-                      <span class="text-sm font-medium text-base-content"><%= number_to_currency(data[:revenue], unit: "$", precision: 2) %></span>
+                      <span class="text-sm font-medium text-base-content"><%= format_currency(data[:revenue], @order.currency) %></span>
                     </div>
                     <div class="flex justify-between">
                       <span class="text-sm font-medium text-base-content/70"><%= t('.fees') %>:</span>
-                      <span class="text-sm font-medium text-error"><%= number_to_currency(data[:payment_fees], unit: "$", precision: 2) %></span>
+                      <span class="text-sm font-medium text-error"><%= format_currency(data[:payment_fees], @order.currency) %></span>
                     </div>
                     <div class="flex justify-between">
                       <span class="text-sm font-medium text-base-content/70"><%= t('.net_revenue') %>:</span>
-                      <span class="text-sm font-medium text-base-content"><%= number_to_currency(data[:revenue] - data[:payment_fees], unit: "$", precision: 2) %></span>
+                      <span class="text-sm font-medium text-base-content"><%= format_currency(data[:revenue] - data[:payment_fees], @order.currency) %></span>
                     </div>
                     <div class="flex justify-between">
                       <span class="text-sm font-medium text-base-content/70"><%= t('.exchange_rate') %>:</span>
@@ -296,15 +296,15 @@
                   <div class="space-y-2">
                     <div class="flex justify-between">
                       <span class="text-sm font-medium text-base-content/70"><%= t('.jpy_revenue') %>:</span>
-                      <span class="text-sm font-medium text-base-content"><%= number_to_currency((data[:revenue] - data[:payment_fees]) * 150, unit: "¥", precision: 0) %></span>
+                      <span class="text-sm font-medium text-base-content"><%= format_jpy_currency((data[:revenue] - data[:payment_fees]) * 150) %></span>
                     </div>
                     <div class="flex justify-between">
                       <span class="text-sm font-medium text-base-content/70"><%= t('.total_costs') %>:</span>
-                      <span class="text-sm font-medium text-error"><%= number_to_currency(data[:procurement_cost] + data[:other_costs] + data[:shipping_cost], unit: "¥", precision: 0) %></span>
+                      <span class="text-sm font-medium text-error"><%= format_jpy_currency(data[:procurement_cost] + data[:other_costs] + data[:shipping_cost]) %></span>
                     </div>
                     <div class="flex justify-between font-semibold">
                       <span class="text-sm text-base-content/70"><%= t('.profit') %>:</span>
-                      <span class="text-sm text-success"><%= number_to_currency(data[:profit], unit: "¥", precision: 0) %></span>
+                      <span class="text-sm text-success"><%= format_jpy_currency(data[:profit]) %></span>
                     </div>
                     <div class="flex justify-between">
                       <span class="text-sm font-medium text-base-content/70"><%= t('.profit_rate') %>:</span>
