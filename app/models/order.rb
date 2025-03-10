@@ -34,7 +34,7 @@ class Order < ApplicationRecord
   def total_cost
     order_lines.sum(&:cost_price)
   end
-  
+
   # eBayの注文詳細ページのURLを返す
   def ebay_order_url
     "https://www.ebay.com/mesh/ord/details?orderid=#{order_number}"
