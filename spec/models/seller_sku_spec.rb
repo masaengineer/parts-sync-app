@@ -46,7 +46,7 @@ RSpec.describe SellerSku, type: :model do
   describe '.ransackable_attributes' do
     it 'ransack用の許可された属性を返すこと' do
       expect(described_class.ransackable_attributes).to match_array(
-        %w[created_at id sku_code updated_at]
+        %w[created_at id item_id sku_code updated_at]
       )
     end
   end
