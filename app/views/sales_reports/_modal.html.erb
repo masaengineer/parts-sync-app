@@ -1,11 +1,226 @@
 <dialog class="modal" data-controller="modal" data-modal-target="modal">
-  <div class="modal-box">
-    <h3 class="text-lg font-bold">Hello!</h3>
-    <p class="py-4">Press ESC key or click the button below to close</p>
+  <div class="modal-box max-w-3xl">
+    <h3 class="text-lg font-bold">
+      <%= t('.title') %>: <%= @order.order_number %>
+    </h3>
+
+    <div class="divider"></div>
+
+    <div class="py-2">
+      <h4 class="font-semibold text-md mb-2"><%= t('.basic_info') %></h4>
+      <div class="grid grid-cols-3 gap-3">
+        <div class="col-span-2">
+          <div class="flex flex-col space-y-1">
+            <p class="text-sm"><%= t('.order_number') %>: <%= @order.order_number %></p>
+            <p class="text-sm"><%= t('.sale_date') %>: <%= l(@order.sale_date, format: :long) if @order.sale_date %></p>
+            <p class="text-sm"><%= t('.tracking_number') %>: <%= @order.shipment&.tracking_number || t('.not_available') %></p>
+          </div>
+          
+          <% if @order.order_lines.any? %>
+            <div class="mt-3">
+              <p class="text-sm font-medium"><%= t('.products') %>:</p>
+              <ul class="list-disc list-inside text-sm pl-2">
+                <% @order.order_lines.each do |line| %>
+                  <li><%= line.line_item_name %> (x<%= line.quantity %>)</li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+        </div>
+        
+        <div class="flex items-center justify-center">
+          <% if @order.order_lines.any? && @order.order_lines.first.seller_sku %>
+            <% image_path = get_product_image_path(@order.order_lines.first.seller_sku) %>
+            <% if image_path.present? %>
+              <div class="relative group">
+                <!-- eBay APIから取得した実際の商品画像 -->
+                <%= image_tag(image_path, alt: @order.order_lines.first.line_item_name, class: "w-32 h-32 object-cover rounded shadow-sm border border-primary group-hover:border-primary-focus transition-all") %>
+                <div class="absolute top-0 right-0 bg-primary text-white text-xs p-1 rounded-bl">
+                  <span class="text-xs">eBay</span>
+                </div>
+                <div class="absolute bottom-0 left-0 right-0 bg-base-100/75 text-xs p-1 text-center truncate">
+                  <%= @order.order_lines.first.seller_sku.sku_code %>
+                </div>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="py-2">
+      <h4 class="font-semibold text-md mb-2"><%= t('.financial_details') %></h4>
+
+      <!-- 売上情報 -->
+      <div class="mb-4">
+        <h5 class="font-medium text-sm mb-2"><%= t('.revenue') %></h5>
+        <div class="overflow-x-auto">
+          <table class="table table-xs">
+            <thead>
+              <tr>
+                <th><%= t('.transaction_type') %></th>
+                <th><%= t('.amount') %></th>
+                <th><%= t('.transaction_date') %></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @order.sales.each do |sale| %>
+                <tr class="<%= sale.transaction_type == 'REFUND' ? 'text-error' : '' %>">
+                  <td><%= sale.transaction_type %></td>
+                  <td>
+                    <%= number_to_currency(sale.order_gross_amount, unit: "$", precision: 2) %>
+                    <% if sale.to_usd_rate.present? && sale.to_usd_rate != 1.0 %>
+                      (<%= number_to_currency(sale.order_gross_amount * sale.to_usd_rate * 150, unit: "¥", precision: 2) %>)
+                    <% end %>
+                  </td>
+                  <td><%= l(sale.created_at, format: :short) %></td>
+                </tr>
+              <% end %>
+            </tbody>
+            <tfoot>
+              <tr class="font-bold">
+                <td><%= t('.total') %></td>
+                <td colspan="2">
+                  <%= number_to_currency(@order.sales.sum(&:order_gross_amount), unit: "$", precision: 2) %>
+                  <% if @order.sales.first&.to_usd_rate.present? %>
+                    (<%= number_to_currency(@order.sales.sum(&:order_gross_amount) * @order.sales.first.to_usd_rate * 150, unit: "¥", precision: 2) %>)
+                  <% end %>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      <!-- 手数料情報 -->
+      <div class="mb-4">
+        <h5 class="font-medium text-sm mb-2"><%= t('.fees') %></h5>
+        <div class="overflow-x-auto">
+          <table class="table table-xs">
+            <thead>
+              <tr>
+                <th><%= t('.fee_type') %></th>
+                <th><%= t('.category') %></th>
+                <th><%= t('.amount') %></th>
+                <th><%= t('.fee_date') %></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @order.payment_fees.each do |fee| %>
+                <tr>
+                  <td><%= fee.transaction_type %></td>
+                  <td><%= fee.fee_category %></td>
+                  <td><%= number_to_currency(fee.fee_amount, unit: "$", precision: 2) %></td>
+                  <td><%= l(@order.sale_date, format: :short) if @order.sale_date %></td>
+                </tr>
+              <% end %>
+            </tbody>
+            <tfoot>
+              <tr class="font-bold">
+                <td colspan="2"><%= t('.total_fees') %></td>
+                <td><%= number_to_currency(@order.payment_fees.sum(&:fee_amount), unit: "$", precision: 2) %></td>
+                <td></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      <!-- 仕入れコスト情報 -->
+      <% if @order.procurement.present? %>
+        <div class="mb-4">
+          <h5 class="font-medium text-sm mb-2"><%= t('.procurement_costs') %></h5>
+          <div class="overflow-x-auto">
+            <table class="table table-xs">
+              <thead>
+                <tr>
+                  <th><%= t('.cost_type') %></th>
+                  <th><%= t('.amount') %></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><%= t('.purchase_price') %></td>
+                  <td><%= number_to_currency(@order.procurement.purchase_price, unit: "¥", precision: 2) %></td>
+                </tr>
+                <% if @order.procurement.forwarding_fee.present? && @order.procurement.forwarding_fee > 0 %>
+                  <tr>
+                    <td><%= t('.forwarding_fee') %></td>
+                    <td><%= number_to_currency(@order.procurement.forwarding_fee, unit: "¥", precision: 2) %></td>
+                  </tr>
+                <% end %>
+                <% if @order.procurement.option_fee.present? && @order.procurement.option_fee > 0 %>
+                  <tr>
+                    <td><%= t('.option_fee') %></td>
+                    <td><%= number_to_currency(@order.procurement.option_fee, unit: "¥", precision: 2) %></td>
+                  </tr>
+                <% end %>
+                <% if @order.procurement.handling_fee.present? && @order.procurement.handling_fee > 0 %>
+                  <tr>
+                    <td><%= t('.handling_fee') %></td>
+                    <td><%= number_to_currency(@order.procurement.handling_fee, unit: "¥", precision: 2) %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+              <tfoot>
+                <tr class="font-bold">
+                  <td><%= t('.total_procurement') %></td>
+                  <td><%= number_to_currency(@order.procurement.total_cost, unit: "¥", precision: 2) %></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- 送料情報 -->
+      <% if @order.shipment.present? %>
+        <div class="mb-4">
+          <h5 class="font-medium text-sm mb-2"><%= t('.shipping') %></h5>
+          <div class="overflow-x-auto">
+            <table class="table table-xs">
+              <tbody>
+                <% if @order.shipment.customer_international_shipping.present? && @order.shipment.customer_international_shipping > 0 %>
+                  <tr>
+                    <td><%= t('.international_shipping') %></td>
+                    <td><%= number_to_currency(@order.shipment.customer_international_shipping, unit: "¥", precision: 2) %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- 利益計算 -->
+      <div class="mt-6 p-3 bg-base-200 rounded-lg">
+        <% 
+          service = SalesReport::Service.new(@order)
+          data = service.calculate
+        %>
+        <h5 class="font-semibold text-sm mb-2"><%= t('.profit_summary') %></h5>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <p class="text-sm"><%= t('.revenue') %>: <%= number_to_currency(data[:revenue], unit: "$", precision: 2) %></p>
+            <p class="text-sm"><%= t('.fees') %>: <%= number_to_currency(data[:payment_fees], unit: "$", precision: 2) %></p>
+            <p class="text-sm"><%= t('.net_revenue') %>: <%= number_to_currency(data[:revenue] - data[:payment_fees], unit: "$", precision: 2) %></p>
+            <p class="text-sm"><%= t('.exchange_rate') %>: <%= number_with_precision(data[:exchange_rate], precision: 2) %></p>
+          </div>
+          <div>
+            <p class="text-sm"><%= t('.jpy_revenue') %>: <%= number_to_currency((data[:revenue] - data[:payment_fees]) * 150, unit: "¥", precision: 2) %></p>
+            <p class="text-sm"><%= t('.total_costs') %>: <%= number_to_currency(data[:procurement_cost] + data[:other_costs] + data[:shipping_cost], unit: "¥", precision: 2) %></p>
+            <p class="text-sm font-bold"><%= t('.profit') %>: <%= number_to_currency(data[:profit], unit: "¥", precision: 2) %></p>
+            <p class="text-sm"><%= t('.profit_rate') %>: <%= number_to_percentage(data[:profit_rate], precision: 2) %></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="modal-action">
       <form method="dialog">
-        <!-- if there is a button in form, it will close the modal -->
-        <button class="btn" data-action="click->modal#close">Close</button>
+        <button class="btn" data-action="click->modal#close"><%= t('.close') %></button>
       </form>
     </div>
   </div>

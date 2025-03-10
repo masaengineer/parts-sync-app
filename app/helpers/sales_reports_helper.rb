@@ -1,4 +1,54 @@
 module SalesReportsHelper
+  # SKUコードから商品画像のパスを取得するメソッド
+  # eBay商品ページからの取得を試み、画像がない場合はnilを返す
+  def get_product_image_path(seller_sku)
+    return nil unless seller_sku && seller_sku.item_id.present?
+
+    # キャッシュからitem_idを取得
+    @image_cache ||= {}
+    cache_key = "sku_image_#{seller_sku.id}"
+
+    # キャッシュにあればそれを返す（リクエスト内でキャッシュ）
+    return @image_cache[cache_key] if @image_cache.key?(cache_key)
+
+    # eBay商品ページから画像URLを取得する
+    begin
+      # メタデータキャッシュを確認
+      image_url = Rails.cache.fetch("ebay_image_#{seller_sku.item_id}", expires_in: 1.day) do
+        # eBay商品ページのURLを構築
+        item_url = seller_sku.ebay_item_url
+        # URLからHTMLを取得
+        require 'open-uri'
+        require 'nokogiri'
+
+        html = URI.open(item_url).read
+        doc = Nokogiri::HTML(html)
+
+        # メタデータから画像URLを抽出
+        og_image = doc.at('meta[property="og:image"]')&.attr('content')
+
+        # 商品画像を見つける
+        image_element = doc.at('div#mainImgHldr img') ||
+                        doc.at('div.ux-image-carousel-item img') ||
+                        doc.at('img.img.img500')
+
+        image_url = og_image || image_element&.attr('src')
+        image_url
+      end
+
+      # 画像URLが取得できた場合はそれをキャッシュして返す
+      if image_url.present?
+        @image_cache[cache_key] = image_url
+        return image_url
+      end
+    rescue => e
+      Rails.logger.error "eBay画像取得エラー: #{e.message}"
+    end
+
+    # 画像が取得できなかった場合はnilを返す
+    nil
+  end
+
   def table_columns
     [
       { key: :sale_date },
