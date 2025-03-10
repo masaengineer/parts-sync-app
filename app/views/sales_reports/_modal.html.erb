@@ -78,7 +78,7 @@
                       (<%= number_to_currency(sale.order_gross_amount * sale.to_usd_rate * 150, unit: "¥", precision: 0) %>)
                     <% end %>
                   </td>
-                  <td><%= l(sale.created_at, format: :short) %></td>
+                  <td><%= l(@order.sale_date, format: :short) if @order.sale_date %></td>
                 </tr>
               <% end %>
             </tbody>
