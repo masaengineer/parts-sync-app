@@ -4,7 +4,6 @@ export default class extends Controller {
   static targets = ['toggle'];
 
   connect() {
-    console.log('theme_controller connect');
     if (this.hasToggleTarget) {
       this.toggleTarget.addEventListener('change', this.toggleTheme.bind(this));
     }
