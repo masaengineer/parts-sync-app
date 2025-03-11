@@ -1,7 +1,7 @@
 module MonthlyReports
   class ExpensesController < ApplicationController
-    before_action :set_expense, only: [:edit, :update, :destroy]
-    before_action :set_year_and_month, only: [:index, :new, :create]
+    before_action :set_expense, only: [ :edit, :update, :destroy ]
+    before_action :set_year_and_month, only: [ :index, :new, :create ]
 
     def index
       @expenses = Expense.where(year: @year, month: @month).order(:item_name)
@@ -15,7 +15,7 @@ module MonthlyReports
       @expense = Expense.new(expense_params)
 
       if @expense.save
-        redirect_to monthly_reports_expenses_path(year: @expense.year, month: @expense.month), notice: '販管費を登録しました'
+        redirect_to monthly_reports_expenses_path(year: @expense.year, month: @expense.month), notice: "販管費を登録しました"
       else
         flash.now[:error] = "入力内容に#{@expense.errors.count}件のエラーがあります"
         render :new, status: :unprocessable_entity
@@ -27,7 +27,7 @@ module MonthlyReports
 
     def update
       if @expense.update(expense_params)
-        redirect_to monthly_reports_expenses_path(year: @expense.year, month: @expense.month), notice: '販管費を更新しました'
+        redirect_to monthly_reports_expenses_path(year: @expense.year, month: @expense.month), notice: "販管費を更新しました"
       else
         flash.now[:error] = "入力内容に#{@expense.errors.count}件のエラーがあります"
         render :edit, status: :unprocessable_entity
@@ -38,7 +38,7 @@ module MonthlyReports
       year = @expense.year
       month = @expense.month
       @expense.destroy
-      redirect_to monthly_reports_expenses_path(year: year, month: month), notice: '販管費を削除しました'
+      redirect_to monthly_reports_expenses_path(year: year, month: month), notice: "販管費を削除しました"
     end
 
     private
