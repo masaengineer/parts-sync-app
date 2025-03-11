@@ -22,12 +22,12 @@
         </thead>
         <tbody>
           <% @table_data[:metrics].each do |metric| %>
-            <tr class="font-medium hover:bg-base-200/40">
+            <tr class="hover:bg-base-200/40">
               <td class="sticky left-0 z-10 bg-base-100 shadow-sm"><%= metric_label(metric[:key]) %></td>
               <% metric[:values].each do |value| %>
                 <td><%= format_metric_cell(value, metric[:format]) %></td>
               <% end %>
-              <td class="bg-base-200">
+              <td class="font-bold">
                 <%= format_total_cell(@totals[metric[:key]], metric[:format]) %>
               </td>
             </tr>
