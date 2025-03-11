@@ -11,12 +11,15 @@ export default class extends Controller {
 
   disconnect() {
     if (this.hasToggleTarget) {
-      this.toggleTarget.removeEventListener('change', this.toggleTheme.bind(this));
+      this.toggleTarget.removeEventListener(
+        'change',
+        this.toggleTheme.bind(this)
+      );
     }
   }
 
   toggleTheme(event) {
     const html = document.querySelector('html');
-    // html.setAttribute('data-theme', event.target.checked ? 'dark' : 'light');
+    html.setAttribute('data-theme', event.target.checked ? 'dark' : 'light');
   }
 }
