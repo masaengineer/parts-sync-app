@@ -10,7 +10,13 @@ Rails.application.routes.draw do
 
   resources :users, only: [ :index, :show ]
   resources :monthly_reports, only: [ :index ]
+
+  namespace :monthly_reports do
+    resources :expenses
+  end
+
   resources :sales_reports, only: [ :index, :show ]
+
   resources :data_imports, only: [ :index, :show ] do
     collection do
       post :import

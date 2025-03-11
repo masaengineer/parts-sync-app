@@ -1,6 +1,14 @@
 <%# app/views/monthly_reports/_table.html.erb %>
 <div class="card card-bordered bg-base-100 shadow-sm mt-5 overflow-x-auto">
   <div class="card-body p-0">
+    <div class="flex justify-between items-center p-4">
+      <h3 class="font-bold">月次データ</h3>
+      <%= link_to monthly_reports_expenses_path(year: @selected_year, month: Time.current.month), class: "btn btn-primary btn-sm" do %>
+        経費管理
+        <iconify-icon class="ml-1" icon="lucide:list"></iconify-icon>
+      <% end %>
+    </div>
+
     <table class="table rounded-box w-full whitespace-nowrap">
       <thead>
         <tr>

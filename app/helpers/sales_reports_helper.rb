@@ -1,4 +1,6 @@
 module SalesReportsHelper
+  include CurrencyFormatter
+
   # SKUコードから商品画像のパスを取得するメソッド
   # eBay商品ページからの取得を試み、画像がない場合はnilを返す
   def get_product_image_path(seller_sku)
@@ -133,34 +135,23 @@ module SalesReportsHelper
 
   private
 
-  # 通貨に応じた金額フォーマットを行う
-  # @param amount [Numeric] 金額
-  # @param currency [Currency] 通貨オブジェクト
-  # @return [String] フォーマットされた金額
+  # 通貨オブジェクトに応じた金額フォーマット
   def format_currency(amount, currency)
     return "" if amount.nil?
 
     # 通貨が指定されていない場合はデフォルトでドル表示
     if currency.nil?
-      return number_to_currency(amount, unit: "$", precision: 2, format: "%u%n")
+      return format_usd(amount)
     end
 
-    # 通貨コードに応じて精度と単位を変更
-    if currency.code == "JPY"
-      precision = 0
-      unit = "¥"
+    case currency.code
+    when "JPY"
+      format_jpy(amount)
+    when "USD"
+      format_usd(amount)
     else
-      precision = 2
-      unit = currency.symbol || "$"
+      format_amount(amount, currency.symbol, 2)
     end
-
-    # 通貨シンボルと金額を表示
-    number_to_currency(
-      amount,
-      unit: unit,
-      precision: precision,
-      format: "%u%n"
-    )
   end
 
   # JPY通貨の金額フォーマットを行う
