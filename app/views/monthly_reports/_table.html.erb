@@ -1,5 +1,5 @@
 <%# app/views/monthly_reports/_table.html.erb %>
-<div class="card card-bordered bg-base-100 shadow-sm mt-5 overflow-x-auto">
+<div class="card card-bordered bg-base-100 shadow-sm mt-5">
   <div class="card-body p-0">
     <div class="flex justify-between items-center p-4">
       <h3 class="font-bold">月次データ</h3>
@@ -9,29 +9,31 @@
       <% end %>
     </div>
 
-    <table class="table rounded-box w-full whitespace-nowrap">
-      <thead>
-        <tr>
-          <th>項目</th>
-          <% @table_data[:headers].each do |header| %>
-            <th><%= header %></th>
-          <% end %>
-          <th class="bg-base-200">合計</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @table_data[:metrics].each do |metric| %>
-          <tr class="font-medium hover:bg-base-200/40">
-            <td><%= metric_label(metric[:key]) %></td>
-            <% metric[:values].each do |value| %>
-              <td><%= format_metric_cell(value, metric[:format]) %></td>
+    <div class="relative overflow-x-auto">
+      <table class="table rounded-box w-full whitespace-nowrap">
+        <thead>
+          <tr>
+            <th class="sticky left-0 z-10 bg-base-100 shadow-sm">項目</th>
+            <% @table_data[:headers].each do |header| %>
+              <th><%= header %></th>
             <% end %>
-            <td class="bg-base-200">
-              <%= format_total_cell(@totals[metric[:key]], metric[:format]) %>
-            </td>
+            <th class="bg-base-200">合計</th>
           </tr>
-        <% end %>
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          <% @table_data[:metrics].each do |metric| %>
+            <tr class="font-medium hover:bg-base-200/40">
+              <td class="sticky left-0 z-10 bg-base-100 shadow-sm"><%= metric_label(metric[:key]) %></td>
+              <% metric[:values].each do |value| %>
+                <td><%= format_metric_cell(value, metric[:format]) %></td>
+              <% end %>
+              <td class="bg-base-200">
+                <%= format_total_cell(@totals[metric[:key]], metric[:format]) %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
