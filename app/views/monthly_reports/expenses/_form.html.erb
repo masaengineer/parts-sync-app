@@ -3,7 +3,7 @@
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
     <div class="form-control">
       <%= form.label :year, "年", class: "label" %>
-      <%= form.number_field :year, class: "input input-bordered #{'input-error' if expense.errors[:year].any?}", min: 2000, max: 2100 %>
+      <%= form.number_field :year, class: "input input-bordered input-sm #{'input-error' if expense.errors[:year].any?}", min: 2000, max: 2100 %>
       <% if expense.errors[:year].any? %>
         <div class="text-error text-sm mt-1"><%= expense.errors[:year].join(', ') %></div>
       <% end %>
@@ -11,7 +11,7 @@
 
     <div class="form-control">
       <%= form.label :month, "月", class: "label" %>
-      <%= form.number_field :month, class: "input input-bordered #{'input-error' if expense.errors[:month].any?}", min: 1, max: 12 %>
+      <%= form.number_field :month, class: "input input-bordered input-sm #{'input-error' if expense.errors[:month].any?}", min: 1, max: 12 %>
       <% if expense.errors[:month].any? %>
         <div class="text-error text-sm mt-1"><%= expense.errors[:month].join(', ') %></div>
       <% end %>
@@ -20,7 +20,7 @@
 
   <div class="form-control">
     <%= form.label :item_name, "項目名", class: "label" %>
-    <%= form.text_field :item_name, class: "input input-bordered #{'input-error' if expense.errors[:item_name].any?}", placeholder: "例: 出品外注費用など" %>
+    <%= form.text_field :item_name, class: "input input-bordered input-sm #{'input-error' if expense.errors[:item_name].any?}", placeholder: "例: 出品外注費用など" %>
     <% if expense.errors[:item_name].any? %>
       <div class="text-error text-sm mt-1"><%= expense.errors[:item_name].join(', ') %></div>
     <% end %>
@@ -30,7 +30,7 @@
     <%= form.label :amount, "金額", class: "label" %>
     <div class="relative">
       <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">¥</span>
-      <%= form.number_field :amount, class: "input input-bordered pl-8 #{'input-error' if expense.errors[:amount].any?}", min: 0, step: 1 %>
+      <%= form.number_field :amount, class: "input input-bordered input-sm pl-8 #{'input-error' if expense.errors[:amount].any?}", min: 0, step: 1 %>
     </div>
     <% if expense.errors[:amount].any? %>
       <div class="text-error text-sm mt-1"><%= expense.errors[:amount].join(', ') %></div>
@@ -38,6 +38,6 @@
   </div>
 
   <div class="mt-6">
-    <%= form.submit "保存", class: "btn btn-primary" %>
+    <%= form.submit "保存", class: "btn btn-primary btn-sm" %>
   </div>
 <% end %>

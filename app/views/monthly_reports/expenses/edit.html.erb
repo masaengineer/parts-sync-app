@@ -1,13 +1,15 @@
 <%# app/views/monthly_reports/expenses/edit.html.erb %>
-<div class="container mx-auto px-4 py-8">
-  <div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold">販管費の編集</h1>
-    <%= link_to "一覧に戻る", monthly_reports_expenses_path(year: @expense.year, month: @expense.month), class: "btn btn-outline" %>
-  </div>
+<div class="w-full p-6">
+  <div class="card card-bordered bg-base-100 shadow-sm mt-5">
+    <div class="card-body p-0">
+      <div class="flex justify-between items-center p-4">
+        <h3 class="font-bold">販管費の編集</h3>
+        <%= link_to "一覧に戻る", monthly_reports_expenses_path(year: @expense.year, month: @expense.month), class: "btn btn-outline btn-sm" %>
+      </div>
 
-  <div class="card card-bordered bg-base-100 shadow-sm">
-    <div class="card-body">
-      <%= render "form", expense: @expense %>
+      <div class="p-4">
+        <%= render "form", expense: @expense %>
+      </div>
     </div>
   </div>
 </div>
