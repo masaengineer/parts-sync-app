@@ -480,6 +480,7 @@ DEPENDENCIES
   letter_opener
   letter_opener_web
   meta-tags
+  nokogiri (~> 1.17)
   oauth2
   omniauth-google-oauth2
   omniauth-rails_csrf_protection

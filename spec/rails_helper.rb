@@ -113,9 +113,13 @@ RSpec.configure do |config|
 
   # 失敗したテストのスクリーンショットを保存
   config.after(:each, type: :system) do |example|
-    if example.exception && defined?(page) && page.respond_to?(:driver) && page.driver.respond_to?(:save_screenshot)
+    if example.exception && defined?(page) && page.respond_to?(:driver)
       # スクリーンショットが取得できる場合のみ実行
-      page.save_screenshot(Rails.root.join("tmp/screenshots/#{example.full_description.gsub(/[^0-9A-Za-z]/, '_')}.png"))
+      begin
+        page.save_screenshot(Rails.root.join("tmp/screenshots/#{example.full_description.gsub(/[^0-9A-Za-z]/, '_')}.png"))
+      rescue Capybara::NotSupportedByDriverError => e
+        puts "スクリーンショットの保存に失敗しました: #{e.message}"
+      end
     end
   end
 end

@@ -102,3 +102,5 @@ group :test do
   gem "selenium-webdriver"
   gem "simplecov", require: false
 end
+
+gem "nokogiri", "~> 1.17"

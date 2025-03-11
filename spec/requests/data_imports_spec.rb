@@ -7,6 +7,8 @@ RSpec.describe "DataImports", type: :request do
 
   before do
     sign_in user
+    # CSRFトークンを無効化して、認証エラーを回避
+    allow_any_instance_of(ActionController::Base).to receive(:protect_against_forgery?).and_return(false)
   end
 
   describe "POST /import" do
@@ -60,9 +62,9 @@ RSpec.describe "DataImports", type: :request do
 
     context "with missing SKUs in Wisewill file" do
       it "handles the error and shows a specific error message" do
-        # モックを使用してMissingSkusErrorを発生させる
+        # モックを使用してMissingOrderNumbersErrorを発生させる
         allow_any_instance_of(WisewillDataSheetImporter).to receive(:import).and_raise(
-          WisewillDataSheetImporter::MissingSkusError.new("未登録のSKUが含まれています")
+          WisewillDataSheetImporter::MissingOrderNumbersError.new("未登録のSKUが含まれています")
         )
 
         file = fixture_file_upload(Rails.root.join('spec/fixtures/files/valid_wisewill_sheet.xlsx'), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')

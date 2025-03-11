@@ -27,7 +27,7 @@ RSpec.describe Order, type: :model do
   end
 
   describe 'Validations' do
-    subject { build(:order) }
+    subject { build(:order, order_number: "TEST-ORDER-123") }
 
     it { should validate_presence_of(:order_number) }
     it { should validate_uniqueness_of(:order_number) }

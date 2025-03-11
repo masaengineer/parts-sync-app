@@ -24,6 +24,15 @@ class SalesReportsController < ApplicationController
   end
 
   def show
-    @order = current_user.orders.find(params[:id])
+    # 必要な関連データを事前に読み込み
+    @order = current_user.orders.includes(
+      :sales,
+      :shipment,
+      :payment_fees,
+      :procurement,
+      order_lines: {
+        seller_sku: :manufacturer_skus
+      }
+    ).find(params[:id])
   end
 end

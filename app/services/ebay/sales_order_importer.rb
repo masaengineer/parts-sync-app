@@ -81,6 +81,12 @@ module Ebay
         # SKUが存在する場合はそのSKUを、存在しない場合は"undefined"を使用
         sku_code = line_item["sku"].presence || "undefined"
         seller_sku = ::SellerSku.find_or_create_by!(sku_code: sku_code)
+
+        # eBayのitem_idを保存（あれば）
+        if line_item["legacyItemId"].present? && seller_sku.item_id.blank?
+          seller_sku.update(item_id: line_item["legacyItemId"])
+        end
+
         attributes[:seller_sku_id] = seller_sku.id
 
         order_line.update!(attributes)
