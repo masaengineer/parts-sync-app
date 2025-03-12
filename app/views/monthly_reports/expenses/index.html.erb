@@ -1,0 +1,24 @@
+<%# app/views/expenses/index.html.erb %>
+<div class="w-full p-6">
+  <div class="card card-bordered bg-base-100 shadow-sm mt-5">
+    <div class="card-body p-0">
+      <div class="flex justify-between items-center p-4">
+        <h3 class="font-bold"><%= @year %>年<%= @month %>月の販管費一覧</h3>
+        <div class="flex space-x-2">
+          <%= link_to "新規登録", new_monthly_reports_expense_path(year: @year, month: @month), class: "btn btn-primary btn-sm" %>
+          <%= link_to "月次レポートに戻る", monthly_reports_path(year: @year), class: "btn btn-outline btn-sm" %>
+        </div>
+      </div>
+
+      <div class="p-4">
+        <%= render 'month_navigation', year: @year, month: @month %>
+
+        <% if expenses_exist?(@expenses) %>
+          <%= render 'expenses_table', expenses: @expenses %>
+        <% else %>
+          <%= render 'no_expenses_message' %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

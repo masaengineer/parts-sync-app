@@ -1,0 +1,33 @@
+<%# app/views/monthly_reports/expenses/_expenses_table.html.erb %>
+<div class="relative overflow-x-auto">
+  <table class="table rounded-box w-full whitespace-nowrap">
+    <thead>
+      <tr>
+        <th class="sticky left-0 z-10 bg-base-100 shadow-sm">項目名</th>
+        <th>金額</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% expenses.each do |expense| %>
+        <tr class="hover:bg-base-200/40">
+          <td class="sticky left-0 z-10 bg-base-100 shadow-sm"><%= expense.item_name %></td>
+          <td><%= format_jpy(expense.amount) %></td>
+          <td class="flex space-x-2">
+            <%= link_to "編集", edit_monthly_reports_expense_path(expense), class: "btn btn-sm btn-outline" %>
+            <%= button_to "削除", monthly_reports_expense_path(expense), method: :delete,
+                class: "btn btn-sm btn-error",
+                form: { data: { turbo_confirm: "本当に削除しますか？" } } %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+    <tfoot>
+      <tr>
+        <th class="sticky left-0 z-10 bg-base-100 shadow-sm">合計</th>
+        <th class="font-bold"><%= format_jpy(total_expenses_amount(expenses)) %></th>
+        <th></th>
+      </tr>
+    </tfoot>
+  </table>
+</div>
