@@ -16,6 +16,7 @@ Rails.application.routes.draw do
   end
 
   resources :sales_reports, only: [ :index, :show ]
+  resources :price_adjustments, only: [ :create ]
 
   resources :data_imports, only: [ :index, :show ] do
     collection do
