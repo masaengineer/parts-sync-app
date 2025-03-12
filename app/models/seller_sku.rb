@@ -2,6 +2,7 @@ class SellerSku < ApplicationRecord
   has_many :order_lines
   has_many :sku_mappings
   has_many :manufacturer_skus, through: :sku_mappings
+  has_many :price_adjustments, dependent: :destroy
 
   validates :sku_code, presence: true, uniqueness: true
 
@@ -16,5 +17,10 @@ class SellerSku < ApplicationRecord
   def ebay_item_url
     return nil unless item_id.present?
     "https://www.ebay.com/itm/#{item_id}"
+  end
+  
+  # 最新の価格調整日を取得
+  def latest_adjustment_date
+    price_adjustments.order(adjustment_date: :desc).first&.adjustment_date
   end
 end
