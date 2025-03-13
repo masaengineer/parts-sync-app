@@ -1,0 +1,21 @@
+<!-- 利益計算 -->
+<div class="card bg-base-100 border border-base-200">
+  <div class="card-body p-4">
+    <% service = SalesReport::Service.new(order) %>
+    <% data = service.calculate %>
+    <div class="grid grid-cols-2 gap-4">
+      <div class="space-y-2">
+        <%= render 'sales_reports/modal/components/summary_row', label: t('.revenue'), value: format_currency(data[:revenue], order.currency) %>
+        <%= render 'sales_reports/modal/components/summary_row', label: t('.fees'), value: format_currency(data[:payment_fees], order.currency), error: true %>
+        <%= render 'sales_reports/modal/components/summary_row', label: t('.net_revenue'), value: format_currency(data[:revenue] - data[:payment_fees], order.currency) %>
+        <%= render 'sales_reports/modal/components/summary_row', label: t('.exchange_rate'), value: number_with_precision(data[:exchange_rate], precision: 2) %>
+      </div>
+      <div class="space-y-2">
+        <%= render 'sales_reports/modal/components/summary_row', label: t('.jpy_revenue'), value: format_jpy_currency((data[:revenue] - data[:payment_fees]) * ApplicationController::JPY_RATE) %>
+        <%= render 'sales_reports/modal/components/summary_row', label: t('.total_costs'), value: format_jpy_currency(data[:procurement_cost] + data[:other_costs] + data[:shipping_cost]), error: true %>
+        <%= render 'sales_reports/modal/components/summary_row', label: t('.profit'), value: format_jpy_currency(data[:profit]), success: true, bold: true %>
+        <%= render 'sales_reports/modal/components/summary_row', label: t('.profit_rate'), value: number_to_percentage(data[:profit_rate], precision: 2) %>
+      </div>
+    </div>
+  </div>
+</div>

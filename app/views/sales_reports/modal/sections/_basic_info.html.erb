@@ -1,0 +1,33 @@
+<!-- 基本情報セクション -->
+<div class="card bg-base-100 mb-6">
+  <div class="card-body p-0">
+    <h4 class="font-semibold text-md mb-3 text-base-content flex items-center">
+      <iconify-icon class="h-6 w-6 mr-2 text-primary flex items-center" icon="lucide:info"></iconify-icon>
+      <%= t('.basic_info') %>
+    </h4>
+    <div class="grid grid-cols-3 gap-6">
+      <div class="col-span-2">
+        <div class="flex flex-col space-y-2">
+          <%= render 'sales_reports/modal/components/info_row', label: t('.order_number'), value: order.order_number %>
+          <%= render 'sales_reports/modal/components/info_row', label: t('.sale_date'), value: l(order.sale_date, format: :long) if order.sale_date %>
+          <%= render 'sales_reports/modal/components/info_row', label: t('.tracking_number'), value: order.shipment&.tracking_number || t('.not_available') %>
+        </div>
+
+        <% if order.order_lines.any? %>
+          <div class="mt-4">
+            <p class="text-sm font-medium text-base-content/70 mb-1"><%= t('.products') %>:</p>
+            <div class="text-sm space-y-3 pl-2 border-l-2 border-base-300 ml-3">
+              <% order.order_lines.each do |line| %>
+                <%= render 'sales_reports/modal/components/order_line', line: line, order: order %>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="flex items-center justify-center">
+        <%= render 'sales_reports/modal/components/product_image', order: order %>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,18 @@
+<% if latest_adjustment = price_adjustment_for_item_id(item_id) %>
+  <div class="mt-1 text-xs">
+    <div class="flex space-x-2 items-center mb-1">
+      <span class="badge badge-sm badge-success"><%= t('.price_adjusted') %></span>
+      <span><%= t('.adjustment_date') %>: <%= l(latest_adjustment.adjustment_date, format: :short_with_time) %></span>
+      <span>
+        <%= t('.adjustment_amount') %>:
+        <span class="font-medium"><%= format_currency(latest_adjustment.adjustment_amount, latest_adjustment.currency || Currency.find_by(code: "USD")) %></span>
+        <span class="badge badge-sm badge-outline font-sm ml-1"><%= latest_adjustment.currency&.code&.upcase || "USD" %></span>
+      </span>
+    </div>
+    <% if latest_adjustment.notes.present? %>
+      <div class="ml-2 pl-2 border-l-2 border-base-300 text-base-content/70">
+        <span class="font-medium"><%= t('.notes') %>:</span> <%= latest_adjustment.notes %>
+      </div>
+    <% end %>
+  </div>
+<% end %>

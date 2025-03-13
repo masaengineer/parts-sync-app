@@ -1,0 +1,20 @@
+<!-- 送料情報 -->
+<div class="card bg-base-100 border border-base-200">
+  <div class="card-body p-4">
+    <h5 class="card-title text-sm font-medium text-base-content/70 pb-2 border-b">
+      <%= t('.shipping') %>
+    </h5>
+    <div class="overflow-x-auto mt-2">
+      <table class="table table-xs">
+        <tbody class="font-medium text-base-content">
+          <tr class="hover:bg-base-200/30">
+            <td><%= t('.international_shipping') %></td>
+            <td class="text-right text-error">
+              <%= format_jpy_currency(order.shipment.customer_international_shipping) %>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,4 @@
+<div class="flex justify-between <%= local_assigns[:bold] ? 'font-semibold' : 'font-medium' %>">
+  <span class="text-sm text-base-content/70"><%= label %>:</span>
+  <span class="text-sm <%= local_assigns[:success] ? 'text-success' : local_assigns[:error] ? 'text-error' : 'text-base-content' %>"><%= value %></span>
+</div>
