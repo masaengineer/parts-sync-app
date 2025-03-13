@@ -1,0 +1,45 @@
+ja:
+  sales_reports:
+    modal:
+      components:
+        order_line:
+          adjust_price: '価格調整メモ'
+        price_adjustment:
+          price_adjusted: '調整済'
+          adjustment_date: '調整日'
+          adjustment_amount: '調整額'
+          notes: '備考'
+        revenue_card:
+          revenue: '売上'
+          transaction_type: '取引種別'
+          amount: '金額'
+          transaction_date: '取引日'
+          total: '合計'
+        fees_card:
+          fees: '手数料'
+          fee_type: '手数料種別'
+          category: 'カテゴリ'
+          amount: '金額'
+          fee_date: '手数料発生日'
+          total_fees: '手数料合計'
+        procurement_card:
+          procurement_costs: '仕入れコスト'
+          cost_type: 'コスト種別'
+          amount: '金額'
+          total_procurement: '調達コスト合計'
+          purchase_price: '仕入価格'
+          forwarding_fee: '転送料'
+          option_fee: 'オプション料'
+          handling_fee: '取扱手数料'
+        shipping_card:
+          shipping: '送料'
+          international_shipping: '国際送料'
+        profit_summary_card:
+          revenue: '売上'
+          fees: '手数料'
+          net_revenue: '純売上（手数料差引後）'
+          exchange_rate: '為替レート'
+          jpy_revenue: '円換算売上'
+          total_costs: '総コスト'
+          profit: '利益'
+          profit_rate: '利益率'

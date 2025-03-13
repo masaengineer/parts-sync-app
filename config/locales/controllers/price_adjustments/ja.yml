@@ -1,0 +1,6 @@
+ja:
+  price_adjustments:
+    create:
+      success: "価格調整メモが正常に保存されました"
+      error: "価格調整メモの保存中にエラーが発生しました"
+    unauthorized: "このアクションを実行する権限がありません"
