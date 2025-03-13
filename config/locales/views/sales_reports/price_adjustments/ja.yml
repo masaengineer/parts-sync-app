@@ -1,0 +1,13 @@
+ja:
+  price_adjustments:
+    new:
+      title: '価格調整メモ'
+      adjustment_date: '調整日'
+      adjustment_amount: '調整額'
+      currency: '通貨'
+      notes: '備考'
+      save: '保存'
+      cancel: 'キャンセル'
+    create:
+      success: '価格調整メモが保存されました'
+      error: '価格調整メモの保存に失敗しました'

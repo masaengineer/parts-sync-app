@@ -27,7 +27,8 @@ ja:
     formats:
       default: '%Y/%m/%d %H:%M:%S'
       long: '%Y年%m月%d日 %H時%M分'
-      short: '%m/%d %H:%M'
+      short: '%m/%d'
+      short_with_time: '%m/%d %H:%M'
     am: '午前'
     pm: '午後'
 

@@ -6,6 +6,11 @@ module CurrencyFormatter
     number_to_currency(amount, unit: symbol, precision: precision, format: "%u%n")
   end
 
+  # 通貨コードを表示用にフォーマット（大文字3文字）
+  def format_currency_code(code)
+    code.to_s.upcase
+  end
+
   def format_jpy(amount)
     format_amount(amount, "¥", 0)
   end

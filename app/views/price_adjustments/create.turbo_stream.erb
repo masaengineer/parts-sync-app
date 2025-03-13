@@ -1,0 +1,99 @@
+<%= turbo_stream.replace "price-adjustment-result" do %>
+  <div id="price-adjustment-result">
+    <div class="alert <%= @success ? 'alert-success' : 'alert-error' %> shadow-sm">
+      <iconify-icon class="h-6 w-6 flex-shrink-0" icon="<%= @success ? 'lucide:check-circle' : 'lucide:alert-circle' %>"></iconify-icon>
+      <span><%= @message %></span>
+    </div>
+  </div>
+<% end %>
+
+<% if @success %>
+  <%= turbo_stream.update "adjustment-form-visibility" do %>
+    <div id="adjustment-form-visibility" data-modal-target="toggleFormVisibility" data-action="toggle-visibility"></div>
+  <% end %>
+
+  <%# 商品の価格調整表示を更新 - すべての対象アイテムを更新 %>
+  <% if @item_id.present? %>
+    <%# モーダル内の価格調整表示を更新 %>
+    <%= turbo_stream.update_all "[data-item-adjustment='#{@item_id}']" do %>
+      <div class="mt-1 text-xs">
+        <div class="flex space-x-2 items-center mb-1">
+          <span class="badge badge-sm badge-success"><%= t('sales_reports.modal.components.price_adjustment.price_adjusted') %></span>
+          <span><%= t('sales_reports.modal.components.price_adjustment.adjustment_date') %>: <%= l(@price_adjustment.adjustment_date, format: :short_with_time) %></span>
+          <span>
+            <%= t('sales_reports.modal.components.price_adjustment.adjustment_amount') %>:
+            <span class="font-medium"><%= format_currency(@price_adjustment.adjustment_amount, @price_adjustment.currency || Currency.find_by(code: "USD")) %></span>
+            <span class="badge badge-xs badge-outline font-bold ml-1"><%= @price_adjustment.currency&.code&.upcase || "USD" %></span>
+          </span>
+        </div>
+        <% if @price_adjustment.notes.present? %>
+          <div class="ml-2 pl-2 border-l-2 border-base-300 text-base-content/70">
+            <span class="font-medium"><%= t('sales_reports.modal.components.price_adjustment.notes') %>:</span> <%= @price_adjustment.notes %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <%# モーダル内の調整日カラムを更新 - 日付のみ表示 %>
+    <%= turbo_stream.update_all "[data-price-adjusted-cell='#{@item_id}']" do %>
+      <div class="flex justify-center">
+        <span class="badge badge-info badge-outline text-xs"><%= l(@price_adjustment.adjustment_date, format: :short) %></span>
+      </div>
+    <% end %>
+
+    <%# 一覧画面のテーブルセルを更新 %>
+    <% if @affected_order_ids.present? %>
+      <% @affected_order_ids.each do |order_id| %>
+        <%= turbo_stream.update_all "#order-row-#{order_id} td[data-column='price_adjusted']" do %>
+          <a href="<%= sales_report_path(order_id) %>" data-turbo-frame="modal">
+            <div class="flex justify-center" data-price-adjusted-cell="<%= @item_id %>">
+              <span class="badge badge-info badge-outline text-xs"><%= l(@price_adjustment.adjustment_date, format: :short) %></span>
+            </div>
+          </a>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <%# 成功時は処理完了後の操作 - JavaScriptで対応 %>
+  <script>
+    // モーダル上部へのスクロール処理 - 複数の方法を試す
+    (function scrollToTopOfModal() {
+      // 10ミリ秒待機してからスクロール実行（レンダリング完了を待つため）
+      setTimeout(function() {
+        try {
+          // 方法1: 直接スクロール処理
+          const modalBox = document.querySelector('.modal-box');
+          if (modalBox) {
+            modalBox.scrollTop = 0;
+          }
+
+          // 方法2: ダイアログ要素自体のスクロール
+          const dialog = document.querySelector('dialog.modal');
+          if (dialog) {
+            dialog.scrollTop = 0;
+          }
+
+          // 方法3: 特定の対象要素をスクロールビューに入れる
+          const modalTitle = document.querySelector('.modal-box h3');
+          if (modalTitle) {
+            modalTitle.scrollIntoView({
+              behavior: 'auto',
+              block: 'start'
+            });
+          }
+
+          // 方法4: カスタムトリガーを発動させる
+          document.dispatchEvent(new CustomEvent('price-adjustment:scroll-top'));
+        } catch (e) {
+          console.error('Modal scroll failed:', e);
+        }
+      }, 30);
+    })();
+
+    // 5秒後にメッセージ非表示
+    setTimeout(function() {
+      document.getElementById('price-adjustment-result').innerHTML = '';
+    }, 5000);
+  </script>
+<% end %>

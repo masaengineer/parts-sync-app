@@ -1,0 +1,30 @@
+<div>
+  <h4 class="font-semibold text-md mb-4 text-base-content flex items-center">
+    <iconify-icon class="h-6 w-6 mr-2 text-primary flex items-center" icon="lucide:circle-dollar-sign"></iconify-icon>
+    <%= t('.financial_details') %>
+  </h4>
+
+  <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+    <!-- 左カラム: 売上と手数料 -->
+    <div class="space-y-6">
+      <%= render 'sales_reports/modal/components/revenue_card', order: order %>
+      <%= render 'sales_reports/modal/components/fees_card', order: order %>
+    </div>
+
+    <!-- 右カラム: 仕入れ、送料、利益 -->
+    <div class="space-y-6">
+      <%= render 'sales_reports/modal/components/procurement_card', order: order if order.procurement.present? %>
+      <%= render 'sales_reports/modal/components/shipping_card', order: order if order.shipment.present? && order.shipment.customer_international_shipping.present? && order.shipment.customer_international_shipping > 0 %>
+
+      <!-- サマリーセクション -->
+      <div class="mt-6 mb-2">
+        <h4 class="font-semibold text-md mb-4 text-base-content flex items-center">
+          <iconify-icon class="h-6 w-6 mr-2 text-primary flex items-center" icon="lucide:chart-column"></iconify-icon>
+          <%= t('.profit_summary') %>
+        </h4>
+      </div>
+
+      <%= render 'sales_reports/modal/components/profit_summary_card', order: order %>
+    </div>
+  </div>
+</div>

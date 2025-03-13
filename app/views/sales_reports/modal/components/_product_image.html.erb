@@ -1,0 +1,17 @@
+<% if order.order_lines.any? && order.order_lines.first.seller_sku %>
+  <% image_path = get_product_image_path(order.order_lines.first.seller_sku) %>
+  <% if image_path.present? %>
+    <div class="relative group">
+      <%= link_to order.ebay_order_url, target: "_blank", rel: "noopener noreferrer", class: "tooltip tooltip-primary" do %>
+        <%= image_tag(image_path, alt: order.order_lines.first.line_item_name,
+            class: "w-48 h-48 object-cover rounded-lg shadow-md border-2 border-primary/30 group-hover:border-primary transition-all cursor-pointer") %>
+        <div class="absolute top-0 right-0 bg-primary text-white text-xs px-2 py-1 rounded-bl rounded-tr">
+          <span class="text-xs">eBay</span>
+        </div>
+        <div class="absolute bottom-0 left-0 right-0 bg-base-100/75 text-xs p-1 text-center truncate">
+          <%= order.order_lines.first.seller_sku.sku_code %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>

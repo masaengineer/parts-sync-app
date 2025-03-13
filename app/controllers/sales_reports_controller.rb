@@ -11,7 +11,7 @@ class SalesReportsController < ApplicationController
                   :payment_fees,
                   :procurement,
                   order_lines: {
-                    seller_sku: :manufacturer_skus
+                    seller_sku: [ :manufacturer_skus, :price_adjustments ]
                   }
                 )
                 .page(params[:page])
@@ -31,7 +31,7 @@ class SalesReportsController < ApplicationController
       :payment_fees,
       :procurement,
       order_lines: {
-        seller_sku: :manufacturer_skus
+        seller_sku: [ :manufacturer_skus, :price_adjustments ]
       }
     ).find(params[:id])
   end

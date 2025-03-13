@@ -1,0 +1,23 @@
+<div class="font-medium text-base-content">
+  <div class="flex justify-between items-center">
+    <span><%= line.line_item_name %> <span class="badge badge-sm badge-outline"><%= line.quantity %></span></span>
+    <% if line.seller_sku&.item_id.present? %>
+      <%= link_to t('.adjust_price'),
+        new_price_adjustment_path(
+          seller_sku_id: line.seller_sku.id,
+          order_id: order.id
+        ),
+        class: "btn btn-xs btn-primary btn-outline",
+        data: {
+          turbo_stream: true,
+          action: "click->modal#prepareAdjustmentForm"
+        }
+      %>
+    <% end %>
+  </div>
+  <% if line.seller_sku&.item_id.present? %>
+    <div data-item-adjustment="<%= line.seller_sku.item_id %>">
+      <%= render 'sales_reports/modal/components/price_adjustment', item_id: line.seller_sku.item_id %>
+    </div>
+  <% end %>
+</div>

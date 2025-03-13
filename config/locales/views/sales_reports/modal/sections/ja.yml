@@ -1,0 +1,14 @@
+ja:
+  sales_reports:
+    modal:
+      sections:
+        basic_info:
+          basic_info: '基本情報'
+          order_number: '注文番号'
+          sale_date: '販売日'
+          tracking_number: '追跡番号'
+          not_available: '未登録'
+          products: '商品'
+        financial_details:
+          financial_details: '注文詳細'
+          profit_summary: '利益サマリー'
