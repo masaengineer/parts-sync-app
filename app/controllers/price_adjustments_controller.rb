@@ -1,5 +1,4 @@
 class PriceAdjustmentsController < ApplicationController
-
   def new
     @price_adjustment = PriceAdjustment.new
     @seller_sku = SellerSku.find_by(id: params[:seller_sku_id])
@@ -23,10 +22,10 @@ class PriceAdjustmentsController < ApplicationController
           render turbo_stream: turbo_stream.replace(
             "price-adjustment-form",
             partial: "shared/error",
-            locals: { message: t('unauthorized') }
+            locals: { message: t("unauthorized") }
           )
         }
-        format.html { redirect_to sales_reports_path, flash: { error: t('unauthorized') } }
+        format.html { redirect_to sales_reports_path, flash: { error: t("unauthorized") } }
       end
     end
   end
@@ -42,7 +41,7 @@ class PriceAdjustmentsController < ApplicationController
     if @seller_sku && @seller_sku.order_lines.any? { |line| line.order.user_id == current_user.id }
       if @price_adjustment.save
         @success = true
-        @message = t('.success')
+        @message = t(".success")
         @item_id = @seller_sku.item_id
 
         # 更新時に最新の調整情報を取得（日付とフォーマット用）
@@ -54,11 +53,11 @@ class PriceAdjustmentsController < ApplicationController
         # 更新が必要な注文IDの配列を保持
         @affected_order_ids = @affected_orders.pluck(:id)
       else
-        @message = t('.error')
+        @message = t(".error")
       end
     else
       # アクセス権限がない場合
-      @message = t('unauthorized')
+      @message = t("unauthorized")
     end
 
     respond_to do |format|

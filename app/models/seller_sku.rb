@@ -18,7 +18,7 @@ class SellerSku < ApplicationRecord
     return nil unless item_id.present?
     "https://www.ebay.com/itm/#{item_id}"
   end
-  
+
   # 最新の価格調整日を取得
   def latest_adjustment_date
     price_adjustments.order(adjustment_date: :desc).first&.adjustment_date
