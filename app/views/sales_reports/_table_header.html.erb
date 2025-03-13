@@ -1,5 +1,5 @@
 <%# app/views/sales_reports/_table_header.html.erb %>
-<thead>
+<thead class="sticky top-0 z-10 bg-base-100 shadow-sm after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[1px] after:bg-base-300">
   <tr>
     <% table_columns.each do |column| %>
       <th class="text-sm font-medium text-base-content/80 <%= get_column_class(column, :header) %>">
