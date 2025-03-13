@@ -13,14 +13,13 @@
       <%= render 'sales_reports/modal/sections/financial_details', order: @order %>
     </div>
 
-    <!-- 価格調整フォーム -->
     <div data-modal-target="priceAdjustmentForm" class="mt-6 hidden">
       <div class="card bg-base-100 border border-base-200">
         <div class="card-body p-4">
           <h5 class="card-title font-semibold text-base-content flex items-center justify-between">
             <span><%= t('.price_adjustment') %> <span id="adjust-sku-code" data-modal-target="skuCodeDisplay" class="badge badge-outline ml-2"></span></span>
           </h5>
-          
+
           <div id="price-adjustment-form" data-modal-target="adjustmentFormContent"></div>
         </div>
       </div>

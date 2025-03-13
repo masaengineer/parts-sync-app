@@ -89,10 +89,8 @@ module SalesReportsHelper
       item_ids = data[:order].order_lines.map { |line| line.seller_sku&.item_id }.compact.uniq
 
       if date.present? && item_ids.any?
-        content_tag(:div, class: "flex justify-center",
-                   data: { price_adjusted_cell: item_ids.first }) do
-          content_tag(:span, l(date, format: :short),
-                     class: "badge badge-info badge-outline text-xs")
+        content_tag(:div, class: "flex justify-center", data: { price_adjusted_cell: item_ids.first }) do
+          content_tag(:span, l(date, format: :short), class: "badge badge-primary badge-outline text-xs")
         end
       else
         ""
