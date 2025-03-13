@@ -65,6 +65,7 @@ module SalesReportsHelper
       { key: :quantity, class: "text-right font-medium" },
       { key: :profit, class: "text-right font-bold text-success" },
       { key: :profit_rate, class: "text-right font-medium" },
+      { key: :price_adjusted, class: "text-center" },
       { key: :tracking_number, class: "whitespace-nowrap font-medium" }
     ]
   end
@@ -99,9 +100,61 @@ module SalesReportsHelper
       format_jpy_currency(data[:profit])
     when :profit_rate
       "#{number_with_precision(data[:profit_rate], precision: 1)}%"
+    when :price_adjusted
+      date = latest_price_adjustment_date(data[:order])
+      # 調整対象のitem_idsを取得
+      item_ids = data[:order].order_lines.map { |line| line.seller_sku&.item_id }.compact.uniq
+      
+      if date.present? && item_ids.any?
+        # 複数のデータ属性を持つHTMLを生成
+        # 日付のみ表示（時刻なし）、badgeで装飾
+        content_tag(:div, class: "flex justify-center", 
+                   data: { price_adjusted_cell: item_ids.first }) do
+          content_tag(:span, l(date, format: :short), 
+                     class: "badge badge-info badge-outline text-xs")
+        end
+      else
+        ""
+      end
     when :tracking_number
       data[:tracking_number].presence || ""
     end
+  end
+  
+  # 注文に紐づく商品の最新の価格調整日を取得
+  def latest_price_adjustment_date(order)
+    # キャッシュを使用して重複クエリを減らす
+    @latest_price_adjustment_dates ||= {}
+    
+    order.order_lines.each do |line|
+      seller_sku = line.seller_sku
+      next unless seller_sku&.item_id.present?
+      
+      item_id = seller_sku.item_id
+      
+      # キャッシュにない場合のみDBを検索
+      if !@latest_price_adjustment_dates.key?(item_id)
+        latest_adjustment = price_adjustment_for_item_id(item_id)
+        @latest_price_adjustment_dates[item_id] = latest_adjustment&.adjustment_date
+      end
+      
+      # 最新の価格調整日があれば返す
+      return @latest_price_adjustment_dates[item_id] if @latest_price_adjustment_dates[item_id].present?
+    end
+    
+    nil # 価格調整がない場合はnilを返す
+  end
+  
+  # item_idに基づいて最新の価格調整を取得
+  def price_adjustment_for_item_id(item_id)
+    @price_adjustments_cache ||= {}
+    
+    return @price_adjustments_cache[item_id] if @price_adjustments_cache.key?(item_id)
+    
+    @price_adjustments_cache[item_id] = PriceAdjustment.joins(:seller_sku)
+                                                    .where(seller_skus: { item_id: item_id })
+                                                    .order(adjustment_date: :desc)
+                                                    .first
   end
 
   # カラムのクラスを取得
@@ -144,7 +197,7 @@ module SalesReportsHelper
       return format_usd(amount)
     end
 
-    case currency.code
+    case currency.code.upcase
     when "JPY"
       format_jpy(amount)
     when "USD"
