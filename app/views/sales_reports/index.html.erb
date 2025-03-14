@@ -3,5 +3,8 @@
 <div class="w-full p-6" data-controller="tour">
   <%= turbo_frame_tag 'modal' %>
   <%= render 'csv_import_form' %>
-  <%= render 'table', orders_data: @orders_data %>
+  
+  <%= turbo_frame_tag 'sales_report_table' do %>
+    <%= render 'table', orders_data: @orders_data %>
+  <% end %>
 </div>

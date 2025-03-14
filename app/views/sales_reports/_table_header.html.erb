@@ -4,10 +4,12 @@
     <% table_columns.each do |column| %>
       <th class="text-sm font-medium text-base-content/80 <%= get_column_class(column, :header) %>">
         <% if [:revenue, :profit, :profit_rate].include?(column[:key]) %>
-          <button type="button" class="flex items-center justify-between cursor-pointer hover:text-primary transition-colors w-full border-none bg-transparent p-0 text-inherit" data-sort-key="<%= column[:key] %>" data-action="click->table-sort#sort">
+          <%= link_to sales_reports_path(sort_by: column[:key]),
+            class: "flex items-center justify-between cursor-pointer hover:text-primary transition-colors w-full",
+            data: { turbo_frame: "sales_report_table" } do %>
             <%= t("sales_reports.index.table.#{column[:key]}") %>
-            <iconify-icon class="sort-icon ml-1" icon="lucide:arrow-up-down" width="16" height="16"></iconify-icon>
-          </button>
+            <iconify-icon class="sort-icon ml-1" icon="<%= get_sort_icon(column[:key].to_s) %>" width="16" height="16"></iconify-icon>
+          <% end %>
         <% else %>
           <%= t("sales_reports.index.table.#{column[:key]}") %>
         <% end %>

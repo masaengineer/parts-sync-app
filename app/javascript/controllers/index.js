@@ -19,8 +19,6 @@ application.register("modal", ModalController)
 import PasswordFieldController from "./password_field_controller"
 application.register("password-field", PasswordFieldController)
 
-import TableSortController from "./table_sort_controller"
-application.register("table-sort", TableSortController)
 
 import ThemeController from "./theme_controller"
 application.register("theme", ThemeController)

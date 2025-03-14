@@ -1,6 +1,7 @@
 <div class="card bg-base-100 mb-6">
   <div class="card-body p-5" id = "order_filter" >
-    <%= search_form_for @q, url: sales_reports_path, data: { controller: "form-submit" } do |f| %>
+    <%= search_form_for @q, url: sales_reports_path, html: { data: { controller: "form-submit", turbo_frame: "sales_report_table" } } do |f| %>
+      <%= hidden_field_tag :sort_by, session[:sort_by] if session[:sort_by].present? %>
       <div class="flex flex-wrap items-end gap-3">
         <% search_form_fields.each do |field| %>
           <div class="w-[calc(16%-0.75rem)]">
@@ -20,12 +21,13 @@
     <% end %>
 
     <div class="flex justify-end mt-4 pt-4 border-t">
-      <%= form_tag sales_reports_path, method: :get, class: "flex items-center gap-2" do %>
+      <%= form_tag sales_reports_path, method: :get, class: "flex items-center gap-2", data: { turbo_frame: "sales_report_table" } do %>
         <% if params[:q].present? %>
           <% params[:q].each do |key, value| %>
             <%= hidden_field_tag "q[#{key}]", value %>
           <% end %>
         <% end %>
+        <%= hidden_field_tag :sort_by, session[:sort_by] if session[:sort_by].present? %>
 
         <label class="text-sm text-gray-600">表示件数:</label>
         <%= select_tag :per_page,

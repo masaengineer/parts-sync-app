@@ -1,10 +1,36 @@
-# app/controllers/sales_reports_controller.rb
-
 class SalesReportsController < ApplicationController
   def index
     @q = current_user.orders.ransack(params[:q])
+
+    if params[:sort_by].present?
+      current_sort_column = session[:sort_by]
+      current_sort_direction = session[:sort_direction]
+
+      if current_sort_column == params[:sort_by]
+        if current_sort_direction.nil?
+          session[:sort_by] = params[:sort_by]
+          session[:sort_direction] = 'asc'
+        elsif current_sort_direction == 'asc'
+          session[:sort_by] = params[:sort_by]
+          session[:sort_direction] = 'desc'
+        else
+          session[:sort_by] = nil
+          session[:sort_direction] = nil
+        end
+      else
+        session[:sort_by] = params[:sort_by]
+        session[:sort_direction] = 'asc'
+      end
+    end
+
+    respond_to do |format|
+      format.html
+      format.turbo_stream
+    end
+
     @per_page = (params[:per_page] || 30).to_i
-    @orders = @q.result
+
+    all_orders = @q.result
                 .includes(
                   :sales,
                   :shipment,
@@ -14,17 +40,40 @@ class SalesReportsController < ApplicationController
                     seller_sku: :manufacturer_skus
                   }
                 )
-                .page(params[:page])
-                .per(@per_page)
 
-    # SalesReport::Serviceを用いて計算を行う
-    @orders_data = @orders.map do |order|
+    all_orders_data = all_orders.map do |order|
       SalesReport::Service.new(order).calculate
     end
+
+    if session[:sort_by].present?
+      sort_direction = session[:sort_direction] == 'desc' ? -1 : 1
+
+      all_orders_data.sort_by! do |data|
+        value = case session[:sort_by]
+                when 'revenue'
+                  data[:revenue].to_f
+                when 'profit'
+                  data[:profit].to_f
+                when 'profit_rate'
+                  data[:profit_rate].to_f
+                else
+                  0
+                end
+
+        value * sort_direction
+      end
+    end
+
+    @orders_data_paginated = Kaminari.paginate_array(all_orders_data)
+                                    .page(params[:page])
+                                    .per(@per_page)
+
+    @orders_data = @orders_data_paginated
+
+    @orders = @orders_data_paginated
   end
 
   def show
-    # 必要な関連データを事前に読み込み
     @order = current_user.orders.includes(
       :sales,
       :shipment,
