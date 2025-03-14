@@ -32,9 +32,26 @@ export default class extends Controller {
         type: 'solid',
         opacity: 0.6,
       },
+      dataLabels: {
+        enabled: true,
+        formatter: function (value) {
+          return new Intl.NumberFormat('ja-JP', {
+            maximumFractionDigits: 0,
+          }).format(value);
+        },
+      },
       series: chartData.series,
       xaxis: {
         categories: chartData.categories,
+      },
+      yaxis: {
+        labels: {
+          formatter: function (value) {
+            return new Intl.NumberFormat('ja-JP', {
+              maximumFractionDigits: 0,
+            }).format(value);
+          },
+        },
       },
       stroke: {
         curve: 'smooth',
