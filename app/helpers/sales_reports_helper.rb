@@ -4,9 +4,9 @@ module SalesReportsHelper
   # ソートアイコンを取得するメソッド
   def get_sort_icon(column_key)
     if session[:sort_by] == column_key
-      session[:sort_direction] == 'asc' ? 'lucide:arrow-up' : 'lucide:arrow-down'
+      session[:sort_direction] == "asc" ? "lucide:arrow-up" : "lucide:arrow-down"
     else
-      'lucide:arrow-up-down'
+      "lucide:arrow-up-down"
     end
   end
 

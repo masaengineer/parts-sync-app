@@ -9,17 +9,17 @@ class SalesReportsController < ApplicationController
       if current_sort_column == params[:sort_by]
         if current_sort_direction.nil?
           session[:sort_by] = params[:sort_by]
-          session[:sort_direction] = 'asc'
-        elsif current_sort_direction == 'asc'
+          session[:sort_direction] = "asc"
+        elsif current_sort_direction == "asc"
           session[:sort_by] = params[:sort_by]
-          session[:sort_direction] = 'desc'
+          session[:sort_direction] = "desc"
         else
           session[:sort_by] = nil
           session[:sort_direction] = nil
         end
       else
         session[:sort_by] = params[:sort_by]
-        session[:sort_direction] = 'asc'
+        session[:sort_direction] = "asc"
       end
     end
 
@@ -46,19 +46,19 @@ class SalesReportsController < ApplicationController
     end
 
     if session[:sort_by].present?
-      sort_direction = session[:sort_direction] == 'desc' ? -1 : 1
+      sort_direction = session[:sort_direction] == "desc" ? -1 : 1
 
       all_orders_data.sort_by! do |data|
         value = case session[:sort_by]
-                when 'revenue'
+        when "revenue"
                   data[:revenue].to_f
-                when 'profit'
+        when "profit"
                   data[:profit].to_f
-                when 'profit_rate'
+        when "profit_rate"
                   data[:profit_rate].to_f
-                else
+        else
                   0
-                end
+        end
 
         value * sort_direction
       end
