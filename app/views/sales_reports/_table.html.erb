@@ -1,11 +1,13 @@
 <%# app/views/sales_reports/_table.html.erb %>
-<div class="card card-bordered bg-base-100 shadow-sm mt-5 overflow-x-auto">
+<div class="card card-bordered bg-base-100 shadow-sm mt-5 overflow-x-auto relative" data-controller="table-sort">
   <div class="card-body p-0">
     <%= render 'search_form' %>
-    <table class="table rounded-box w-full" id = "order_table">
-      <%= render 'table_header' %>
-      <%= render 'table_body', orders_data: orders_data %>
-    </table>
+    <div class="overflow-x-auto max-h-[70vh]">
+      <table class="table rounded-box w-full" id="order_table" data-table-sort-target="table">
+        <%= render 'table_header' %>
+        <%= render 'table_body', orders_data: orders_data %>
+      </table>
+    </div>
     <div class="flex justify-end m-4">
       <%= paginate @orders %>
     </div>

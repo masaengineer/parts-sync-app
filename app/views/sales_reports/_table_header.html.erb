@@ -1,9 +1,16 @@
 <%# app/views/sales_reports/_table_header.html.erb %>
-<thead>
+<thead class="sticky top-0 z-10 bg-base-100">
   <tr>
     <% table_columns.each do |column| %>
       <th class="text-sm font-medium text-base-content/80 <%= get_column_class(column, :header) %>">
-        <%= t("sales_reports.index.table.#{column[:key]}") %>
+        <% if [:revenue, :profit, :profit_rate].include?(column[:key]) %>
+          <button type="button" class="flex items-center justify-between cursor-pointer hover:text-primary transition-colors w-full border-none bg-transparent p-0 text-inherit" data-sort-key="<%= column[:key] %>" data-action="click->table-sort#sort">
+            <%= t("sales_reports.index.table.#{column[:key]}") %>
+            <iconify-icon class="sort-icon ml-1" icon="lucide:arrow-up-down" width="16" height="16"></iconify-icon>
+          </button>
+        <% else %>
+          <%= t("sales_reports.index.table.#{column[:key]}") %>
+        <% end %>
       </th>
     <% end %>
   </tr>
