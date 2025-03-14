@@ -50,17 +50,29 @@ class SalesReportsController < ApplicationController
 
       all_orders_data.sort_by! do |data|
         value = case session[:sort_by]
+        when "sale_date"
+                  # 販売日
+                  data[:sale_date] || Time.current
         when "revenue"
+                  # USD基準の売上
                   data[:revenue].to_f
         when "profit"
+                  # 円建ての利益
                   data[:profit].to_f
         when "profit_rate"
+                  # 利益率
                   data[:profit_rate].to_f
         else
                   0
         end
 
-        value * sort_direction
+        if session[:sort_by] == 'sale_date'
+          # 日付は特別な処理（昇順/降順）
+          sort_direction == -1 ? value.to_time.to_i * -1 : value.to_time.to_i
+        else
+          # 数値は乗算でソート
+          value * sort_direction
+        end
       end
     end
 

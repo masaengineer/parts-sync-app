@@ -3,7 +3,7 @@
   <tr>
     <% table_columns.each do |column| %>
       <th class="text-sm font-medium text-base-content/80 <%= get_column_class(column, :header) %>">
-        <% if [:revenue, :profit, :profit_rate].include?(column[:key]) %>
+        <% if [:sale_date, :revenue, :profit, :profit_rate].include?(column[:key]) %>
           <% 
              # 検索条件を含めたパラメータを構築
              sort_params = { sort_by: column[:key] }
