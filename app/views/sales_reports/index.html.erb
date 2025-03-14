@@ -2,9 +2,33 @@
 
 <div class="w-full p-6" data-controller="tour">
   <%= turbo_frame_tag 'modal' %>
-  <%= render 'csv_import_form' %>
-  
+
   <%= turbo_frame_tag 'sales_report_table' do %>
     <%= render 'table', orders_data: @orders_data %>
   <% end %>
+
+  <!-- CSV Import Modal -->
+  <dialog id="csvImportModal" class="modal" data-controller="form-submit">
+    <div class="modal-backdrop absolute inset-0 bg-black bg-opacity-50" onclick="document.getElementById('csvImportModal').close()"></div>
+    <div class="modal-box max-w-4xl bg-base-100 shadow-lg relative z-10">
+      <h3 class="text-lg font-bold text-base-content border-b pb-2">
+        <%= t("sales_reports.csv_import.title") %>
+      </h3>
+
+      <div class="py-4">
+        <%= render 'csv_import_form_modal' %>
+      </div>
+
+      <div class="modal-action pt-3">
+        <button type="button" class="btn btn-sm btn-outline" onclick="document.getElementById('csvImportModal').close()">
+          <iconify-icon icon="lucide:x" class="h-4 w-4 mr-1"></iconify-icon>
+          <%= t('shared.buttons.close') %>
+        </button>
+        <button type="button" form="csv-import-form" class="btn btn-sm btn-primary" data-action="click->form-submit#submit">
+          <span data-form-submit-target="buttonText"><%= t("sales_reports.csv_import.submit") %></span>
+          <span data-form-submit-target="spinner" class="loading loading-spinner loading-sm hidden"></span>
+        </button>
+      </div>
+    </div>
+  </dialog>
 </div>
