@@ -30,6 +30,7 @@ ja:
         tracking_number: '追跡番号'
     csv_import:
       title: 'CSVファイルインポート'
+      button: 'CSVインポート'
       import_type: 'インポート種別'
       file: 'CSVファイル'
       submit: 'インポート'

@@ -2,9 +2,23 @@
 
 <div class="w-full p-6" data-controller="tour">
   <%= turbo_frame_tag 'modal' %>
-  <%= render 'csv_import_form' %>
   
   <%= turbo_frame_tag 'sales_report_table' do %>
     <%= render 'table', orders_data: @orders_data %>
   <% end %>
+  
+  <!-- CSV Import Modal -->
+  <div class="modal fade" id="csvImportModal" tabindex="-1" aria-labelledby="csvImportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="csvImportModalLabel"><%= t("sales_reports.csv_import.title") %></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <%= render 'csv_import_form' %>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
