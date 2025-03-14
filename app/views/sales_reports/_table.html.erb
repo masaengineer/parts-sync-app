@@ -9,8 +9,18 @@
       </table>
     </div>
     <div class="flex justify-end m-4">
-      <% paginate_params = {} %>
-      <% paginate_params[:sort_by] = session[:sort_by] if session[:sort_by].present? %>
+      <% 
+        # ページネーションパラメータを構築
+        paginate_params = {}
+        # ソート情報
+        paginate_params[:sort_by] = session[:sort_by] if session[:sort_by].present?
+        # 検索条件（安全に処理）
+        if params[:q].present? && params[:q].is_a?(ActionController::Parameters)
+          paginate_params[:q] = params[:q].to_unsafe_h
+        end
+        # 表示件数
+        paginate_params[:per_page] = params[:per_page] if params[:per_page].present?
+      %>
       <%= paginate @orders, params: paginate_params.merge({ format: :html }), data: { turbo_frame: "sales_report_table" } %>
     </div>
   </div>
