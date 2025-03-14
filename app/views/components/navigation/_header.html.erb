@@ -18,14 +18,14 @@
     </div>
 
     <%# 右側のコンテンツ %>
-    <div class="navbar-end gap-1.5">
+    <div class="navbar-end gap-4">
 
       <%# Theme Toggle - テーマ切り替え %>
       <div data-controller="theme" id = "dark_change">
-        <label class="swap swap-rotate btn btn-ghost btn-circle btn-sm">
-          <input type="checkbox" data-theme-target="toggle" class="theme-controller"/>
-          <iconify-icon class="swap-on fill-current" icon="lucide:moon" width="20" height="20"></iconify-icon>
-          <iconify-icon class="swap-off fill-current" icon="lucide:sun" width="20" height="20"></iconify-icon>
+        <label class="flex cursor-pointer gap-2">
+          <iconify-icon icon="lucide:sun" width="20" height="20"></iconify-icon>
+          <input type="checkbox" data-theme-target="toggle" class="toggle theme-controller"/>
+          <iconify-icon icon="lucide:moon" width="20" height="20"></iconify-icon>
         </label>
       </div>
 
