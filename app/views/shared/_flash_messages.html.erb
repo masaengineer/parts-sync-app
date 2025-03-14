@@ -8,7 +8,7 @@
     else "alert-info"
     end %>
 
-  <div class="alert <%= alert_class %> shadow-lg mb-4" role="alert">
+  <div class="alert <%= alert_class %> shadow-lg mb-4" role="alert" data-controller="flash">
     <div>
       <% icon_name = case type.to_sym
         when :success then "lucide:check-circle"
@@ -19,11 +19,6 @@
         end %>
       <iconify-icon icon="<%= icon_name %>" class="w-6 h-6"></iconify-icon>
       <span><%= message %></span>
-    </div>
-    <div class="flex-none">
-      <button type="button" class="btn btn-ghost btn-xs" data-action="click->flash#dismiss">
-        <iconify-icon icon="lucide:x" class="w-4 h-4"></iconify-icon>
-      </button>
     </div>
   </div>
 <% end %>
