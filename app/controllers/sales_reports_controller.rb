@@ -66,7 +66,7 @@ class SalesReportsController < ApplicationController
                   0
         end
 
-        if session[:sort_by] == 'sale_date'
+        if session[:sort_by] == "sale_date"
           # 日付は特別な処理（昇順/降順）
           sort_direction == -1 ? value.to_time.to_i * -1 : value.to_time.to_i
         else
