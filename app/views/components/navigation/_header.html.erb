@@ -11,7 +11,7 @@
 
     <%# 中央のコンテンツ - タブナビゲーション %>
     <div class="navbar-center" id = "report_change">
-      <div role="tablist" class="tabs-boxed tabs">
+      <div role="tablist" class="tabs-boxed tabs font-bold">
         <%= link_to t("shared.header.navigation.sales_reports"), sales_reports_path, role: "tab", class: "tab #{params[:controller] == 'sales_reports' ? 'tab-active' : ''}" %>
         <%= link_to t("shared.header.navigation.monthly_reports"), monthly_reports_path, role: "tab", class: "tab #{params[:controller] == 'monthly_reports' || params[:controller].start_with?('monthly_reports/') ? 'tab-active' : ''}" %>
       </div>
