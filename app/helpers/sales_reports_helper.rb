@@ -1,6 +1,18 @@
 module SalesReportsHelper
   include CurrencyFormatter
 
+  # ソートアイコンを取得するメソッド
+  def get_sort_icon(column_key)
+    if session[:sort_by] == column_key
+      session[:sort_direction] == "asc" ? "lucide:arrow-up" : "lucide:arrow-down"
+    else
+      "lucide:arrow-up-down"
+    end
+  end
+
+  # SKUコードから商品画像のパスを取得するメソッド
+  # eBay商品ページからの取得を試み、画像がない場合はnilを返す
+
   def get_product_image_path(seller_sku)
     return nil unless seller_sku && seller_sku.item_id.present?
 

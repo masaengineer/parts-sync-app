@@ -1,15 +1,27 @@
 <%# app/views/sales_reports/_table.html.erb %>
-<div class="card card-bordered bg-base-100 shadow-sm mt-5">
+<div class="card card-bordered bg-base-100 shadow-sm mt-5 overflow-x-auto relative">
   <div class="card-body p-0">
     <%= render 'search_form' %>
-    <div class="overflow-x-auto overflow-y-auto max-h-[70vh] relative">
-      <table class="table rounded-box w-full bg-base-100" id="sales-reports-table">
+    <div class="overflow-x-auto max-h-[70vh]">
+      <table class="table rounded-box w-full" id="order_table">
         <%= render 'table_header' %>
         <%= render 'table_body', orders_data: orders_data %>
       </table>
     </div>
     <div class="flex justify-end m-4">
-      <%= paginate @orders %>
+      <% 
+        # ページネーションパラメータを構築
+        paginate_params = {}
+        # ソート情報
+        paginate_params[:sort_by] = session[:sort_by] if session[:sort_by].present?
+        # 検索条件（安全に処理）
+        if params[:q].present? && params[:q].is_a?(ActionController::Parameters)
+          paginate_params[:q] = params[:q].to_unsafe_h
+        end
+        # 表示件数
+        paginate_params[:per_page] = params[:per_page] if params[:per_page].present?
+      %>
+      <%= paginate @orders, params: paginate_params.merge({ format: :html }), data: { turbo_frame: "sales_report_table" } %>
     </div>
   </div>
 </div>

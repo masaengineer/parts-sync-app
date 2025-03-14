@@ -1,0 +1,17 @@
+<%# CSVインポートフォーム（モーダル用） %>
+<%= form_with url: import_data_imports_path, local: true, method: :post, multipart: true, id: "csv-import-form", data: { form_submit_id: "csv-import-form" } do |f| %>
+  <div class="grid grid-cols-1 md:grid-cols-6 gap-5">
+    <div class="form-control md:col-span-2">
+      <%= f.label :import_type, t("sales_reports.csv_import.import_type"), class: "label font-medium text-sm" %>
+      <%= f.select :import_type, [
+        [t("sales_reports.csv_import.types.wisewill_data_sheet"), "wisewill_data_sheet"],
+        [t("sales_reports.csv_import.types.cpass_data_sheet"), "cpass_data_sheet"],
+      ], {}, { class: "select select-sm select-bordered w-full focus:select-primary text-base" } %>
+    </div>
+
+    <div class="form-control md:col-span-4">
+      <%= f.label :file, t("sales_reports.csv_import.file"), class: "label font-medium text-sm" %>
+      <%= f.file_field :file, class: "file-input file-input-sm file-input-bordered w-full focus:file-input-primary text-base", accept: ".csv" %>
+    </div>
+  </div>
+<% end %>

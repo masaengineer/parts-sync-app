@@ -17,7 +17,7 @@ RSpec.describe '売上レポート', type: :system do
       visit sales_reports_path
 
       # テーブルヘッダーの存在を確認（インデックスが存在するか確認するだけ）
-      expect(page).to have_selector('#sales-reports-table')
+      expect(page).to have_selector('#order_table')
     end
   end
 
