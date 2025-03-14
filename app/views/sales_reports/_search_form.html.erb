@@ -9,8 +9,8 @@
           </div>
         <% end %>
         <div class="w-[calc(10%-0.75rem)]">
-          <%= link_to t("sales_reports.search.reset"), sales_reports_path,
-                          class: "btn btn-ghost btn-sm hover:btn-error w-full",
+          <%= link_to t("sales_reports.search.reset"), sales_reports_path, 
+                          class: "btn btn-ghost btn-sm hover:btn-error w-full", 
                           data: { turbo_frame: "sales_report_table" } %>
         </div>
         <div class="w-[calc(10%-0.75rem)]">
@@ -23,29 +23,23 @@
     <% end %>
 
     <div class="flex justify-end mt-4 pt-4 border-t">
-      <div class="flex items-center gap-3">
-        <%= form_tag sales_reports_path, method: :get, class: "flex items-center gap-2", data: { turbo_frame: "sales_report_table" } do %>
-          <%# ソート状態をセッションから保持 %>
-          <%= hidden_field_tag :sort_by, session[:sort_by] if session[:sort_by].present? %>
-          <%# 検索条件の保持（安全に処理） %>
-          <% if params[:q].present? && params[:q].is_a?(ActionController::Parameters) %>
-            <% q_params = params[:q].to_unsafe_h %>
-            <% q_params.each do |key, value| %>
-              <%= hidden_field_tag "q[#{key}]", value %>
-            <% end %>
+      <%= form_tag sales_reports_path, method: :get, class: "flex items-center gap-2", data: { turbo_frame: "sales_report_table" } do %>
+        <%# ソート状態をセッションから保持 %>
+        <%= hidden_field_tag :sort_by, session[:sort_by] if session[:sort_by].present? %>
+        <%# 検索条件の保持（安全に処理） %>
+        <% if params[:q].present? && params[:q].is_a?(ActionController::Parameters) %>
+          <% q_params = params[:q].to_unsafe_h %>
+          <% q_params.each do |key, value| %>
+            <%= hidden_field_tag "q[#{key}]", value %>
           <% end %>
-
-          <label class="text-sm text-gray-600">表示件数:</label>
-          <%= select_tag :per_page,
-              options_for_select([10, 30, 50, 100], @per_page),
-              class: "select select-bordered select-sm",
-              onchange: 'this.form.submit()' %>
         <% end %>
 
-        <button class="btn btn-sm btn-outline" data-bs-toggle="modal" data-bs-target="#csvImportModal">
-          <iconify-icon icon="lucide:file-input" class="w-4 h-4 mr-1"></iconify-icon><%= t("sales_reports.csv_import.button") %>
-        </button>
-      </div>
+        <label class="text-sm text-gray-600">表示件数:</label>
+        <%= select_tag :per_page,
+            options_for_select([10, 30, 50, 100], @per_page),
+            class: "select select-bordered select-sm",
+            onchange: 'this.form.submit()' %>
+      <% end %>
     </div>
   </div>
 </div>

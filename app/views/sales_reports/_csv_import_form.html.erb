@@ -1,24 +1,28 @@
 <%# CSVインポートフォーム %>
-<%= form_with url: import_data_imports_path, local: true, method: :post, multipart: true, data: { controller: "form-submit" } do |f| %>
-  <div class="grid grid-cols-1 md:grid-cols-5 gap-5">
-    <div class="form-control">
-      <%= f.label :import_type, t("sales_reports.csv_import.import_type"), class: "label font-medium text-sm" %>
-      <%= f.select :import_type, [
-        [t("sales_reports.csv_import.types.wisewill_data_sheet"), "wisewill_data_sheet"],
-        [t("sales_reports.csv_import.types.cpass_data_sheet"), "cpass_data_sheet"],
-      ], {}, { class: "select select-sm select-bordered w-full focus:select-primary text-base" } %>
-    </div>
+<div class="card card-bordered bg-base-100 shadow-sm mb-6" id="csv_import">
+  <div class="card-body p-5">
+    <%= form_with url: import_data_imports_path, local: true, method: :post, multipart: true, data: { controller: "form-submit" } do |f| %>
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-5">
+        <div class="form-control">
+          <%= f.label :import_type, t("sales_reports.csv_import.import_type"), class: "label font-medium text-sm" %>
+          <%= f.select :import_type, [
+            [t("sales_reports.csv_import.types.wisewill_data_sheet"), "wisewill_data_sheet"],
+            [t("sales_reports.csv_import.types.cpass_data_sheet"), "cpass_data_sheet"],
+          ], {}, { class: "select select-sm select-bordered w-full focus:select-primary text-base" } %>
+        </div>
 
-    <div class="form-control md:col-span-3">
-      <%= f.label :file, t("sales_reports.csv_import.file"), class: "label font-medium text-sm" %>
-      <%= f.file_field :file, class: "file-input file-input-sm file-input-bordered w-full focus:file-input-primary text-base", accept: ".csv" %>
-    </div>
+        <div class="form-control md:col-span-2">
+          <%= f.label :file, t("sales_reports.csv_import.file"), class: "label font-medium text-sm" %>
+          <%= f.file_field :file, class: "file-input file-input-sm file-input-bordered w-full focus:file-input-primary text-base", accept: ".csv" %>
+        </div>
 
-    <div class="flex justify-end items-end">
-      <%= f.button t("sales_reports.csv_import.submit"), type: "submit", class: "btn btn-primary btn-sm", data: { action: "click->form-submit#submit" } do %>
-        <span data-form-submit-target="buttonText"><%= t("sales_reports.csv_import.submit") %></span>
-        <span data-form-submit-target="spinner" class="loading loading-spinner loading-sm hidden"></span>
-      <% end %>
-    </div>
+        <div class="md:col-span-2 flex justify-end items-end">
+          <%= f.button t("sales_reports.csv_import.submit"), type: "submit", class: "btn btn-primary btn-sm", data: { action: "click->form-submit#submit" } do %>
+            <span data-form-submit-target="buttonText"><%= t("sales_reports.csv_import.submit") %></span>
+            <span data-form-submit-target="spinner" class="loading loading-spinner loading-sm hidden"></span>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
   </div>
-<% end %>
+</div>
