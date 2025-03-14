@@ -1,9 +1,32 @@
 <%# app/views/sales_reports/_table_header.html.erb %>
-<thead class="sticky top-0 z-10 bg-base-100 shadow-sm after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[1px] after:bg-base-300">
+<thead class="sticky top-0 z-10 bg-base-100">
   <tr>
     <% table_columns.each do |column| %>
       <th class="text-sm font-medium text-base-content/80 <%= get_column_class(column, :header) %>">
-        <%= t("sales_reports.index.table.#{column[:key]}") %>
+        <% if [:sale_date, :revenue, :profit, :profit_rate].include?(column[:key]) %>
+          <% 
+             # 検索条件を含めたパラメータを構築
+             sort_params = { sort_by: column[:key] }
+             
+             # 現在の検索条件があれば個別にパラメータとして追加
+             if params[:q].present? && params[:q].is_a?(ActionController::Parameters)
+               # パラメータを安全に処理
+               q_params = params[:q].to_unsafe_h
+               sort_params[:q] = q_params
+             end
+             
+             # 表示件数設定
+             sort_params[:per_page] = params[:per_page] if params[:per_page].present?
+          %>
+          <%= link_to sales_reports_path(sort_params),
+            class: "flex items-center justify-between cursor-pointer hover:text-primary transition-colors w-full",
+            data: { turbo_frame: "sales_report_table" } do %>
+            <%= t("sales_reports.index.table.#{column[:key]}") %>
+            <iconify-icon class="sort-icon ml-1" icon="<%= get_sort_icon(column[:key].to_s) %>" width="16" height="16"></iconify-icon>
+          <% end %>
+        <% else %>
+          <%= t("sales_reports.index.table.#{column[:key]}") %>
+        <% end %>
       </th>
     <% end %>
   </tr>

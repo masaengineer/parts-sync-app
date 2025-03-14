@@ -19,6 +19,7 @@ application.register("modal", ModalController)
 import PasswordFieldController from "./password_field_controller"
 application.register("password-field", PasswordFieldController)
 
+
 import ThemeController from "./theme_controller"
 application.register("theme", ThemeController)
 
