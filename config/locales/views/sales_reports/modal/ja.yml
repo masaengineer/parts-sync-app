@@ -1,0 +1,15 @@
+ja:
+  sales_reports:
+    modal:
+      title: '注文詳細'
+      price_adjustment: '価格調整メモ'
+      save: '保存'
+      cancel: 'キャンセル'
+      close: '閉じる'
+      costs: 'コスト'
+      summary: 'サマリー'
+      revenue_breakdown: '売上内訳'
+      cost_breakdown: 'コスト内訳'
+      gross_revenue: '総売上'
+      other_costs: 'その他コスト'
+      no_image: '画像なし'

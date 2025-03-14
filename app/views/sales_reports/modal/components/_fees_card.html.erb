@@ -1,0 +1,41 @@
+<!-- 手数料情報 -->
+<div class="card bg-base-100 border border-base-200">
+  <div class="card-body p-4">
+    <h5 class="card-title text-sm font-medium text-base-content/70 pb-2 border-b">
+      <%= t('.fees') %>
+    </h5>
+    <div class="overflow-x-auto mt-2">
+      <table class="table table-xs">
+        <thead>
+          <tr class="text-xs font-medium text-base-content/70 bg-base-200/50">
+            <th class="rounded-l-md"><%= t('.fee_type') %></th>
+            <th><%= t('.category') %></th>
+            <th class="text-right"><%= t('.amount') %></th>
+            <th class="text-right rounded-r-md"><%= t('.fee_date') %></th>
+          </tr>
+        </thead>
+        <tbody class="font-medium">
+          <% order.payment_fees.each do |fee| %>
+            <tr class="hover:bg-base-200/30 text-base-content">
+              <td><%= fee.transaction_type %></td>
+              <td><%= fee.fee_category %></td>
+              <td class="text-right <%= fee.fee_amount < 0 ? 'text-error' : '' %>">
+                <%= format_currency(fee.fee_amount, order.currency) %>
+              </td>
+              <td class="text-right"><%= l(order.sale_date, format: :short) if order.sale_date %></td>
+            </tr>
+          <% end %>
+        </tbody>
+        <tfoot>
+          <tr class="font-bold text-base-content border-t">
+            <td colspan="2"><%= t('.total_fees') %></td>
+            <td class="text-right <%= order.payment_fees.sum(&:fee_amount) < 0 ? 'text-error' : '' %>">
+              <%= format_currency(order.payment_fees.sum(&:fee_amount), order.currency) %>
+            </td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</div>

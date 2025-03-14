@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_03_10_141833) do
+ActiveRecord::Schema[7.2].define(version: 2025_03_12_073411) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -84,6 +84,18 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_10_141833) do
     t.string "transaction_id"
     t.index ["order_id"], name: "index_payment_fees_on_order_id"
     t.index ["transaction_id", "transaction_type", "fee_category"], name: "index_payment_fees_on_transaction_id_type_and_category", unique: true
+  end
+
+  create_table "price_adjustments", force: :cascade do |t|
+    t.bigint "seller_sku_id", null: false
+    t.datetime "adjustment_date"
+    t.decimal "adjustment_amount", precision: 10, scale: 2
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "currency_id"
+    t.index ["currency_id"], name: "index_price_adjustments_on_currency_id"
+    t.index ["seller_sku_id"], name: "index_price_adjustments_on_seller_sku_id"
   end
 
   create_table "procurements", force: :cascade do |t|
@@ -164,6 +176,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_10_141833) do
   add_foreign_key "orders", "currencies"
   add_foreign_key "orders", "users"
   add_foreign_key "payment_fees", "orders"
+  add_foreign_key "price_adjustments", "currencies"
+  add_foreign_key "price_adjustments", "seller_skus"
   add_foreign_key "procurements", "orders"
   add_foreign_key "sales", "orders"
   add_foreign_key "shipments", "currencies"

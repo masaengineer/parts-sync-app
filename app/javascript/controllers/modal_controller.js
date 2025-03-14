@@ -1,19 +1,30 @@
 import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller {
-  static targets = ['modal'];
+  static targets = [
+    'modal',
+    'backdrop',
+    'priceAdjustmentForm',
+    'adjustmentFormContent',
+    'skuCodeDisplay',
+    'toggleFormVisibility',
+  ];
 
   connect() {
     if (this.modalTarget.tagName === 'DIALOG') {
       this.modalTarget.showModal();
 
-      // 外側クリックでモーダルを閉じるための処理
-      this.handleOutsideClick = this.handleOutsideClick.bind(this);
-      this.modalTarget.addEventListener('click', this.handleOutsideClick);
+      this.backdropTarget.addEventListener(
+        'click', this.closeOnBackdropClick.bind(this));
 
-      // ESCキーの処理
       this.handleEscKey = this.handleEscKey.bind(this);
       document.addEventListener('keydown', this.handleEscKey);
+
+      this.handleScrollTop = this.scrollToTop.bind(this);
+      document.addEventListener(
+        'price-adjustment:scroll-top',
+        this.handleScrollTop
+      );
     } else {
       console.error('Modal target is not a DIALOG element:', this.modalTarget);
     }
@@ -21,23 +32,23 @@ export default class extends Controller {
 
   disconnect() {
     if (this.modalTarget) {
-      this.modalTarget.removeEventListener('click', this.handleOutsideClick);
+      if (this.hasBackdropTarget) {
+        this.backdropTarget.removeEventListener(
+          'click', this.closeOnBackdropClick
+        );
+      }
       document.removeEventListener('keydown', this.handleEscKey);
+      document.removeEventListener(
+        'price-adjustment:scroll-top',
+        this.handleScrollTop
+      );
     }
   }
 
-  handleOutsideClick(event) {
-    // dialogの背景部分（modal-box以外）がクリックされた場合のみ閉じる
-    const rect = this.modalTarget.getBoundingClientRect();
-    const isInDialog = rect.top <= event.clientY && event.clientY <= rect.top + rect.height
-      && rect.left <= event.clientX && event.clientX <= rect.left + rect.width;
-
-    // dialogの中でクリックされた場合
-    if (isInDialog) {
-      if (event.target === this.modalTarget) {
-        this.close();
-      }
-    }
+  closeOnBackdropClick(event) {
+    // イベントの伝播を停止して、モーダル自体のクリックイベントを防ぐ
+    event.stopPropagation();
+    this.close();
   }
 
   handleEscKey(event) {
@@ -48,5 +59,40 @@ export default class extends Controller {
 
   close() {
     this.modalTarget.close();
+  }
+
+  prepareAdjustmentForm(event) {
+    this.priceAdjustmentFormTarget.classList.remove('hidden');
+
+    this.adjustmentFormContentTarget.innerHTML =
+      '<div class="flex justify-center p-4"><span class="loading loading-spinner loading-md"></span></div>';
+
+    setTimeout(() => {
+      this.priceAdjustmentFormTarget.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+    }, 100);
+  }
+
+  closePriceAdjustmentForm() {
+    this.priceAdjustmentFormTarget.classList.add('hidden');
+  }
+
+  toggleFormVisibilityTargetConnected() {
+    if (this.hasToggleFormVisibilityTarget) {
+      this.priceAdjustmentFormTarget.classList.add('hidden');
+
+      this.scrollToTop();
+    }
+  }
+
+  scrollToTop() {
+    if (this.modalTarget) {
+      const modalBox = this.modalTarget.querySelector('.modal-box');
+      if (modalBox) {
+        modalBox.scrollTop = 0;
+      }
+    }
   }
 }

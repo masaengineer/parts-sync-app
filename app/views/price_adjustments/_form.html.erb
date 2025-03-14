@@ -1,0 +1,43 @@
+<%= form_with(model: local_assigns[:price_adjustment] || PriceAdjustment.new, url: price_adjustments_path, class: "mt-4", data: { turbo: true, controller: "form-submit", action: "submit->form-submit#disableSubmit" }) do |f| %>
+  <%= hidden_field_tag :return_order_id, order_id %>
+  <%= f.hidden_field :seller_sku_id, value: seller_sku_id %>
+
+  <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <div class="form-control">
+      <%= f.label :adjustment_date, t('sales_reports.modal.components.price_adjustment.adjustment_date'), class: "label text-sm font-medium" %>
+      <%= f.datetime_local_field :adjustment_date, class: "input input-sm input-bordered w-full", value: Time.current.strftime("%Y-%m-%dT%H:%M"), required: true %>
+    </div>
+
+    <div class="form-control">
+      <%= f.label :adjustment_amount, t('sales_reports.modal.components.price_adjustment.adjustment_amount'), class: "label text-sm font-medium" %>
+      <div class="flex items-center space-x-2">
+        <div class="relative flex-1">
+          <% currency = local_assigns[:currency] || Currency.find_by(code: "USD") %>
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3"><%= currency.symbol %></span>
+          <%= f.number_field :adjustment_amount, class: "input input-sm input-bordered w-full pl-8", step: "0.01", required: true %>
+        </div>
+        <%= f.hidden_field :currency_id, value: currency.id %>
+        <div class="badge badge-outline font-bold"><%= currency.code.upcase %></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-control mt-4">
+    <%= f.label :notes, t('sales_reports.modal.components.price_adjustment.notes'), class: "label text-sm font-medium" %>
+    <%= f.text_area :notes, class: "textarea textarea-sm textarea-bordered w-full", rows: 2 %>
+  </div>
+
+  <div class="mt-4 flex justify-end">
+    <button type="button" class="btn btn-sm btn-ghost mr-2" data-action="click->modal#closePriceAdjustmentForm">
+      <%= t('sales_reports.modal.cancel') %>
+    </button>
+    <%= f.button t('sales_reports.modal.save'), class: "btn btn-sm btn-primary relative", type: "submit" do %>
+      <div class="flex items-center">
+        <span data-form-submit-target="buttonText"><%= t('sales_reports.modal.save') %></span>
+        <span class="hidden ml-2" data-form-submit-target="spinner">
+          <span class="loading loading-spinner loading-xs"></span>
+        </span>
+      </div>
+    <% end %>
+  </div>
+<% end %>

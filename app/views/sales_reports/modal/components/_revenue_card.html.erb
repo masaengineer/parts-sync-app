@@ -1,0 +1,40 @@
+<!-- 売上情報 -->
+<div class="card bg-base-100 border border-base-200">
+  <div class="card-body p-4">
+    <h5 class="card-title text-sm font-medium text-base-content/70 pb-2 border-b">
+      <%= t('.revenue') %>
+    </h5>
+    <div class="overflow-x-auto mt-2">
+      <table class="table table-xs">
+        <thead>
+          <tr class="text-xs font-medium text-base-content/70 bg-base-200/50">
+            <th class="rounded-l-md"><%= t('.transaction_type') %></th>
+            <th class="text-right"><%= t('.amount') %></th>
+            <th class="text-right rounded-r-md"><%= t('.transaction_date') %></th>
+          </tr>
+        </thead>
+        <tbody class="font-medium">
+          <% order.sales.each do |sale| %>
+            <tr class="hover:bg-base-200/30 <%= sale.transaction_type == 'REFUND' ? 'text-error' : 'text-base-content' %>">
+              <td><%= sale.transaction_type %></td>
+              <td class="text-right">
+                <%= format_currency(sale.order_gross_amount, order.currency) %>
+                <%= render 'sales_reports/modal/components/jpy_conversion', amount: sale.order_gross_amount, rate: sale.to_usd_rate if sale.to_usd_rate.present? && sale.to_usd_rate != 1.0 %>
+              </td>
+              <td class="text-right"><%= l(order.sale_date, format: :short) if order.sale_date %></td>
+            </tr>
+          <% end %>
+        </tbody>
+        <tfoot>
+          <tr class="font-bold text-base-content border-t">
+            <td><%= t('.total') %></td>
+            <td class="text-right" colspan="2">
+              <%= format_currency(order.sales.sum(&:order_gross_amount), order.currency) %>
+              <%= render 'sales_reports/modal/components/jpy_conversion', amount: order.sales.sum(&:order_gross_amount), rate: order.sales.first&.to_usd_rate if order.sales.first&.to_usd_rate.present? %>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</div>

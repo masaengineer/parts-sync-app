@@ -1,0 +1,16 @@
+<%= turbo_stream.replace "price-adjustment-form" do %>
+  <div id="price-adjustment-form">
+    <%= render partial: "price_adjustments/form", locals: {
+      price_adjustment: @price_adjustment,
+      seller_sku_id: @seller_sku.id,
+      sku_code: @seller_sku.sku_code,
+      order_id: @order_id,
+      currency: @currency
+    } %>
+  </div>
+<% end %>
+
+<%# SKUコードを表示 %>
+<%= turbo_stream.update "adjust-sku-code" do %>
+  <%= @seller_sku.sku_code %>
+<% end %>

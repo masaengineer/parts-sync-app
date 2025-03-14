@@ -1,9 +1,9 @@
 <%# app/views/sales_reports/_table_body.html.erb %>
-<tbody>
+<tbody id="sales-reports-table-body">
   <% orders_data.each do |data| %>
-    <tr class="font-medium cursor-pointer hover:bg-base-200/40">
+    <tr id="order-row-<%= data[:order].id %>" class="font-medium cursor-pointer hover:bg-base-200/40" data-order-id="<%= data[:order].id %>">
       <% table_columns.each do |column| %>
-        <td class="<%= get_column_class(column, :cell) %>">
+        <td class="<%= get_column_class(column, :cell) %>" data-column="<%= column[:key] %>">
           <%= link_to render_cell_value(data, column), sales_report_path(data[:order].id),
             data: { turbo_frame: "modal" }
           %>

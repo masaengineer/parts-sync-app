@@ -1,333 +1,35 @@
 <dialog class="modal" data-controller="modal" data-modal-target="modal">
-  <div class="modal-box max-w-4xl bg-base-100 shadow-lg">
+  <div class="modal-backdrop absolute inset-0 bg-black bg-opacity-50" data-modal-target="backdrop"></div>
+  <div class="modal-box max-w-4xl bg-base-100 shadow-lg relative z-10">
     <h3 class="text-lg font-bold text-base-content border-b pb-2">
       <%= t('.title') %>: <%= @order.order_number %>
     </h3>
 
+    <div id="price-adjustment-result" class="mt-3"></div>
+    <div id="adjustment-form-visibility"></div>
+
     <div class="py-4">
-      <!-- 基本情報セクション -->
-      <div class="card bg-base-100 mb-6">
-        <div class="card-body p-0">
-          <h4 class="font-semibold text-md mb-3 text-base-content flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <%= t('.basic_info') %>
-          </h4>
-          <div class="grid grid-cols-3 gap-6">
-            <div class="col-span-2">
-              <div class="flex flex-col space-y-2">
-                <div class="flex">
-                  <span class="text-sm font-medium text-base-content/70 w-28"><%= t('.order_number') %>:</span>
-                  <span class="text-sm font-medium text-base-content"><%= @order.order_number %></span>
-                </div>
-                <div class="flex">
-                  <span class="text-sm font-medium text-base-content/70 w-28"><%= t('.sale_date') %>:</span>
-                  <span class="text-sm font-medium text-base-content"><%= l(@order.sale_date, format: :long) if @order.sale_date %></span>
-                </div>
-                <div class="flex">
-                  <span class="text-sm font-medium text-base-content/70 w-28"><%= t('.tracking_number') %>:</span>
-                  <span class="text-sm font-medium text-base-content"><%= @order.shipment&.tracking_number || t('.not_available') %></span>
-                </div>
-              </div>
+      <%= render 'sales_reports/modal/sections/basic_info', order: @order %>
+      <%= render 'sales_reports/modal/sections/financial_details', order: @order %>
+    </div>
 
-              <% if @order.order_lines.any? %>
-                <div class="mt-4">
-                  <p class="text-sm font-medium text-base-content/70 mb-1"><%= t('.products') %>:</p>
-                  <div class="text-sm space-y-1 pl-2 border-l-2 border-base-300 ml-3">
-                    <% @order.order_lines.each do |line| %>
-                      <div class="font-medium text-base-content"><%= line.line_item_name %> <span class="badge badge-sm badge-outline"><%= line.quantity %></span></div>
-                    <% end %>
-                  </div>
-                </div>
-              <% end %>
-            </div>
+    <div data-modal-target="priceAdjustmentForm" class="mt-6 hidden">
+      <div class="card bg-base-100 border border-base-200">
+        <div class="card-body p-4">
+          <h5 class="card-title font-semibold text-base-content flex items-center justify-between">
+            <span><%= t('.price_adjustment') %> <span id="adjust-sku-code" data-modal-target="skuCodeDisplay" class="badge badge-outline ml-2"></span></span>
+          </h5>
 
-            <div class="flex items-center justify-center">
-              <% if @order.order_lines.any? && @order.order_lines.first.seller_sku %>
-                <% image_path = get_product_image_path(@order.order_lines.first.seller_sku) %>
-                <% if image_path.present? %>
-                  <div class="relative group">
-                    <!-- クリック可能な画像、eBayの注文詳細ページに遷移 -->
-                    <%= link_to @order.ebay_order_url, target: "_blank", rel: "noopener noreferrer", class: "tooltip tooltip-primary" do %>
-                      <%= image_tag(image_path, alt: @order.order_lines.first.line_item_name,
-                          class: "w-48 h-48 object-cover rounded-lg shadow-md border-2 border-primary/30 group-hover:border-primary transition-all cursor-pointer") %>
-                      <div class="absolute top-0 right-0 bg-primary text-white text-xs px-2 py-1 rounded-bl rounded-tr">
-                        <span class="text-xs">eBay</span>
-                      </div>
-                      <div class="absolute bottom-0 left-0 right-0 bg-base-100/75 text-xs p-1 text-center truncate">
-                        <%= @order.order_lines.first.seller_sku.sku_code %>
-                      </div>
-                    <% end %>
-                  </div>
-                <% end %>
-              <% end %>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 財務情報セクション -->
-      <div>
-        <h4 class="font-semibold text-md mb-4 text-base-content flex items-center">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <%= t('.financial_details') %>
-        </h4>
-
-        <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <!-- 左カラム: 売上と手数料 -->
-          <div class="space-y-6">
-            <!-- 売上情報 -->
-            <div class="card bg-base-100 border border-base-200">
-              <div class="card-body p-4">
-                <h5 class="card-title text-sm font-medium text-base-content/70 pb-2 border-b">
-                  <%= t('.revenue') %>
-                </h5>
-                <div class="overflow-x-auto mt-2">
-                  <table class="table table-xs">
-                    <thead>
-                      <tr class="text-xs font-medium text-base-content/70 bg-base-200/50">
-                        <th class="rounded-l-md"><%= t('.transaction_type') %></th>
-                        <th class="text-right"><%= t('.amount') %></th>
-                        <th class="text-right rounded-r-md"><%= t('.transaction_date') %></th>
-                      </tr>
-                    </thead>
-                    <tbody class="font-medium">
-                      <% @order.sales.each do |sale| %>
-                        <tr class="hover:bg-base-200/30 <%= sale.transaction_type == 'REFUND' ? 'text-error' : 'text-base-content' %>">
-                          <td><%= sale.transaction_type %></td>
-                          <td class="text-right">
-                            <%= format_currency(sale.order_gross_amount, @order.currency) %>
-                            <% if sale.to_usd_rate.present? && sale.to_usd_rate != 1.0 %>
-                              <div class="text-xs text-base-content/60">
-                                <%= format_jpy_currency(sale.order_gross_amount * sale.to_usd_rate * 150) %>
-                              </div>
-                            <% end %>
-                          </td>
-                          <td class="text-right"><%= l(@order.sale_date, format: :short) if @order.sale_date %></td>
-                        </tr>
-                      <% end %>
-                    </tbody>
-                    <tfoot>
-                      <tr class="font-bold text-base-content border-t">
-                        <td><%= t('.total') %></td>
-                        <td class="text-right" colspan="2">
-                          <%= format_currency(@order.sales.sum(&:order_gross_amount), @order.currency) %>
-                          <% if @order.sales.first&.to_usd_rate.present? %>
-                            <div class="text-xs">
-                              <%= format_jpy_currency(@order.sales.sum(&:order_gross_amount) * @order.sales.first.to_usd_rate * 150) %>
-                            </div>
-                          <% end %>
-                        </td>
-                      </tr>
-                    </tfoot>
-                  </table>
-                </div>
-              </div>
-            </div>
-
-            <!-- 手数料情報 -->
-            <div class="card bg-base-100 border border-base-200">
-              <div class="card-body p-4">
-                <h5 class="card-title text-sm font-medium text-base-content/70 pb-2 border-b">
-                  <%= t('.fees') %>
-                </h5>
-                <div class="overflow-x-auto mt-2">
-                  <table class="table table-xs">
-                    <thead>
-                      <tr class="text-xs font-medium text-base-content/70 bg-base-200/50">
-                        <th class="rounded-l-md"><%= t('.fee_type') %></th>
-                        <th><%= t('.category') %></th>
-                        <th class="text-right"><%= t('.amount') %></th>
-                        <th class="text-right rounded-r-md"><%= t('.fee_date') %></th>
-                      </tr>
-                    </thead>
-                    <tbody class="font-medium">
-                      <% @order.payment_fees.each do |fee| %>
-                        <tr class="hover:bg-base-200/30 text-base-content">
-                          <td><%= fee.transaction_type %></td>
-                          <td><%= fee.fee_category %></td>
-                          <td class="text-right <%= fee.fee_amount < 0 ? 'text-error' : '' %>">
-                            <%= format_currency(fee.fee_amount, @order.currency) %>
-                          </td>
-                          <td class="text-right"><%= l(@order.sale_date, format: :short) if @order.sale_date %></td>
-                        </tr>
-                      <% end %>
-                    </tbody>
-                    <tfoot>
-                      <tr class="font-bold text-base-content border-t">
-                        <td colspan="2"><%= t('.total_fees') %></td>
-                        <td class="text-right <%= @order.payment_fees.sum(&:fee_amount) < 0 ? 'text-error' : '' %>">
-                          <%= format_currency(@order.payment_fees.sum(&:fee_amount), @order.currency) %>
-                        </td>
-                        <td></td>
-                      </tr>
-                    </tfoot>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 右カラム: 仕入れ、送料、利益 -->
-          <div class="space-y-6">
-            <!-- 仕入れコスト情報 -->
-            <% if @order.procurement.present? %>
-              <div class="card bg-base-100 border border-base-200">
-                <div class="card-body p-4">
-                  <h5 class="card-title text-sm font-medium text-base-content/70 pb-2 border-b">
-                    <%= t('.procurement_costs') %>
-                  </h5>
-                  <div class="overflow-x-auto mt-2">
-                    <table class="table table-xs">
-                      <thead>
-                        <tr class="text-xs font-medium text-base-content/70 bg-base-200/50">
-                          <th class="rounded-l-md"><%= t('.cost_type') %></th>
-                          <th class="text-right rounded-r-md"><%= t('.amount') %></th>
-                        </tr>
-                      </thead>
-                      <tbody class="font-medium text-base-content">
-                        <tr class="hover:bg-base-200/30">
-                          <td><%= t('.purchase_price') %></td>
-                          <td class="text-right text-error">
-                            <%= format_jpy_currency(@order.procurement.purchase_price) %>
-                          </td>
-                        </tr>
-                        <% if @order.procurement.forwarding_fee.present? && @order.procurement.forwarding_fee > 0 %>
-                          <tr class="hover:bg-base-200/30">
-                            <td><%= t('.forwarding_fee') %></td>
-                            <td class="text-right text-error">
-                              <%= format_jpy_currency(@order.procurement.forwarding_fee) %>
-                            </td>
-                          </tr>
-                        <% end %>
-                        <% if @order.procurement.option_fee.present? && @order.procurement.option_fee > 0 %>
-                          <tr class="hover:bg-base-200/30">
-                            <td><%= t('.option_fee') %></td>
-                            <td class="text-right text-error">
-                              <%= format_jpy_currency(@order.procurement.option_fee) %>
-                            </td>
-                          </tr>
-                        <% end %>
-                        <% if @order.procurement.handling_fee.present? && @order.procurement.handling_fee > 0 %>
-                          <tr class="hover:bg-base-200/30">
-                            <td><%= t('.handling_fee') %></td>
-                            <td class="text-right text-error">
-                              <%= format_jpy_currency(@order.procurement.handling_fee) %>
-                            </td>
-                          </tr>
-                        <% end %>
-                      </tbody>
-                      <tfoot>
-                        <tr class="font-bold text-base-content border-t">
-                          <td><%= t('.total_procurement') %></td>
-                          <td class="text-right text-error">
-                            <%= format_jpy_currency(@order.procurement.total_cost) %>
-                          </td>
-                        </tr>
-                      </tfoot>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            <% end %>
-
-            <!-- 送料情報 -->
-            <% if @order.shipment.present? && @order.shipment.customer_international_shipping.present? && @order.shipment.customer_international_shipping > 0 %>
-              <div class="card bg-base-100 border border-base-200">
-                <div class="card-body p-4">
-                  <h5 class="card-title text-sm font-medium text-base-content/70 pb-2 border-b">
-                    <%= t('.shipping') %>
-                  </h5>
-                  <div class="overflow-x-auto mt-2">
-                    <table class="table table-xs">
-                      <tbody class="font-medium text-base-content">
-                        <tr class="hover:bg-base-200/30">
-                          <td><%= t('.international_shipping') %></td>
-                          <td class="text-right text-error">
-                            <%= format_jpy_currency(@order.shipment.customer_international_shipping) %>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            <% end %>
-
-            <!-- サマリーセクション -->
-            <div class="mt-6 mb-2">
-              <h4 class="font-semibold text-md mb-4 text-base-content flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-                <%= t('.profit_summary') %>
-              </h4>
-            </div>
-
-            <!-- 利益計算 -->
-            <div class="card bg-base-100 border border-base-200">
-              <div class="card-body p-4">
-                <%
-                  service = SalesReport::Service.new(@order)
-                  data = service.calculate
-                %>
-                <div class="grid grid-cols-2 gap-4">
-                  <div class="space-y-2">
-                    <div class="flex justify-between">
-                      <span class="text-sm font-medium text-base-content/70"><%= t('.revenue') %>:</span>
-                      <span class="text-sm font-medium text-base-content"><%= format_currency(data[:revenue], @order.currency) %></span>
-                    </div>
-                    <div class="flex justify-between">
-                      <span class="text-sm font-medium text-base-content/70"><%= t('.fees') %>:</span>
-                      <span class="text-sm font-medium text-error"><%= format_currency(data[:payment_fees], @order.currency) %></span>
-                    </div>
-                    <div class="flex justify-between">
-                      <span class="text-sm font-medium text-base-content/70"><%= t('.net_revenue') %>:</span>
-                      <span class="text-sm font-medium text-base-content"><%= format_currency(data[:revenue] - data[:payment_fees], @order.currency) %></span>
-                    </div>
-                    <div class="flex justify-between">
-                      <span class="text-sm font-medium text-base-content/70"><%= t('.exchange_rate') %>:</span>
-                      <span class="text-sm font-medium text-base-content"><%= number_with_precision(data[:exchange_rate], precision: 2) %></span>
-                    </div>
-                  </div>
-                  <div class="space-y-2">
-                    <div class="flex justify-between">
-                      <span class="text-sm font-medium text-base-content/70"><%= t('.jpy_revenue') %>:</span>
-                      <span class="text-sm font-medium text-base-content"><%= format_jpy_currency((data[:revenue] - data[:payment_fees]) * 150) %></span>
-                    </div>
-                    <div class="flex justify-between">
-                      <span class="text-sm font-medium text-base-content/70"><%= t('.total_costs') %>:</span>
-                      <span class="text-sm font-medium text-error"><%= format_jpy_currency(data[:procurement_cost] + data[:other_costs] + data[:shipping_cost]) %></span>
-                    </div>
-                    <div class="flex justify-between font-semibold">
-                      <span class="text-sm text-base-content/70"><%= t('.profit') %>:</span>
-                      <span class="text-sm text-success"><%= format_jpy_currency(data[:profit]) %></span>
-                    </div>
-                    <div class="flex justify-between">
-                      <span class="text-sm font-medium text-base-content/70"><%= t('.profit_rate') %>:</span>
-                      <span class="text-sm font-medium text-base-content"><%= number_to_percentage(data[:profit_rate], precision: 2) %></span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <div id="price-adjustment-form" data-modal-target="adjustmentFormContent"></div>
         </div>
       </div>
     </div>
 
     <div class="modal-action pt-3">
-      <form method="dialog">
-        <button class="btn btn-sm btn-outline" data-action="click->modal#close">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-          <%= t('.close') %>
-        </button>
-      </form>
+      <button type="button" class="btn btn-sm btn-outline" data-action="click->modal#close">
+        <iconify-icon icon="lucide:x" class="h-4 w-4 mr-1"></iconify-icon>
+        <%= t('.close') %>
+      </button>
     </div>
   </div>
 </dialog>

@@ -12,33 +12,26 @@ module SalesReportsHelper
 
   # SKUコードから商品画像のパスを取得するメソッド
   # eBay商品ページからの取得を試み、画像がない場合はnilを返す
+
   def get_product_image_path(seller_sku)
     return nil unless seller_sku && seller_sku.item_id.present?
 
-    # キャッシュからitem_idを取得
     @image_cache ||= {}
     cache_key = "sku_image_#{seller_sku.id}"
 
-    # キャッシュにあればそれを返す（リクエスト内でキャッシュ）
     return @image_cache[cache_key] if @image_cache.key?(cache_key)
 
-    # eBay商品ページから画像URLを取得する
     begin
-      # メタデータキャッシュを確認
       image_url = Rails.cache.fetch("ebay_image_#{seller_sku.item_id}", expires_in: 1.day) do
-        # eBay商品ページのURLを構築
         item_url = seller_sku.ebay_item_url
-        # URLからHTMLを取得
         require "open-uri"
         require "nokogiri"
 
         html = URI.open(item_url).read
         doc = Nokogiri::HTML(html)
 
-        # メタデータから画像URLを抽出
         og_image = doc.at('meta[property="og:image"]')&.attr("content")
 
-        # 商品画像を見つける
         image_element = doc.at("div#mainImgHldr img") ||
                         doc.at("div.ux-image-carousel-item img") ||
                         doc.at("img.img.img500")
@@ -47,7 +40,6 @@ module SalesReportsHelper
         image_url
       end
 
-      # 画像URLが取得できた場合はそれをキャッシュして返す
       if image_url.present?
         @image_cache[cache_key] = image_url
         return image_url
@@ -56,7 +48,6 @@ module SalesReportsHelper
       Rails.logger.error "eBay画像取得エラー: #{e.message}"
     end
 
-    # 画像が取得できなかった場合はnilを返す
     nil
   end
 
@@ -74,6 +65,7 @@ module SalesReportsHelper
       { key: :quantity, class: "text-right font-medium" },
       { key: :profit, class: "text-right font-bold text-success" },
       { key: :profit_rate, class: "text-right font-medium" },
+      { key: :price_adjusted, class: "text-center" },
       { key: :tracking_number, class: "whitespace-nowrap font-medium" }
     ]
   end
@@ -93,33 +85,70 @@ module SalesReportsHelper
     when :fee
       format_currency(data[:payment_fees], data[:order].currency)
     when :shipping_cost
-      # 送料は常にJPYとして扱う
       format_jpy_currency(data[:shipping_cost])
     when :procurement_cost
-      # 仕入原価は常にJPYとして扱う
       format_jpy_currency(data[:procurement_cost])
     when :other_cost
-      # その他原価は常にJPYとして扱う
       format_jpy_currency(data[:other_costs])
     when :quantity
       data[:quantity]
     when :profit
-      # 利益は常にJPYとして扱う
       format_jpy_currency(data[:profit])
     when :profit_rate
       "#{number_with_precision(data[:profit_rate], precision: 1)}%"
+    when :price_adjusted
+      date = latest_price_adjustment_date(data[:order])
+      item_ids = data[:order].order_lines.map { |line| line.seller_sku&.item_id }.compact.uniq
+
+      if date.present? && item_ids.any?
+        content_tag(:div, class: "flex justify-center", data: { price_adjusted_cell: item_ids.first }) do
+          content_tag(:span, l(date, format: :short), class: "badge badge-primary badge-outline text-xs")
+        end
+      else
+        ""
+      end
     when :tracking_number
       data[:tracking_number].presence || ""
     end
   end
 
-  # カラムのクラスを取得
+  # 注文に紐づく商品の最新の価格調整日を取得
+  def latest_price_adjustment_date(order)
+    @latest_price_adjustment_dates ||= {}
+
+    order.order_lines.each do |line|
+      seller_sku = line.seller_sku
+      next unless seller_sku&.item_id.present?
+
+      item_id = seller_sku.item_id
+
+      if !@latest_price_adjustment_dates.key?(item_id)
+        latest_adjustment = price_adjustment_for_item_id(item_id)
+        @latest_price_adjustment_dates[item_id] = latest_adjustment&.adjustment_date
+      end
+
+      return @latest_price_adjustment_dates[item_id] if @latest_price_adjustment_dates[item_id].present?
+    end
+
+    nil
+  end
+
+  def price_adjustment_for_item_id(item_id)
+    @price_adjustments_cache ||= {}
+
+    return @price_adjustments_cache[item_id] if @price_adjustments_cache.key?(item_id)
+
+    @price_adjustments_cache[item_id] = PriceAdjustment.joins(:seller_sku)
+                                                    .where(seller_skus: { item_id: item_id })
+                                                    .order(adjustment_date: :desc)
+                                                    .first
+  end
+
   def get_column_class(column, type = :cell)
     return column[:class] if column[:class]
     type == :header ? column[:header_class] : column[:cell_class]
   end
 
-  # 検索フォームの入力フィールドを生成するヘルパーメソッド
   def search_form_field(form, field_name, label_text, options = {})
     field_type = options[:field_type] || :search_field
     input_classes = "input input-sm input-bordered w-full focus:input-primary text-base"
@@ -131,7 +160,6 @@ module SalesReportsHelper
     end
   end
 
-  # 検索フォームのフィールド設定を返すメソッド
   def search_form_fields
     [
       { name: :order_number_cont, label: "注文番号" },
@@ -144,16 +172,14 @@ module SalesReportsHelper
 
   private
 
-  # 通貨オブジェクトに応じた金額フォーマット
   def format_currency(amount, currency)
     return "" if amount.nil?
 
-    # 通貨が指定されていない場合はデフォルトでドル表示
     if currency.nil?
       return format_usd(amount)
     end
 
-    case currency.code
+    case currency.code.upcase
     when "JPY"
       format_jpy(amount)
     when "USD"
@@ -163,9 +189,6 @@ module SalesReportsHelper
     end
   end
 
-  # JPY通貨の金額フォーマットを行う
-  # @param amount [Numeric] 金額
-  # @return [String] フォーマットされた金額
   def format_jpy_currency(amount)
     return "" if amount.nil?
 
