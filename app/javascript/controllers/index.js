@@ -2,22 +2,31 @@
 // Run that command whenever you add a new controller or create them with
 // ./bin/rails generate stimulus controllerName
 
-import { application } from './application';
+import { application } from "./application"
 
-import ChartController from './chart_controller';
-application.register('chart', ChartController);
+import ChartController from "./chart_controller"
+application.register("chart", ChartController)
+console.log("Chart controller registered")
 
-import FormSubmitController from './form_submit_controller';
-application.register('form-submit', FormSubmitController);
+import FormSubmitController from "./form_submit_controller"
+application.register("form-submit", FormSubmitController)
+console.log("Form submit controller registered")
 
-import ModalController from './modal_controller';
-application.register('modal', ModalController);
+import ModalController from "./modal_controller"
+application.register("modal", ModalController)
+console.log("Modal controller registered")
 
-import PasswordFieldController from './password_field_controller';
-application.register('password-field', PasswordFieldController);
+import PasswordFieldController from "./password_field_controller"
+application.register("password-field", PasswordFieldController)
+console.log("Password field controller registered")
 
-import ThemeController from './theme_controller';
-application.register('theme', ThemeController);
+import ThemeController from "./theme_controller"
+application.register("theme", ThemeController)
+console.log("Theme controller registered")
 
-import TourController from './tour_controller';
-application.register('tour', TourController);
+import TourController from "./tour_controller"
+application.register("tour", TourController)
+console.log("Tour controller registered")
+
+console.log("All controllers loaded and registered")
+console.log("Available controllers:", application.controllers.map(c => c.identifier))
