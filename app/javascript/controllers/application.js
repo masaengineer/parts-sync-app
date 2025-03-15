@@ -9,6 +9,4 @@ application.debug = true
 // Make it available globally
 window.Stimulus = application
 
-console.log("Stimulus application initialized")
-
 export { application }
