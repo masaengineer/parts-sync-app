@@ -36,9 +36,11 @@ class DataImportsController < ApplicationController
       when "wisewill_data_sheet"
         WisewillDataSheetImporter.new(file.path, current_user).import
         flash_message = "Wisewill委託分シートのインポートが完了しました。"
+        flash_type = :notice
       when "cpass_data_sheet"
         CpassDataSheetImporter.new(file.path, current_user).import
         flash_message = "CPaSS委託分シートのインポートが完了しました。"
+        flash_type = :notice
       else
         flash_message = "不明なインポートタイプです。"
         flash_type = :alert
@@ -59,8 +61,6 @@ class DataImportsController < ApplicationController
         "予期せぬエラーが発生しました: #{e.message}"
       end
       flash_type = :alert
-    else
-      flash_type = :notice
     end
 
     respond_to do |format|
