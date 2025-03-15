@@ -1,24 +1,27 @@
 <%# app/views/shared/_flash_messages.html.erb %>
-<% flash.each do |type, message| %>
-  <% alert_class = case type.to_sym
-    when :success then "alert-success"
-    when :error then "alert-error"
-    when :alert then "alert-warning"
-    when :notice then "alert-info"
-    else "alert-info"
-    end %>
+<div id="flash">
+  <% flash_data = local_assigns[:flash] || flash %>
+  <% flash_data.each do |type, message| %>
+    <% alert_class = case type.to_sym
+      when :success then "alert-success"
+      when :error then "alert-error"
+      when :alert then "alert-warning"
+      when :notice then "alert-info"
+      else "alert-info"
+      end %>
 
-  <div class="alert <%= alert_class %> shadow-lg mb-4" role="alert">
-    <div>
-      <% icon_name = case type.to_sym
-        when :success then "lucide:check-circle"
-        when :error then "lucide:x-circle"
-        when :alert then "lucide:alert-triangle"
-        when :notice then "lucide:info"
-        else "lucide:info"
-        end %>
-      <iconify-icon icon="<%= icon_name %>" class="w-6 h-6"></iconify-icon>
-      <span><%= message %></span>
+    <div class="alert <%= alert_class %> shadow-lg mb-4" role="alert">
+      <div>
+        <% icon_name = case type.to_sym
+          when :success then "lucide:check-circle"
+          when :error then "lucide:x-circle"
+          when :alert then "lucide:alert-triangle"
+          when :notice then "lucide:info"
+          else "lucide:info"
+          end %>
+        <iconify-icon icon="<%= icon_name %>" class="w-6 h-6"></iconify-icon>
+        <span><%= message %></span>
+      </div>
     </div>
-  </div>
-<% end %>
+  <% end %>
+</div>

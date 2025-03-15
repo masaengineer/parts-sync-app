@@ -24,7 +24,7 @@
           <iconify-icon icon="lucide:x" class="h-4 w-4 mr-1"></iconify-icon>
           <%= t('shared.buttons.close') %>
         </button>
-        <button type="button" form="csv-import-form" class="btn btn-sm btn-primary" data-action="click->form-submit#submit">
+        <button type="button" form="csv-import-form" class="btn btn-sm btn-primary" data-form-submit-target="submitButton" data-action="click->form-submit#submit">
           <span data-form-submit-target="buttonText"><%= t("sales_reports.csv_import.submit") %></span>
           <span data-form-submit-target="spinner" class="loading loading-spinner loading-sm hidden"></span>
         </button>

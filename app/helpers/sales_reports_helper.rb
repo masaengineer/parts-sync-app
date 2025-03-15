@@ -151,12 +151,40 @@ module SalesReportsHelper
 
   def search_form_field(form, field_name, label_text, options = {})
     field_type = options[:field_type] || :search_field
-    input_classes = "input input-sm input-bordered w-full focus:input-primary text-base"
-    label_classes = "label font-medium text-sm"
+    input_classes = "input input-sm input-bordered w-full focus:input-primary text-base bg-base-100 pl-10"
+
+    # フィールド名からプレースホルダーのキーを生成（例: order_number_cont -> order_number）
+    placeholder_key = field_name.to_s.gsub(/_cont$|_gteq$|_lteq$/, "")
+    placeholder = t("sales_reports.placeholder.#{placeholder_key}", default: label_text)
+
+    # 各フィールドのアイコンを決定
+    icon = case placeholder_key
+    when "order_number"
+             "lucide:hash"
+    when "shipment_tracking_number"
+             "lucide:package"
+    when "order_lines_seller_sku_sku_code"
+             "lucide:tag"
+    else
+             "lucide:search"
+    end
+
+    # data属性があれば適用
+    html_options = { class: input_classes, placeholder: placeholder }
+    html_options.merge!(data: options[:data]) if options[:data].present?
 
     content_tag(:div, class: "form-control w-full") do
-      concat form.label(field_name, label_text, class: label_classes)
-      concat form.send(field_type, field_name, class: input_classes)
+      input_wrapper = content_tag(:div, class: "relative") do
+        icon_wrapper = content_tag(:div, class: "absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none") do
+          "<iconify-icon icon=\"#{icon}\" class=\"w-4 h-4 text-gray-500\"></iconify-icon>".html_safe
+        end
+
+        input = form.send(field_type, field_name, html_options)
+
+        icon_wrapper + input
+      end
+
+      input_wrapper
     end
   end
 
