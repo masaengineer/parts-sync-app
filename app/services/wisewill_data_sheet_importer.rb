@@ -67,7 +67,11 @@ class WisewillDataSheetImporter
     manufacturer_name = row["manufacturer_name"]&.strip
     purchase_price    = to_decimal(row["purchase_price"])
     handling_fee      = to_decimal(row["handling_fee"])
-    option_fee         = to_decimal(row["option_fee"])
+    option_fee        = to_decimal(row["option_fee"])
+    year              = row["year"]&.to_i
+    month             = row["month"]&.to_i
+    sheet_name        = row["sheet_name"]
+
     # 必須項目のバリデーション
     if order_number.blank?
       Rails.logger.warn "[WisewillDataSheetImporter] order_numberが空のため、この行をスキップします: #{row.to_h.inspect}"
@@ -88,19 +92,45 @@ class WisewillDataSheetImporter
     end
 
     # 3. 既存のorderを使ってProcurementレコードを作成
-    create_procurement(order, purchase_price, handling_fee, option_fee)
+    create_procurement(order, purchase_price, handling_fee)
+
+    # 4. option_feeがある場合はExpenseレコードを作成
+    create_expense(order, option_fee, year, month) if option_fee.present?
   end
 
   # Procurementレコードの作成
-  def create_procurement(order, purchase_price, handling_fee, option_fee)
-    return unless purchase_price || handling_fee || option_fee
+  def create_procurement(order, purchase_price, handling_fee)
+    return unless purchase_price || handling_fee
 
     # 既存のProcurementレコードを更新するか、新しいものを作成
     procurement = order.procurement || order.build_procurement
     procurement.update!(
       purchase_price: purchase_price,
-      handling_fee: handling_fee,
-      option_fee: option_fee
+      handling_fee: handling_fee
+    )
+  end
+
+  # Expenseレコードの作成
+  def create_expense(order, option_fee, year, month)
+    return unless option_fee
+
+    # 年月が取得できなかった場合は現在の年月を使用
+    current_date = Date.today
+    year = year.presence || current_date.year
+    month = month.presence || current_date.month
+
+    # 既存のExpenseレコードを検索または新規作成
+    expense = Expense.find_or_initialize_by(
+      order_id: order.id,
+      expense_type: 'option_fee'
+    )
+
+    expense.update!(
+      amount: option_fee,
+      option_fee: option_fee,
+      year: year,
+      month: month,
+      item_name: "オプション料金（#{order.order_number}）"
     )
   end
 

@@ -26,7 +26,7 @@ function showSheetSelectionDialog() {
     props.setProperty('processingTotal', '0');
     props.setProperty('processingSheetName', '');
     props.setProperty('processingTimestamp', '0');
-    
+
     var htmlOutput = HtmlService.createHtmlOutput(createSheetSelectionHtml())
       .setWidth(400)
       .setHeight(500)
@@ -34,7 +34,9 @@ function showSheetSelectionDialog() {
     SpreadsheetApp.getUi().showModalDialog(htmlOutput, 'シート選択');
     Logger.log('showSheetSelectionDialog が完了しました');
   } catch (e) {
-    Logger.log('showSheetSelectionDialog でエラーが発生しました: ' + e.toString());
+    Logger.log(
+      'showSheetSelectionDialog でエラーが発生しました: ' + e.toString()
+    );
   }
 }
 
@@ -127,14 +129,14 @@ function createSheetSelectionHtml() {
               <button onclick="google.script.host.close()">キャンセル</button>
             </div>
           </div>
-          
+
           <div id="loading-container">
             <div class="spinner"></div>
             <div class="progress-text">処理中...</div>
             <div id="progress-current">0/0 シート処理済み</div>
             <div id="progress-sheet">処理を開始しています...</div>
           </div>
-          
+
           <script>
             // 処理開始関数
             function processSheets() {
@@ -144,58 +146,58 @@ function createSheetSelectionHtml() {
                 alert('少なくとも1つのシートを選択してください');
                 return;
               }
-              
+
               // 選択されたシート名の配列を作成
               const selectedSheets = Array.from(checkboxes).map(cb => cb.value);
-              
+
               // ローディング表示を開始
               document.getElementById('main-container').style.display = 'none';
               document.getElementById('loading-container').style.display = 'flex';
-              
+
               // 進捗状況のポーリングを開始
               startProgressPolling();
-              
+
               // サーバーサイド処理を実行
               google.script.run
                 .withSuccessHandler(handleSuccess)
                 .withFailureHandler(handleError)
                 .processSheets(selectedSheets);
             }
-            
+
             // 進捗状況のポーリング
             let progressInterval = null;
-            
+
             function startProgressPolling() {
               if (progressInterval) clearInterval(progressInterval);
               progressInterval = setInterval(updateProgress, 1000);
             }
-            
+
             function stopProgressPolling() {
               if (progressInterval) {
                 clearInterval(progressInterval);
                 progressInterval = null;
               }
             }
-            
+
             function updateProgress() {
               google.script.run
                 .withSuccessHandler(function(status) {
                   if (status && status.total > 0) {
-                    document.getElementById('progress-current').textContent = 
+                    document.getElementById('progress-current').textContent =
                       status.current + '/' + status.total + ' シート処理済み';
-                    document.getElementById('progress-sheet').textContent = 
+                    document.getElementById('progress-sheet').textContent =
                       '処理中: ' + status.sheetName;
                   }
                 })
                 .getProcessingStatus();
             }
-            
+
             // 処理成功時の処理
             function handleSuccess(result) {
               stopProgressPolling();
               document.body.innerHTML = result;
             }
-            
+
             // エラー処理
             function handleError(error) {
               stopProgressPolling();
@@ -211,7 +213,9 @@ function createSheetSelectionHtml() {
     Logger.log('createSheetSelectionHtml が完了しました');
     return html;
   } catch (e) {
-    Logger.log('createSheetSelectionHtml でエラーが発生しました: ' + e.toString());
+    Logger.log(
+      'createSheetSelectionHtml でエラーが発生しました: ' + e.toString()
+    );
     throw e;
   }
 }
@@ -228,12 +232,12 @@ function getProcessingStatus() {
     var total = parseInt(props.getProperty('processingTotal') || '0');
     var sheetName = props.getProperty('processingSheetName') || '';
     var timestamp = props.getProperty('processingTimestamp') || '0';
-    
+
     return {
       current: current,
       total: total,
       sheetName: sheetName,
-      timestamp: timestamp
+      timestamp: timestamp,
     };
   } catch (e) {
     Logger.log('getProcessingStatus でエラーが発生しました: ' + e.toString());
@@ -255,7 +259,7 @@ function processSheets(sheetNames) {
     props.setProperty('processingTotal', sheetNames.length.toString());
     props.setProperty('processingSheetName', '処理を開始します...');
     props.setProperty('processingTimestamp', new Date().getTime().toString());
-    
+
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var allRows = [];
     var processedCount = 0;
@@ -267,94 +271,114 @@ function processSheets(sheetNames) {
       'purchase_price',
       'handling_fee',
       'option_fee',
-      'sheet_name' // シート名を識別するための追加列
+      'year',
+      'month',
+      'sheet_name', // シート名を識別するための追加列
     ];
     allRows.push(headerRow);
-    
+
     for (var i = 0; i < sheetNames.length; i++) {
       var sheetName = sheetNames[i];
       var sheet = ss.getSheetByName(sheetName);
-      
+
       if (sheet) {
         // 進捗状況を更新
         updateProgress(i + 1, sheetNames.length, sheetName);
-        
+
         var result = generateFilteredCSV(sheet);
-        
+
         // 行を解析し、シート名を追加
         var csvLines = Utilities.parseCsv(result.csv);
-        if (csvLines.length > 1) { // ヘッダー以外のデータがある場合
+        if (csvLines.length > 1) {
+          // ヘッダー以外のデータがある場合
           // ヘッダー行はスキップ（初回のみallRowsに追加済み）
           for (var j = 1; j < csvLines.length; j++) {
             var row = csvLines[j];
-            // シート名を追加
-            row.push(sheetName);
+            // allRowsに追加（現在の形式をそのまま使用）
             allRows.push(row);
           }
           processedCount++;
         }
       }
     }
-    
+
     // すべてのデータを一つのCSVに変換
     var csvContent = allRows
-      .map(function(r) {
+      .map(function (r) {
         return r.map(csvEscape).join(',');
       })
       .join('\r\n');
-    
+
     // ファイル名を生成
     var fileName = 'Wisewill 委託分データ まとめ.csv';
-    
+
     // BOM付きUTF-8でCSVデータを作成
     var csvContentWithBOM = '\ufeff' + csvContent;
     var blob = Utilities.newBlob(csvContentWithBOM, 'text/csv', fileName);
     var file = DriveApp.createFile(blob);
-    
+
     // 新しいスプレッドシートを作成
-    var newSSName = 'Wisewill 委託分データ まとめ (' + Utilities.formatDate(new Date(), 'JST', 'yyyy-MM-dd HH:mm') + ')';
+    var newSSName =
+      'Wisewill 委託分データ まとめ (' +
+      Utilities.formatDate(new Date(), 'JST', 'yyyy-MM-dd HH:mm') +
+      ')';
     var newSS = SpreadsheetApp.create(newSSName);
     var newSheet = newSS.getActiveSheet();
-    
+
     newSheet.clear();
-    newSheet.getRange(1, 1, allRows.length, allRows[0].length).setValues(allRows);
-    
+    newSheet
+      .getRange(1, 1, allRows.length, allRows[0].length)
+      .setValues(allRows);
+
     // 1行目を太字にして固定
     newSheet.getRange(1, 1, 1, allRows[0].length).setFontWeight('bold');
     newSheet.setFrozenRows(1);
-    
+
     var fileUrl = file.getDownloadUrl();
     var sheetUrl = newSS.getUrl();
-    
+
     // 結果を表示するHTMLを生成
-    var htmlContent = '<html><head>'
-      + '<style>'
-      + 'body { font-family: Arial, sans-serif; margin: 20px; }'
-      + '.result-item { margin-bottom: 20px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }'
-      + 'h3 { margin-top: 0; }'
-      + 'button { padding: 8px 12px; }'
-      + '.success-icon { color: #4CAF50; font-size: 18px; margin-right: 5px; }'
-      + '</style>'
-      + '</head><body>'
-      + '<h2>処理結果 <span class="success-icon">✓</span></h2>';
-    
+    var htmlContent =
+      '<html><head>' +
+      '<style>' +
+      'body { font-family: Arial, sans-serif; margin: 20px; }' +
+      '.result-item { margin-bottom: 20px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }' +
+      'h3 { margin-top: 0; }' +
+      'button { padding: 8px 12px; }' +
+      '.success-icon { color: #4CAF50; font-size: 18px; margin-right: 5px; }' +
+      '</style>' +
+      '</head><body>' +
+      '<h2>処理結果 <span class="success-icon">✓</span></h2>';
+
     if (processedCount > 0) {
-      htmlContent += '<p>処理完了: ' + processedCount + ' / ' + sheetNames.length + ' シートのデータをまとめました</p>'
-        + '<p>合計行数: ' + (allRows.length - 1) + ' 行（ヘッダー行を除く）</p>'
-        + '<div class="result-item">'
-        + '<h3>まとめデータ</h3>'
-        + '<p><a href="' + fileUrl + '" target="_blank">CSVダウンロード</a></p>'
-        + '<p><a href="' + sheetUrl + '" target="_blank">Googleスプレッドシートを開く</a></p>'
-        + '</div>';
+      htmlContent +=
+        '<p>処理完了: ' +
+        processedCount +
+        ' / ' +
+        sheetNames.length +
+        ' シートのデータをまとめました</p>' +
+        '<p>合計行数: ' +
+        (allRows.length - 1) +
+        ' 行（ヘッダー行を除く）</p>' +
+        '<div class="result-item">' +
+        '<h3>まとめデータ</h3>' +
+        '<p><a href="' +
+        fileUrl +
+        '" target="_blank">CSVダウンロード</a></p>' +
+        '<p><a href="' +
+        sheetUrl +
+        '" target="_blank">Googleスプレッドシートを開く</a></p>' +
+        '</div>';
     } else {
       htmlContent += '<p>処理できるシートがありませんでした。</p>';
     }
-    
-    htmlContent += '<div style="margin-top: 20px;">'
-      + '<button onclick="google.script.host.close()">閉じる</button>'
-      + '</div>'
-      + '</body></html>';
-    
+
+    htmlContent +=
+      '<div style="margin-top: 20px;">' +
+      '<button onclick="google.script.host.close()">閉じる</button>' +
+      '</div>' +
+      '</body></html>';
+
     Logger.log('processSheets が完了しました');
     return htmlContent;
   } catch (e) {
@@ -375,14 +399,14 @@ function updateProgress(current, total, sheetName) {
     // この関数は直接クライアントサイドに表示を更新するものではなく、
     // デバッグやログ目的で使用します。実際のUI更新はHTMLとJavaScriptで行われます。
     Logger.log('処理中: ' + current + '/' + total + ' - シート: ' + sheetName);
-    
+
     // プロパティサービスに進捗状況を保存
     var props = PropertiesService.getScriptProperties();
     props.setProperty('processingCurrent', current.toString());
     props.setProperty('processingTotal', total.toString());
     props.setProperty('processingSheetName', sheetName);
     props.setProperty('processingTimestamp', new Date().getTime().toString());
-    
+
     Logger.log('updateProgress が完了しました');
   } catch (e) {
     Logger.log('updateProgress でエラーが発生しました: ' + e.toString());
@@ -427,6 +451,9 @@ function generateFilteredCSV(sheet) {
       'purchase_price',
       'handling_fee',
       'option_fee',
+      'year',
+      'month',
+      'sheet_name',
     ]);
 
     var orderNumberPattern = /^\d{2}-\d{5}-\d{5}$/;
@@ -441,6 +468,11 @@ function generateFilteredCSV(sheet) {
 
     var sheetName = sheet.getName();
     var isMatome = sheetName.indexOf('まとめ専用') >= 0;
+
+    // シート名から年と月を抽出
+    var extractedYearMonth = extractYearMonthFromSheetName(sheetName);
+    var year = extractedYearMonth.year;
+    var month = extractedYearMonth.month;
 
     // スキップカウントと最大スキップ行数を設定
     var skipCount = 0;
@@ -516,6 +548,9 @@ function generateFilteredCSV(sheet) {
         purchase_price,
         handling_fee,
         option_fee,
+        year,
+        month,
+        sheetName,
       ]);
     }
 
@@ -607,7 +642,9 @@ function searchPriceByPartNumber(ss, partNumber) {
     Logger.log('searchPriceByPartNumber が完了しました');
     return null;
   } catch (e) {
-    Logger.log('searchPriceByPartNumber でエラーが発生しました: ' + e.toString());
+    Logger.log(
+      'searchPriceByPartNumber でエラーが発生しました: ' + e.toString()
+    );
     throw e;
   }
 }
@@ -640,7 +677,9 @@ function extractAndCleanPartNumbers(text) {
     Logger.log('extractAndCleanPartNumbers が完了しました');
     return parts;
   } catch (e) {
-    Logger.log('extractAndCleanPartNumbers でエラーが発生しました: ' + e.toString());
+    Logger.log(
+      'extractAndCleanPartNumbers でエラーが発生しました: ' + e.toString()
+    );
     throw e;
   }
 }
@@ -673,5 +712,50 @@ function cleanPartNumber(str) {
   } catch (e) {
     Logger.log('cleanPartNumber でエラーが発生しました: ' + e.toString());
     throw e;
+  }
+}
+
+/**
+ * シート名から年と月を抽出します。
+ * @param {string} sheetName シート名
+ * @return {Object} 抽出された年と月の情報
+ */
+function extractYearMonthFromSheetName(sheetName) {
+  Logger.log('extractYearMonthFromSheetName が呼び出されました');
+  try {
+    // シート名から年と月を抽出するための正規表現
+    var yearMonthPattern = /(20\d{2})\s*\/\s*(\d{1,2})/;
+    var match = sheetName.match(yearMonthPattern);
+
+    var year = 0;
+    var month = 0;
+
+    if (match && match.length >= 3) {
+      year = parseInt(match[1], 10);
+      month = parseInt(match[2], 10);
+    } else {
+      // マッチしない場合は現在の年月を使用
+      var currentDate = new Date();
+      year = currentDate.getFullYear();
+      month = currentDate.getMonth() + 1;
+    }
+
+    Logger.log(
+      'extractYearMonthFromSheetName が完了しました - 年: ' +
+        year +
+        ', 月: ' +
+        month
+    );
+    return { year: year, month: month };
+  } catch (e) {
+    Logger.log(
+      'extractYearMonthFromSheetName でエラーが発生しました: ' + e.toString()
+    );
+    // エラー時は現在の年月を返す
+    var currentDate = new Date();
+    return {
+      year: currentDate.getFullYear(),
+      month: currentDate.getMonth() + 1,
+    };
   }
 }
