@@ -24,11 +24,14 @@ RSpec.describe 'CSVインポート機能', type: :system do
         # 売上レポートページに遷移
         visit sales_reports_path
 
-        # CSVインポートフォームが存在することを確認
-        expect(page).to have_selector('#csv_import')
+        # CSVインポートモーダルが存在することを確認（非表示状態）
+        expect(page).to have_selector('#csvImportModal', visible: false)
+
+        # インポートフォームの存在を確認
+        expect(page).to have_selector('#csv-import-form', visible: false)
 
         # インポートボタンの存在を確認
-        expect(page).to have_button(I18n.t('sales_reports.csv_import.submit'))
+        expect(page).to have_button(I18n.t('sales_reports.csv_import.submit'), visible: false)
       end
     end
 
@@ -36,8 +39,8 @@ RSpec.describe 'CSVインポート機能', type: :system do
       it 'エラーメッセージが表示されること' do
         visit sales_reports_path
 
-        # フォームの存在確認のみ行う
-        expect(page).to have_selector('#csv_import')
+        # モーダルの存在確認のみ行う
+        expect(page).to have_selector('#csvImportModal', visible: false)
       end
     end
 
@@ -58,8 +61,8 @@ RSpec.describe 'CSVインポート機能', type: :system do
       it 'エラーメッセージが表示されること' do
         visit sales_reports_path
 
-        # フォームの存在確認のみ行う
-        expect(page).to have_selector('#csv_import')
+        # モーダルの存在確認のみ行う
+        expect(page).to have_selector('#csvImportModal', visible: false)
       end
     end
   end
