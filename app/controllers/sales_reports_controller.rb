@@ -2,7 +2,7 @@ class SalesReportsController < ApplicationController
   def index
     # 日付範囲のプリセットを処理
     process_date_preset if params[:date_preset].present?
-    
+
     @q = current_user.orders.ransack(params[:q])
 
     if params[:sort_by].present?
@@ -99,42 +99,42 @@ class SalesReportsController < ApplicationController
       }
     ).find(params[:id])
   end
-  
+
   private
 
   def process_date_preset
     # カスタム以外の場合は日付範囲を計算してパラメータに設定
-    return if params[:date_preset] == 'custom'
-    
+    return if params[:date_preset] == "custom"
+
     # DateRangeCalculatorを使用して日付範囲を計算
     today = Date.current
     start_date, end_date = case params[:date_preset]
-    when 'last_90_days'
-      [today - 90.days, today]
-    when 'today'
-      [today, today]
-    when 'yesterday'
+    when "last_90_days"
+      [ today - 90.days, today ]
+    when "today"
+      [ today, today ]
+    when "yesterday"
       yesterday = today - 1.day
-      [yesterday, yesterday]
-    when 'this_week'
-      [today.beginning_of_week, today]
-    when 'last_week'
+      [ yesterday, yesterday ]
+    when "this_week"
+      [ today.beginning_of_week, today ]
+    when "last_week"
       last_week_start = today - 1.week
-      [last_week_start.beginning_of_week, last_week_start.end_of_week]
-    when 'this_month'
-      [today.beginning_of_month, today]
-    when 'last_month'
+      [ last_week_start.beginning_of_week, last_week_start.end_of_week ]
+    when "this_month"
+      [ today.beginning_of_month, today ]
+    when "last_month"
       last_month = today - 1.month
-      [last_month.beginning_of_month, last_month.end_of_month]
-    when 'this_year'
-      [today.beginning_of_year, today]
-    when 'last_year'
+      [ last_month.beginning_of_month, last_month.end_of_month ]
+    when "this_year"
+      [ today.beginning_of_year, today ]
+    when "last_year"
       last_year = today - 1.year
-      [last_year.beginning_of_year, last_year.end_of_year]
+      [ last_year.beginning_of_year, last_year.end_of_year ]
     else
       return
     end
-    
+
     # パラメータに計算した日付範囲を設定
     params[:q] ||= {}
     params[:q][:sale_date_gteq] = start_date.to_s
