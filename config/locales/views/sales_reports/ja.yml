@@ -56,7 +56,7 @@ ja:
         price_adjusted: '最終価格調整を入力'
         tracking_number: '追跡番号を入力'
     csv_import:
-      title: 'CSVファイルインポート'
+      title: 'CSVファイル インポート'
       button: 'CSVインポート'
       import_type: 'インポート種別'
       file: 'CSVファイル'

@@ -1,7 +1,7 @@
 <%# CSVインポートフォーム %>
 <div class="card card-bordered bg-base-100 shadow-sm mb-6" id="csv_import">
   <div class="card-body p-5">
-    <%= form_with url: import_data_imports_path, local: true, method: :post, multipart: true, data: { controller: "form-submit" } do |f| %>
+    <%= form_with url: import_data_imports_path, method: :post, multipart: true, id: "csv-import-form", data: { controller: "form-submit", turbo_frame: "csv_import" } do |f| %>
       <div class="grid grid-cols-1 md:grid-cols-5 gap-5">
         <div class="form-control">
           <%= f.label :import_type, t("sales_reports.csv_import.import_type"), class: "label font-medium text-sm" %>
@@ -17,7 +17,10 @@
         </div>
 
         <div class="md:col-span-2 flex justify-end items-end">
-          <%= f.button t("sales_reports.csv_import.submit"), type: "submit", class: "btn btn-primary btn-sm", data: { action: "click->form-submit#submit" } do %>
+          <%= f.button t("sales_reports.csv_import.submit"), id: "import-submit-button", type: "submit", class: "btn btn-primary btn-sm", data: { 
+            form_submit_target: "submitButton",
+            action: "click->form-submit#submit"
+          } do %>
             <span data-form-submit-target="buttonText"><%= t("sales_reports.csv_import.submit") %></span>
             <span data-form-submit-target="spinner" class="loading loading-spinner loading-sm hidden"></span>
           <% end %>
