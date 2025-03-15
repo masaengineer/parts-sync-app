@@ -122,7 +122,7 @@ class WisewillDataSheetImporter
     # 既存のExpenseレコードを検索または新規作成
     expense = Expense.find_or_initialize_by(
       order_id: order.id,
-      expense_type: 'option_fee'
+      expense_type: "option_fee"
     )
 
     expense.update!(
