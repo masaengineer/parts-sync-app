@@ -21,3 +21,6 @@ application.register('theme', ThemeController);
 
 import TourController from './tour_controller';
 application.register('tour', TourController);
+
+import DateRangeSelectorController from './date_range_selector_controller';
+application.register('date-range-selector', DateRangeSelectorController);
