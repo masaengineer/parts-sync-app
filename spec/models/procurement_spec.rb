@@ -38,11 +38,10 @@ RSpec.describe Procurement, type: :model do
         procurement = build(:procurement,
           purchase_price: 5000,
           forwarding_fee: 500,
-          option_fee: 300,
           handling_fee: 200
         )
 
-        expect(procurement.total_cost).to eq(6000)
+        expect(procurement.total_cost).to eq(5700)
       end
     end
 
@@ -51,7 +50,6 @@ RSpec.describe Procurement, type: :model do
         procurement = build(:procurement,
           purchase_price: 5000,
           forwarding_fee: nil,
-          option_fee: nil,
           handling_fee: 200
         )
 
@@ -64,7 +62,6 @@ RSpec.describe Procurement, type: :model do
         procurement = build(:procurement,
           purchase_price: 5000,
           forwarding_fee: nil,
-          option_fee: nil,
           handling_fee: nil
         )
 

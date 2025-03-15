@@ -22,12 +22,14 @@ RSpec.describe MonthlyReport::Service do
       order: order,
       purchase_price: 50000,
       forwarding_fee: 5000,
-      option_fee: 2000,
       handling_fee: 3000
     )
 
     # 販管費データの作成
     create(:expense, year: year, month: month, amount: 20000)
+
+    # オプション料金の作成
+    create(:expense, :option_fee, year: year, month: month, order: order)
   end
 
   describe '#calculate' do
