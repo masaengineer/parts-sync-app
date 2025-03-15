@@ -2,4 +2,5 @@
 import '@hotwired/turbo-rails';
 import './controllers';
 
+// Iconifyのインポート
 import 'iconify-icon';

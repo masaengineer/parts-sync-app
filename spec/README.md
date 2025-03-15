@@ -361,3 +361,60 @@ bundle exec rspec spec/system
    # 例：特定の要素が表示されるまで待つ
    wait_for_selector('.my-element')
    ```
+
+## JavaScript アセットのテスト
+
+JavaScript アセット（application.js）が正しく配信されているかを検証するテストを追加しました。
+このテストでは以下の項目を確認します：
+
+1. Iconify が正しく読み込まれているか
+2. Stimulus が正しく読み込まれているか
+3. 各 Stimulus コントローラーが正しく動作しているか
+   - パスワードフィールドコントローラー
+   - モーダルコントローラー
+   - テーマコントローラー
+   - チャートコントローラー
+   - フォーム送信コントローラー
+
+## テストの実行方法
+
+### 全てのテストを実行
+
+```bash
+bundle exec rspec
+```
+
+### JavaScript アセットのテストのみ実行
+
+```bash
+bundle exec rspec spec/system/javascript_assets_spec.rb
+```
+
+### ヘッドレスモードでテストを実行
+
+```bash
+HEADLESS=true bundle exec rspec spec/system/javascript_assets_spec.rb
+```
+
+### ブラウザを表示してテストを実行（デバッグ用）
+
+```bash
+HEADLESS=false bundle exec rspec spec/system/javascript_assets_spec.rb
+```
+
+## テストヘルパー
+
+`spec/support/javascript_assets_helper.rb` には、JavaScript アセットのテストをサポートするヘルパーメソッドが定義されています：
+
+- `javascript_loaded?(script_name)` - 特定の JavaScript が読み込まれているかを確認
+- `stimulus_controller_registered?(controller_name)` - Stimulus コントローラーが登録されているかを確認
+- `has_stimulus_controller?(controller_name)` - 特定の Stimulus コントローラーを持つ要素が存在するかを確認
+- `iconify_loaded?` - Iconify が正しく読み込まれているかを確認
+- `icon_rendered?(icon_name)` - 特定のアイコンが正しく表示されているかを確認
+
+## 注意事項
+
+- テストは JavaScript を実行するため、`js: true` オプションを指定しています
+- テストの実行には Chrome または Chromium が必要です
+- テストの実行時間を短縮するため、ヘッドレスモードがデフォルトで有効になっています
+- 特定のページやコンポーネントでのみ使用されるコントローラーは、条件付きでテストされます
