@@ -33,14 +33,13 @@ RSpec.describe 'CSVインポート機能', type: :system, skip: 'ホスト認証
 
         # インポートボタンの存在を確認
         expect(page).to have_button(I18n.t('sales_reports.csv_import.submit'), visible: false)
-
       end
     end
 
     context 'ファイルが選択されていない場合' do
       it 'CSVインポートボタンが存在すること' do
         visit sales_reports_path
-        
+
         # モーダルの存在確認のみ行う
         expect(page).to have_selector('#csvImportModal', visible: false)
       end
