@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_03_12_073411) do
+ActiveRecord::Schema[7.2].define(version: 2025_03_15_173100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -31,6 +31,10 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_12_073411) do
     t.decimal "amount"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "option_fee", precision: 10, scale: 2
+    t.bigint "order_id"
+    t.string "expense_type"
+    t.index ["order_id"], name: "index_expenses_on_order_id"
   end
 
   create_table "manufacturer_skus", force: :cascade do |t|
@@ -101,7 +105,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_12_073411) do
   create_table "procurements", force: :cascade do |t|
     t.decimal "purchase_price"
     t.decimal "forwarding_fee"
-    t.decimal "option_fee"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "order_id", null: false
@@ -170,6 +173,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_12_073411) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "expenses", "orders"
   add_foreign_key "manufacturer_skus", "manufacturers"
   add_foreign_key "order_lines", "orders"
   add_foreign_key "order_lines", "seller_skus"

@@ -84,7 +84,7 @@ module SalesReport
     def calculate_procurement_data(order)
       result = {
         procurement_cost: 0,  # 仕入原価（purchase_price）
-        other_costs: 0,      # その他原価（forwarding_fee + option_fee + handling_fee）
+        other_costs: 0,      # その他原価（forwarding_fee + handling_fee）
         total_quantity: 0
       }
 
@@ -92,10 +92,9 @@ module SalesReport
         # 仕入原価の計算（商品の実際の仕入れ価格）
         result[:procurement_cost] = safe_decimal_conversion(procurement.purchase_price)
 
-        # その他原価の計算（転送料 + オプション料 + 取扱手数料）
+        # その他原価の計算（転送料 + 取扱手数料）- オプション料は除外
         result[:other_costs] = [
           safe_decimal_conversion(procurement.forwarding_fee), # 転送料
-          safe_decimal_conversion(procurement.option_fee),      # オプション料
           safe_decimal_conversion(procurement.handling_fee)    # 取扱手数料
         ].sum
       end
