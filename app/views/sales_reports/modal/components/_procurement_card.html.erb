@@ -23,9 +23,6 @@
                      label: t('.forwarding_fee'),
                      amount: order.procurement.forwarding_fee if order.procurement.forwarding_fee.present? && order.procurement.forwarding_fee > 0 %>
           <%= render 'sales_reports/modal/components/procurement_fee_row',
-                     label: t('.option_fee'),
-                     amount: order.procurement.option_fee if order.procurement.option_fee.present? && order.procurement.option_fee > 0 %>
-          <%= render 'sales_reports/modal/components/procurement_fee_row',
                      label: t('.handling_fee'),
                      amount: order.procurement.handling_fee if order.procurement.handling_fee.present? && order.procurement.handling_fee > 0 %>
         </tbody>

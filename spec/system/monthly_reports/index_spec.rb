@@ -34,8 +34,16 @@ RSpec.describe '月次レポート', type: :system do
           order: order,
           purchase_price: 50000 * multiplier,
           forwarding_fee: 5000,
-          option_fee: 2000,
           handling_fee: 3000
+        )
+
+        # オプション料金を作成
+        create(:expense, :option_fee,
+          year: year,
+          month: month,
+          order: order,
+          amount: 2000,
+          option_fee: 2000
         )
       end
 

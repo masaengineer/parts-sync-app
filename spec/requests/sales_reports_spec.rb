@@ -27,8 +27,15 @@ RSpec.describe "SalesReports", type: :request do
             order: order,
             purchase_price: 5000,
             forwarding_fee: 500,
-            option_fee: 300,
             handling_fee: 200
+          )
+          # オプション料金を作成
+          create(:expense, :option_fee,
+            year: Time.current.year,
+            month: Time.current.month,
+            order: order,
+            amount: 300,
+            option_fee: 300
           )
           seller_sku = create(:seller_sku, sku_code: "SKU#{order.id}")
           create(:order_line,

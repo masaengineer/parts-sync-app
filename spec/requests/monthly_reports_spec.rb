@@ -59,8 +59,16 @@ RSpec.describe MonthlyReportsController, type: :request do
               order: order,
               purchase_price: amount * 0.5, # 売上の半分を原価とする
               forwarding_fee: 5000,
-              option_fee: 2000,
               handling_fee: 3000
+            )
+
+            # オプション料金を作成
+            create(:expense, :option_fee,
+              year: year,
+              month: month,
+              order: order,
+              amount: 2000,
+              option_fee: 2000
             )
 
             # 販管費を作成（月ごとに1件）
