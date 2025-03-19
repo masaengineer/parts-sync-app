@@ -14,7 +14,8 @@ class EbayOrdersSyncJob < ApplicationJob
         Rails.logger.info "ユーザーID: #{user.id} の注文同期を開始"
 
         # eBay APIからデータを取得するサービス
-        orders_data = Ebay::EbaySalesOrderClient.new.fetch_orders(user)
+        # ユーザー情報をファクトリーに渡してクライアントを取得
+        orders_data = Ebay::EbayClientFactory.create_sales_order_client(user).fetch_orders(user)
 
         # 取得したデータをインポート
         Ebay::SalesOrderImporter.new(orders_data).import(user)

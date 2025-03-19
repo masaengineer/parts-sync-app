@@ -8,8 +8,9 @@ module Ebay
   class SellerFeeTransactionImporter
     class ImportError < StandardError; end
 
-    def initialize(api_client = EbayFinanceClient.new)
-      @api_client = api_client
+    def initialize(user = nil, api_client = nil)
+      @user = user
+      @api_client = api_client || EbayClientFactory.create_finance_client(user)
     end
 
     # 取引データをインポート

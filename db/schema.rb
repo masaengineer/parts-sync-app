@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_03_15_173100) do
+ActiveRecord::Schema[7.2].define(version: 2025_03_19_145447) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -22,6 +22,20 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_15_173100) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["code"], name: "index_currencies_on_code", unique: true
+  end
+
+  create_table "ebay_integrations", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "access_token"
+    t.string "refresh_token"
+    t.datetime "token_expires_at"
+    t.string "ebay_user_id"
+    t.jsonb "account_info"
+    t.string "environment", default: "production"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["ebay_user_id"], name: "index_ebay_integrations_on_ebay_user_id", unique: true
+    t.index ["user_id"], name: "index_ebay_integrations_on_user_id"
   end
 
   create_table "expenses", force: :cascade do |t|
@@ -169,10 +183,12 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_15_173100) do
     t.string "uid"
     t.datetime "ebay_orders_last_synced_at"
     t.datetime "ebay_transaction_fees_last_synced_at"
+    t.boolean "test_account", default: true, null: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "ebay_integrations", "users"
   add_foreign_key "expenses", "orders"
   add_foreign_key "manufacturer_skus", "manufacturers"
   add_foreign_key "order_lines", "orders"
