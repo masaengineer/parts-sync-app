@@ -3,7 +3,7 @@ module Ebay
     class FinanceError < StandardError; end
 
     def initialize
-      @mock_data_path = Rails.root.join('app', 'services', 'ebay', 'mock_data', 'mock_transactions.json')
+      @mock_data_path = Rails.root.join("app", "services", "ebay", "mock_data", "mock_transactions.json")
       load_mock_data
     end
 
@@ -12,13 +12,13 @@ module Ebay
 
       begin
         # モックデータが正常に読み込まれたか確認
-        if @mock_data.nil? || !@mock_data.key?('transactions')
+        if @mock_data.nil? || !@mock_data.key?("transactions")
           raise FinanceError, "モックデータの読み込みに失敗しました"
         end
 
         # フィルタリングされたトランザクションを返す
         # 実際のAPIと同様に動作させるためのフィルタリング処理
-        transactions = filter_transactions(@mock_data['transactions'], filters)
+        transactions = filter_transactions(@mock_data["transactions"], filters)
 
         Rails.logger.info "モックデータから #{transactions.size} 件のトランザクションを取得しました"
         { "transactions" => transactions }

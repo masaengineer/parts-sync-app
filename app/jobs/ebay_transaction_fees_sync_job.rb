@@ -16,7 +16,7 @@ class EbayTransactionFeesSyncJob < ApplicationJob
         importer = Ebay::SellerFeeTransactionImporter.new(user)
     log_output = importer.import
 
-    # インポートの詳細ログを記録
+        # インポートの詳細ログを記録
         Rails.logger.info "📝 ユーザーID: #{user.id} - インポート詳細:\n#{log_output}"
         Rails.logger.info "✅ ユーザーID: #{user.id} の取引手数料同期完了"
   rescue Ebay::SellerFeeTransactionImporter::ImportError => e

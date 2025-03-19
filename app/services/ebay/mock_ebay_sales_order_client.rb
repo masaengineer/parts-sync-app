@@ -3,7 +3,7 @@ module Ebay
     class FulfillmentError < StandardError; end
 
     def initialize
-      @mock_data_path = Rails.root.join('app', 'services', 'ebay', 'mock_data', 'mock_orders.json')
+      @mock_data_path = Rails.root.join("app", "services", "ebay", "mock_data", "mock_orders.json")
       load_mock_data
     end
 
@@ -13,7 +13,7 @@ module Ebay
     def fetch_orders(current_user)
       begin
         # モックデータが正常に読み込まれたか確認
-        if @mock_data.nil? || !@mock_data.key?('orders')
+        if @mock_data.nil? || !@mock_data.key?("orders")
           raise FulfillmentError, "モックデータの読み込みに失敗しました"
         end
 
@@ -21,7 +21,7 @@ module Ebay
         current_time_utc = Time.now.utc
 
         # モックデータと最終同期日時を返す
-        { orders: @mock_data['orders'], last_synced_at: current_time_utc }
+        { orders: @mock_data["orders"], last_synced_at: current_time_utc }
       rescue StandardError => e
         raise FulfillmentError, "予期せぬエラーが発生しました: #{e.message}"
       end

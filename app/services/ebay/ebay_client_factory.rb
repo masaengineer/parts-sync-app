@@ -1,7 +1,7 @@
 module Ebay
   class EbayClientFactory
     # 環境変数の名前
-    MOCK_ENV_NAME = 'USE_MOCK_EBAY_CLIENT'
+    MOCK_ENV_NAME = "USE_MOCK_EBAY_CLIENT"
 
     class << self
       # ユーザーのeBayアカウント種類に応じたEbaySalesOrderClientのインスタンスを返す
