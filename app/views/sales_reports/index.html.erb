@@ -31,4 +31,33 @@
       </div>
     </div>
   </dialog>
+
+  <!-- Demo Data Modal -->
+  <dialog id="demoDataModal" class="modal">
+    <div class="modal-backdrop absolute inset-0 bg-black bg-opacity-50" onclick="document.getElementById('demoDataModal').close()"></div>
+    <div class="modal-box bg-base-100 shadow-lg relative z-10">
+      <h3 class="text-lg font-bold text-base-content border-b pb-2">
+        デモデータの作成
+      </h3>
+
+      <div class="py-4">
+        <p>デモデータを作成すると、サンプルの注文や売上データがアカウントに追加されます。</p>
+        <div class="alert alert-info mt-3">
+          <iconify-icon icon="lucide:info" class="h-5 w-5"></iconify-icon>
+          <span>デモデータの作成には数分かかる場合があります。</span>
+        </div>
+      </div>
+
+      <div class="modal-action pt-3">
+        <button type="button" class="btn btn-sm btn-outline" onclick="document.getElementById('demoDataModal').close()">
+          <iconify-icon icon="lucide:x" class="h-4 w-4 mr-1"></iconify-icon>
+          キャンセル
+        </button>
+        <%= button_to demo_data_path, method: :post, class: "btn btn-sm btn-accent" do %>
+          <iconify-icon icon="lucide:layers" class="h-4 w-4 mr-1"></iconify-icon>
+          デモデータを作成する
+        <% end %>
+      </div>
+    </div>
+  </dialog>
 </div>

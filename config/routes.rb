@@ -23,6 +23,9 @@ Rails.application.routes.draw do
       post :import
     end
   end
+
+  resources :demo_data, only: [ :create ]
+
   resources :ebay_orders, only: [ :index ] do
     collection do
       post :import_orders
