@@ -99,6 +99,13 @@
         <button class="btn btn-sm btn-outline" onclick="document.getElementById('csvImportModal').showModal()">
           <iconify-icon icon="lucide:file-input" class="w-4 h-4 mr-1"></iconify-icon><%= t("sales_reports.csv_import.button") %>
         </button>
+        
+        <!-- デモデータ作成ボタン (注文データがない場合のみ表示) -->
+        <% if current_user.orders.none? %>
+          <button type="button" class="btn btn-sm btn-accent" onclick="document.getElementById('demoDataModal').showModal()">
+            <iconify-icon icon="lucide:layers" class="w-4 h-4 mr-1"></iconify-icon>デモデータを作成
+          </button>
+        <% end %>
       </div>
     </div>
   </div>
