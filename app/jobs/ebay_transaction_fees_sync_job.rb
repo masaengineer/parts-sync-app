@@ -7,8 +7,9 @@ class EbayTransactionFeesSyncJob < ApplicationJob
   def perform
     Rails.logger.info "🔄 eBay取引手数料同期開始"
 
+    # デモユーザーを除外して、本番ユーザーのみを対象に処理実行
     importer = Ebay::SellerFeeTransactionImporter.new
-    log_output = importer.import
+    log_output = importer.import(User.production_users)
 
     # インポートの詳細ログを記録
     Rails.logger.info "📝 インポート詳細:\n#{log_output}"

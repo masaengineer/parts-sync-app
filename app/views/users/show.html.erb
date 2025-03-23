@@ -1,40 +1,85 @@
 <div class="container mx-auto px-4 py-8">
   <h1 class="text-2xl font-bold mb-6">アカウント設定</h1>
 
+  <% if notice %>
+    <div class="alert alert-success mb-4">
+      <%= notice %>
+    </div>
+  <% end %>
+
+  <% if alert %>
+    <div class="alert alert-error mb-4">
+      <%= alert %>
+    </div>
+  <% end %>
+
+  <!-- ユーザーモード設定 -->
+  <div class="shadow-md rounded px-8 pt-6 pb-8 mb-6">
+    <h2 class="text-xl font-semibold mb-4">アカウントモード設定</h2>
+
+    <div class="flex items-center mb-4">
+      <div class="mr-4">
+        <% if @user.is_demo %>
+          <span class="badge badge-warning">デモモード</span>
+        <% else %>
+          <span class="badge badge-success">本番モード</span>
+        <% end %>
+      </div>
+
+      <div class="text-sm text-gray-600 mb-4">
+        <% if @user.is_demo %>
+          <p>現在デモモードです。このモードではeBayとの連携や自動同期処理は実行されません。</p>
+        <% else %>
+          <p>現在本番モードです。eBayとの連携や自動同期処理が定期的に実行されます。</p>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="flex">
+      <%= button_to @user.is_demo ? "本番モードに切り替える" : "デモモードに切り替える",
+        toggle_demo_mode_user_path(@user),
+        method: :patch,
+        class: "btn #{@user.is_demo ? 'btn-success' : 'btn-warning'}" %>
+    </div>
+  </div>
+
+  <!-- プロフィール情報 -->
+  <div class="shadow-md rounded px-8 pt-6 pb-8 mb-6">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-xl font-semibold">プロフィール情報</h2>
+      <%= link_to "編集", edit_user_registration_path, class: "btn btn-sm btn-outline" %>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <h3 class="text-sm font-semibold text-gray-500">姓</h3>
+        <p class="text-lg"><%= @user.last_name %></p>
+      </div>
+
+      <div>
+        <h3 class="text-sm font-semibold text-gray-500">名</h3>
+        <p class="text-lg"><%= @user.first_name %></p>
+      </div>
+
+      <div class="md:col-span-2">
+        <h3 class="text-sm font-semibold text-gray-500">メールアドレス</h3>
+        <p class="text-lg"><%= @user.email %></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- アカウント設定リンク -->
   <div class="shadow-md rounded px-8 pt-6 pb-8 mb-4">
-    <%= form_for(@user, url: registration_path(@user), html: { method: :put }) do |f| %>
-      <%# 名前変更フォーム %>
-      <div class="mb-8">
-        <h2 class="text-xl font-semibold mb-4">名前の変更</h2>
-        <div class="mb-4">
-          <%= f.label :last_name, "姓", class: "block text-gray-700 text-sm font-bold mb-2" %>
-          <%= f.text_field :last_name, class: "input input-bordered w-full" %>
+    <h2 class="text-xl font-semibold mb-4">アカウント管理</h2>
+
+    <div class="space-y-3">
+      <%= link_to edit_user_registration_path, class: "flex items-center p-3 rounded-lg hover:bg-base-200 transition-colors" do %>
+        <div class="flex-1">
+          <h3 class="font-semibold">アカウント情報を編集</h3>
+          <p class="text-sm text-gray-500">名前、メールアドレス、パスワードなどの変更</p>
         </div>
-
-        <div class="mb-4">
-          <%= f.label :first_name, "名", class: "block text-gray-700 text-sm font-bold mb-2" %>
-          <%= f.text_field :first_name, class: "input input-bordered w-full" %>
-        </div>
-      </div>
-
-      <%# メールアドレス変更フォーム %>
-      <div class="mb-8">
-        <h2 class="text-xl font-semibold mb-4">メールアドレスの変更</h2>
-        <div class="mb-4">
-          <%= f.label :email, "新しいメールアドレス", class: "block text-gray-700 text-sm font-bold mb-2" %>
-          <%= f.email_field :email, autocomplete: "email", class: "input input-bordered w-full" %>
-        </div>
-      </div>
-
-      <%# 現在のパスワード確認 %>
-      <div class="mb-4">
-        <%= f.label :current_password, "現在のパスワード（変更を確認するため）", class: "block text-gray-700 text-sm font-bold mb-2" %>
-        <%= f.password_field :current_password, autocomplete: "current-password", class: "input input-bordered w-full" %>
-      </div>
-
-      <div class="flex justify-end">
-        <%= f.submit "設定を更新", class: "btn btn-primary" %>
-      </div>
-    <% end %>
+        <iconify-icon icon="lucide:chevron-right" class="w-5 h-5"></iconify-icon>
+      <% end %>
+    </div>
   </div>
 </div>

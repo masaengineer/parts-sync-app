@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_03_15_173100) do
+ActiveRecord::Schema[7.2].define(version: 2025_03_23_152706) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -169,7 +169,9 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_15_173100) do
     t.string "uid"
     t.datetime "ebay_orders_last_synced_at"
     t.datetime "ebay_transaction_fees_last_synced_at"
+    t.boolean "is_demo", default: true, null: false
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["is_demo"], name: "index_users_on_is_demo"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 

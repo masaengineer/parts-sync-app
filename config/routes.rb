@@ -8,7 +8,12 @@ Rails.application.routes.draw do
     omniauth_callbacks: "users/omniauth_callbacks"
   }
 
-  resources :users, only: [ :index, :show ]
+  resources :users, only: [ :index, :show ] do
+    member do
+      patch :toggle_demo_mode
+    end
+  end
+
   resources :monthly_reports, only: [ :index ]
 
   namespace :monthly_reports do

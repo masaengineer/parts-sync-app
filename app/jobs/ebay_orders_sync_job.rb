@@ -8,8 +8,8 @@ class EbayOrdersSyncJob < ApplicationJob
   def perform
     Rails.logger.info "=== eBay注文同期開始 ==="
 
-    # すべてのユーザーに対して処理を実行
-    User.find_each do |user|
+    # デモユーザーを除外し、本番ユーザーのみに対して処理を実行
+    User.production_users.find_each do |user|
       begin
         Rails.logger.info "ユーザーID: #{user.id} の注文同期を開始"
 

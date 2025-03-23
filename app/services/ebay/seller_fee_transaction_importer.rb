@@ -12,12 +12,10 @@ module Ebay
       @api_client = api_client
     end
 
-    # 取引データをインポート
-    # @return [String] 処理結果
-    def import
+    def import(users = User.all)
       begin
         transactions_data = @api_client.fetch_transactions
-        process_transactions(transactions_data["transactions"])
+        process_transactions(transactions_data["transactions"], users)
       rescue StandardError => e
         raise ImportError, "取引データのインポートに失敗しました: #{e.message}"
       end
@@ -27,24 +25,19 @@ module Ebay
 
     private
 
-    # 取引データを処理
-    # @param transactions [Array] 取引データの配列
-    def process_transactions(transactions)
+    def process_transactions(transactions, users)
       transactions.each do |transaction|
         order_number = find_order_number(transaction)
 
         next unless order_number
 
-        order = Order.find_by(order_number: order_number)
+        order = Order.joins(:user).where(users: { id: users.pluck(:id) }).find_by(order_number: order_number)
         next unless order
 
         process_transaction_by_type(order, transaction)
       end
     end
 
-    # 取引タイプに応じて適切なプロセッサークラスを使用
-    # @param order [Order] 注文オブジェクト
-    # @param transaction [Hash] 取引データ
     def process_transaction_by_type(order, transaction)
       processor_class = case transaction["transactionType"]
       when "SALE"
@@ -63,16 +56,11 @@ module Ebay
       processor_class.new(order, transaction).process
     end
 
-    # 取引データから注文番号を取得
-    # @param transaction [Hash] 取引データ
-    # @return [String, nil] 注文番号
     def find_order_number(transaction)
       order_number = if transaction["transactionType"] == "NON_SALE_CHARGE"
-        # references 配列から referenceType が ORDER_ID の要素を探す
         order_id_reference = transaction["references"]&.find { |ref| ref["referenceType"] == "ORDER_ID" }
         order_id_reference&.[]("referenceId")
       else
-        # 通常の処理 (SALE, REFUND, SHIPPING_LABEL など)
         transaction["orderId"]
       end
 
