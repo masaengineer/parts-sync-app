@@ -4,7 +4,7 @@ RSpec.describe Ebay::SellerFeeTransactionImporter do
   let(:mock_api_client) { instance_double(Ebay::EbayFinanceClient) }
   let(:importer) { described_class.new(mock_api_client) }
   let(:transactions_data) { { 'transactions' => [] } }
-  let(:users) { instance_double('ActiveRecord::Relation', pluck: [1, 2]) }
+  let(:users) { instance_double('ActiveRecord::Relation', pluck: [ 1, 2 ]) }
 
   before do
     allow(mock_api_client).to receive(:fetch_transactions).and_return(transactions_data)
