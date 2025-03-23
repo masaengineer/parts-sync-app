@@ -4,6 +4,7 @@ RSpec.describe Ebay::SellerFeeTransactionImporter do
   let(:mock_api_client) { instance_double(Ebay::EbayFinanceClient) }
   let(:importer) { described_class.new(mock_api_client) }
   let(:transactions_data) { { 'transactions' => [] } }
+  let(:users) { instance_double('ActiveRecord::Relation', pluck: [ 1, 2 ]) }
 
   before do
     allow(mock_api_client).to receive(:fetch_transactions).and_return(transactions_data)
@@ -11,13 +12,13 @@ RSpec.describe Ebay::SellerFeeTransactionImporter do
 
   describe '#import' do
     it 'APIからトランザクションを取得する' do
-      importer.import
+      importer.import(users)
       expect(mock_api_client).to have_received(:fetch_transactions)
     end
 
     context 'トランザクションが存在しない場合' do
       it '処理完了メッセージを返す' do
-        expect(importer.import).to eq('処理が完了しました')
+        expect(importer.import(users)).to eq('処理が完了しました')
       end
     end
 
@@ -44,14 +45,16 @@ RSpec.describe Ebay::SellerFeeTransactionImporter do
         }
       end
 
-      it '対応するトランザクション処理クラスを呼び出す', skip: 'モックの設定を見直し中' do
+      it '対応するトランザクション処理クラスを呼び出す' do
+        allow(Order).to receive(:joins).with(:user).and_return(Order)
+        allow(Order).to receive(:where).with(users: { id: users.pluck(:id) }).and_return(Order)
         allow(Order).to receive(:find_by).with(order_number: '123456789').and_return(order)
 
         processor = instance_double(Ebay::Transactions::SaleTransactionProcessor)
-        allow(Ebay::Transactions::SaleTransactionProcessor).to receive(:new).and_return(processor)
+        allow(Ebay::Transactions::SaleTransactionProcessor).to receive(:new).with(order, transactions_data['transactions'][0]).and_return(processor)
         expect(processor).to receive(:process).and_return(true)
 
-        importer.import
+        importer.import(users)
       end
     end
 
@@ -75,14 +78,16 @@ RSpec.describe Ebay::SellerFeeTransactionImporter do
         }
       end
 
-      it '対応するトランザクション処理クラスを呼び出す', skip: 'モックの設定を見直し中' do
+      it '対応するトランザクション処理クラスを呼び出す' do
+        allow(Order).to receive(:joins).with(:user).and_return(Order)
+        allow(Order).to receive(:where).with(users: { id: users.pluck(:id) }).and_return(Order)
         allow(Order).to receive(:find_by).with(order_number: '123456789').and_return(order)
 
         processor = instance_double(Ebay::Transactions::NonSaleChargeTransactionProcessor)
-        allow(Ebay::Transactions::NonSaleChargeTransactionProcessor).to receive(:new).and_return(processor)
+        allow(Ebay::Transactions::NonSaleChargeTransactionProcessor).to receive(:new).with(order, transactions_data['transactions'][0]).and_return(processor)
         expect(processor).to receive(:process).and_return(true)
 
-        importer.import
+        importer.import(users)
       end
     end
 
@@ -100,11 +105,13 @@ RSpec.describe Ebay::SellerFeeTransactionImporter do
       end
 
       it 'ログにメッセージを出力する' do
+        allow(Order).to receive(:joins).with(:user).and_return(Order)
+        allow(Order).to receive(:where).with(users: { id: users.pluck(:id) }).and_return(Order)
         allow(Order).to receive(:find_by).and_return(instance_double('Order', id: 1))
         allow(Rails.logger).to receive(:debug).with(any_args)
         expect(Rails.logger).to receive(:debug).with(/Unsupported transaction type/).at_least(:once)
 
-        importer.import
+        importer.import(users)
       end
     end
 
@@ -114,7 +121,7 @@ RSpec.describe Ebay::SellerFeeTransactionImporter do
       end
 
       it '例外をスローする' do
-        expect { importer.import }.to raise_error(Ebay::SellerFeeTransactionImporter::ImportError, /取引データのインポートに失敗しました: API error/)
+        expect { importer.import(users) }.to raise_error(Ebay::SellerFeeTransactionImporter::ImportError, /取引データのインポートに失敗しました: API error/)
       end
     end
   end

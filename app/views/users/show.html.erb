@@ -1,40 +1,200 @@
-<div class="container mx-auto px-4 py-8">
-  <h1 class="text-2xl font-bold mb-6">アカウント設定</h1>
+<div class="container mx-auto px-4 py-12 max-w-5xl">
+  <!-- ヘッダーセクション -->
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+    <div>
+      <h1 class="text-3xl font-bold">マイアカウント</h1>
+      <p class="text-base-content/60 mt-1">アカウント情報の確認と設定</p>
+    </div>
 
-  <div class="shadow-md rounded px-8 pt-6 pb-8 mb-4">
-    <%= form_for(@user, url: registration_path(@user), html: { method: :put }) do |f| %>
-      <%# 名前変更フォーム %>
-      <div class="mb-8">
-        <h2 class="text-xl font-semibold mb-4">名前の変更</h2>
-        <div class="mb-4">
-          <%= f.label :last_name, "姓", class: "block text-gray-700 text-sm font-bold mb-2" %>
-          <%= f.text_field :last_name, class: "input input-bordered w-full" %>
+    <div class="mt-4 md:mt-0">
+      <%= link_to edit_user_registration_path, class: "btn btn-outline btn-primary gap-2" do %>
+        <iconify-icon icon="lucide:settings" width="18" height="18"></iconify-icon>
+        <span>設定を編集</span>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- 左カラム：ユーザー情報 -->
+    <div class="lg:col-span-2 space-y-6">
+      <!-- プロフィールカード -->
+      <div class="card bg-base-100 shadow-lg overflow-hidden">
+        <div class="card-body">
+          <div class="flex flex-col md:flex-row items-start md:items-center">
+            <div class="avatar">
+              <div class="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center ring ring-primary ring-offset-base-100 ring-offset-2">
+                <% if @user.profile_picture_url.present? %>
+                  <%= image_tag @user.profile_picture_url, alt: @user.full_name, class: "w-full h-full object-cover" %>
+                <% else %>
+                  <iconify-icon icon="lucide:user" width="40" height="40" class="text-primary"></iconify-icon>
+                <% end %>
+              </div>
+            </div>
+
+            <div class="mt-4 md:mt-0 md:ml-6">
+              <h2 class="text-2xl font-bold"><%= @user.full_name %></h2>
+              <div class="flex items-center mt-1">
+                <iconify-icon icon="lucide:mail" class="text-base-content/60 w-4 h-4 mr-2"></iconify-icon>
+                <span class="text-base-content/80"><%= @user.email %></span>
+              </div>
+              <div class="flex items-center mt-1">
+                <iconify-icon icon="lucide:calendar" class="text-base-content/60 w-4 h-4 mr-2"></iconify-icon>
+                <span class="text-base-content/60">登録日: <%= l @user.created_at.to_date, format: :long %></span>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
 
-        <div class="mb-4">
-          <%= f.label :first_name, "名", class: "block text-gray-700 text-sm font-bold mb-2" %>
-          <%= f.text_field :first_name, class: "input input-bordered w-full" %>
+      <!-- アカウント詳細情報 -->
+      <div class="card bg-base-100 shadow-lg">
+        <div class="card-body">
+          <h2 class="card-title flex items-center">
+            <iconify-icon icon="lucide:user" class="w-5 h-5 mr-2"></iconify-icon>
+            アカウント詳細
+          </h2>
+
+          <div class="divider my-2"></div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h3 class="text-sm font-semibold text-base-content/70">姓</h3>
+              <p class="text-lg font-medium mt-1"><%= @user.last_name %></p>
+            </div>
+
+            <div>
+              <h3 class="text-sm font-semibold text-base-content/70">名</h3>
+              <p class="text-lg font-medium mt-1"><%= @user.first_name %></p>
+            </div>
+
+            <div class="md:col-span-2">
+              <h3 class="text-sm font-semibold text-base-content/70">メールアドレス</h3>
+              <p class="text-lg font-medium mt-1"><%= @user.email %></p>
+            </div>
+          </div>
+
+          <div class="mt-6">
+            <%= link_to edit_user_registration_path, class: "btn btn-sm btn-outline gap-2 w-full sm:w-auto" do %>
+              <iconify-icon icon="lucide:edit-3" width="16" height="16"></iconify-icon>
+              <span>プロフィールを編集</span>
+            <% end %>
+          </div>
         </div>
       </div>
 
-      <%# メールアドレス変更フォーム %>
-      <div class="mb-8">
-        <h2 class="text-xl font-semibold mb-4">メールアドレスの変更</h2>
-        <div class="mb-4">
-          <%= f.label :email, "新しいメールアドレス", class: "block text-gray-700 text-sm font-bold mb-2" %>
-          <%= f.email_field :email, autocomplete: "email", class: "input input-bordered w-full" %>
+      <!-- アクティビティ履歴 -->
+      <div class="card bg-base-100 shadow-lg">
+        <div class="card-body">
+          <h2 class="card-title flex items-center">
+            <iconify-icon icon="lucide:activity" class="w-5 h-5 mr-2"></iconify-icon>
+            最近のアクティビティ
+          </h2>
+
+          <div class="divider my-2"></div>
+
+          <div class="py-3">
+            <div class="flex items-center">
+              <div class="bg-info/20 p-2 rounded-full">
+                <iconify-icon icon="lucide:log-in" class="w-5 h-5 text-info"></iconify-icon>
+              </div>
+              <div class="ml-4">
+                <p class="font-medium">ログイン</p>
+                <p class="text-sm text-base-content/60">登録日: <%= l @user.created_at, format: :long %></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="py-3 border-t border-base-300">
+            <div class="flex items-center">
+              <div class="bg-success/20 p-2 rounded-full">
+                <iconify-icon icon="lucide:refresh-cw" class="w-5 h-5 text-success"></iconify-icon>
+              </div>
+              <div class="ml-4">
+                <p class="font-medium">モード変更</p>
+                <p class="text-sm text-base-content/60">現在のモード: <%= @user.is_demo ? "デモモード" : "本番モード" %></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右カラム：アカウント設定と機能 -->
+    <div class="space-y-6">
+      <!-- デモ/本番モード切り替え -->
+      <div class="card bg-base-100 shadow-lg">
+        <div class="card-body">
+          <h2 class="card-title flex items-center">
+            <iconify-icon icon="lucide:toggle-left" class="w-5 h-5 mr-2"></iconify-icon>
+            アカウントモード
+          </h2>
+
+          <div class="divider my-2"></div>
+
+          <div class="flex flex-col items-center py-4">
+            <div class="indicator mb-4 w-full">
+              <% if @user.is_demo %>
+                <span class="indicator-item badge badge-warning right-1/2 -translate-y-1/2">デモモード</span>
+                <div class="bg-warning/10 text-warning p-4 w-full rounded-lg">
+                  <div class="flex items-center">
+                    <iconify-icon icon="lucide:info" class="w-6 h-6 mr-3"></iconify-icon>
+                    <p>eBayとの連携や自動同期処理は実行されません</p>
+                  </div>
+                </div>
+              <% else %>
+                <span class="indicator-item badge badge-success right-1/2 -translate-y-1/2">本番モード</span>
+                <div class="bg-success/10 text-success p-4 w-full rounded-lg">
+                  <div class="flex items-center">
+                    <iconify-icon icon="lucide:check-circle" class="w-6 h-6 mr-3"></iconify-icon>
+                    <p>eBayとの連携や自動同期処理が定期実行されます</p>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+
+            <%= button_to toggle_demo_mode_user_path(@user), method: :patch, class: "btn #{@user.is_demo ? 'btn-success' : 'btn-warning'} w-full gap-2" do %>
+              <iconify-icon icon="lucide:refresh-cw" width="18" height="18"></iconify-icon>
+              <span><%= @user.is_demo ? "本番モードに切り替える" : "デモモードに切り替える" %></span>
+            <% end %>
+          </div>
         </div>
       </div>
 
-      <%# 現在のパスワード確認 %>
-      <div class="mb-4">
-        <%= f.label :current_password, "現在のパスワード（変更を確認するため）", class: "block text-gray-700 text-sm font-bold mb-2" %>
-        <%= f.password_field :current_password, autocomplete: "current-password", class: "input input-bordered w-full" %>
-      </div>
+      <!-- クイックアクション -->
+      <div class="card bg-base-100 shadow-lg">
+        <div class="card-body">
+          <h2 class="card-title flex items-center">
+            <iconify-icon icon="lucide:settings" class="w-5 h-5 mr-2"></iconify-icon>
+            アカウント管理
+          </h2>
 
-      <div class="flex justify-end">
-        <%= f.submit "設定を更新", class: "btn btn-primary" %>
+          <div class="divider my-2"></div>
+
+          <ul class="menu bg-base-100 w-full p-0">
+            <li>
+              <%= link_to edit_user_registration_path, class: "flex items-center p-3 hover:bg-base-200 rounded-lg" do %>
+                <iconify-icon icon="lucide:user" class="w-5 h-5 mr-3"></iconify-icon>
+                <div>
+                  <p class="font-medium">プロフィール編集</p>
+                  <p class="text-xs text-base-content/60">個人情報を更新する</p>
+                </div>
+                <iconify-icon icon="lucide:chevron-right" class="w-5 h-5 ml-auto"></iconify-icon>
+              <% end %>
+            </li>
+
+            <li>
+              <%= link_to edit_user_registration_path(anchor: "password"), class: "flex items-center p-3 hover:bg-base-200 rounded-lg" do %>
+                <iconify-icon icon="lucide:key" class="w-5 h-5 mr-3"></iconify-icon>
+                <div>
+                  <p class="font-medium">パスワード変更</p>
+                  <p class="text-xs text-base-content/60">セキュリティを強化する</p>
+                </div>
+                <iconify-icon icon="lucide:chevron-right" class="w-5 h-5 ml-auto"></iconify-icon>
+              <% end %>
+            </li>
+          </ul>
+        </div>
       </div>
-    <% end %>
+    </div>
   </div>
 </div>

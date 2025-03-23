@@ -1,123 +1,218 @@
 <% content_for :title, t('.title') %>
 
-<div class="container mx-auto px-4 py-8">
-  <div class="max-w-3xl mx-auto">
-    <h1 class="text-2xl font-bold mb-6"><%= t('.title') %></h1>
+<div class="container mx-auto px-4 py-12 max-w-5xl">
+  <!-- ヘッダーセクション -->
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+    <div>
+      <h1 class="text-3xl font-bold">アカウント設定</h1>
+      <p class="text-base-content/60 mt-1">プロフィールやパスワードの変更</p>
+    </div>
 
-    <div class="card bg-base-100 shadow-xl">
-      <div class="card-body">
-        <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f| %>
-          <%= render "devise/shared/error_messages", resource: resource %>
+    <div class="mt-4 md:mt-0">
+      <%= link_to user_path(current_user), class: "btn btn-outline gap-2" do %>
+        <iconify-icon icon="lucide:arrow-left" width="18" height="18"></iconify-icon>
+        <span>マイアカウントに戻る</span>
+      <% end %>
+    </div>
+  </div>
 
-          <div class="space-y-6">
-            <%# プロフィール画像 %>
-            <div class="form-control">
+  <!-- エラーメッセージ -->
+  <%= render "devise/shared/error_messages", resource: resource %>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- 左カラム：プロフィール情報編集 -->
+    <div class="lg:col-span-2 space-y-6">
+      <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f| %>
+        <!-- プロフィール情報編集 -->
+        <div class="card bg-base-100 shadow-lg">
+          <div class="card-body">
+            <h2 class="card-title flex items-center">
+              <iconify-icon icon="lucide:user" class="w-5 h-5 mr-2"></iconify-icon>
+              基本情報
+            </h2>
+
+            <div class="divider my-2"></div>
+
+            <!-- プロフィール画像 -->
+            <div class="form-control mb-6">
               <label class="label">
-                <span class="label-text"><%= t('.profile_image') %></span>
+                <span class="label-text font-medium">プロフィール画像</span>
               </label>
               <div class="flex items-center space-x-4">
-                <% if resource.profile_picture_url.present? %>
-                  <%= image_tag resource.profile_picture_url, class: "mask mask-squircle w-24 h-24", alt: "Profile Picture" %>
-                <% else %>
-                  <div class="mask mask-squircle w-24 h-24 bg-base-300 flex items-center justify-center">
-                    <iconify-icon icon="lucide:user" width="32" height="32" class="text-base-content/50"></iconify-icon>
+                <div class="avatar">
+                  <div class="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center ring ring-primary ring-offset-base-100 ring-offset-2">
+                    <% if resource.profile_picture_url.present? %>
+                      <%= image_tag resource.profile_picture_url, alt: resource.full_name, class: "w-full h-full object-cover" %>
+                    <% else %>
+                      <iconify-icon icon="lucide:user" width="40" height="40" class="text-primary"></iconify-icon>
+                    <% end %>
                   </div>
-                <% end %>
+                </div>
+
                 <% if resource.provider == 'google_oauth2' %>
-                  <div class="text-sm text-base-content/70">
-                    <%= t('.google_profile_image_note') %>
+                  <div class="text-sm text-base-content/70 bg-info/10 p-3 rounded-lg flex items-center">
+                    <iconify-icon icon="lucide:info" class="w-5 h-5 mr-2 text-info"></iconify-icon>
+                    <span>Googleアカウントからプロフィール画像が同期されます</span>
                   </div>
                 <% end %>
               </div>
             </div>
 
-            <%# メールアドレス %>
-            <div class="form-control">
-              <%= f.label :email, class: "label" %>
-              <%= f.email_field :email,
-                  autofocus: true,
-                  autocomplete: "email",
-                  class: "input input-bordered w-full" %>
+            <!-- ユーザー情報フィールド -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div class="form-control">
+                <%= f.label :last_name, class: "label font-medium" %>
+                <%= f.text_field :last_name, class: "input input-bordered w-full" %>
+              </div>
+
+              <div class="form-control">
+                <%= f.label :first_name, class: "label font-medium" %>
+                <%= f.text_field :first_name, class: "input input-bordered w-full" %>
+              </div>
             </div>
 
-            <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
-              <div class="alert alert-info">
-                <iconify-icon icon="lucide:info" class="text-info"></iconify-icon>
-                <span><%= t('.waiting_confirmation', email: resource.unconfirmed_email) %></span>
-              </div>
-            <% end %>
+            <div class="form-control mb-6">
+              <%= f.label :email, class: "label font-medium" %>
+              <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "input input-bordered w-full" %>
 
-            <%# 新しいパスワード %>
-            <div class="form-control">
-              <%= f.label :password, class: "label" %>
-              <div class="label">
-                <span class="label-text-alt text-base-content/70">
-                  <%= t('.leave_blank_if_no_change') %>
-                </span>
-              </div>
-              <%= f.password_field :password,
-                  autocomplete: "new-password",
-                  class: "input input-bordered w-full" %>
-              <% if @minimum_password_length %>
-                <div class="label">
-                  <span class="label-text-alt text-base-content/70">
-                    <%= t('devise.shared.minimum_password_length', count: @minimum_password_length) %>
-                  </span>
+              <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
+                <div class="mt-2 alert alert-info text-sm">
+                  <iconify-icon icon="lucide:mail" class="w-5 h-5 mr-2"></iconify-icon>
+                  <span><%= t('.waiting_confirmation', email: resource.unconfirmed_email) %></span>
                 </div>
               <% end %>
             </div>
+          </div>
+        </div>
 
-            <%# パスワード確認 %>
-            <div class="form-control">
-              <%= f.label :password_confirmation, class: "label" %>
-              <%= f.password_field :password_confirmation,
-                  autocomplete: "new-password",
-                  class: "input input-bordered w-full" %>
+        <!-- パスワード変更セクション -->
+        <div class="card bg-base-100 shadow-lg" id="password">
+          <div class="card-body">
+            <h2 class="card-title flex items-center">
+              <iconify-icon icon="lucide:lock" class="w-5 h-5 mr-2"></iconify-icon>
+              パスワード変更
+            </h2>
+
+            <div class="divider my-2"></div>
+
+            <div class="form-control mb-6">
+              <%= f.label :password, "新しいパスワード", class: "label font-medium" %>
+              <div class="input-group">
+                <%= f.password_field :password, autocomplete: "new-password", class: "input input-bordered w-full" %>
+              </div>
+              <label class="label">
+                <span class="label-text-alt text-base-content/70">
+                  <%= t('.leave_blank_if_no_change') %>
+                  <% if @minimum_password_length %>
+                    （<%= t('devise.shared.minimum_password_length', count: @minimum_password_length) %>）
+                  <% end %>
+                </span>
+              </label>
             </div>
 
-            <%# 現在のパスワード %>
-            <div class="form-control">
-              <%= f.label :current_password, class: "label" %>
-              <div class="label">
+            <div class="form-control mb-6">
+              <%= f.label :password_confirmation, "新しいパスワード（確認）", class: "label font-medium" %>
+              <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "input input-bordered w-full" %>
+            </div>
+          </div>
+        </div>
+
+        <!-- 現在のパスワード確認 -->
+        <div class="card bg-base-100 shadow-lg">
+          <div class="card-body">
+            <h2 class="card-title flex items-center">
+              <iconify-icon icon="lucide:shield" class="w-5 h-5 mr-2"></iconify-icon>
+              認証
+            </h2>
+
+            <div class="divider my-2"></div>
+
+            <div class="form-control mb-6">
+              <%= f.label :current_password, class: "label font-medium" %>
+              <%= f.password_field :current_password, autocomplete: "current-password", class: "input input-bordered w-full" %>
+              <label class="label">
                 <span class="label-text-alt text-base-content/70">
                   <%= t('.current_password_needed') %>
                 </span>
+              </label>
+            </div>
+
+            <!-- 更新ボタン -->
+            <div class="flex justify-end">
+              <%= f.submit t('.update'), class: "btn btn-primary" %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- 右カラム：アカウント管理とその他のオプション -->
+    <div class="space-y-6">
+      <!-- 戻るボタン -->
+      <div class="card bg-base-100 shadow-lg">
+        <div class="card-body">
+          <h2 class="card-title flex items-center">
+            <iconify-icon icon="lucide:arrow-left" class="w-5 h-5 mr-2"></iconify-icon>
+            ナビゲーション
+          </h2>
+
+          <div class="divider my-2"></div>
+
+          <ul class="menu bg-base-100 w-full p-0">
+            <li>
+              <%= link_to user_path(current_user), class: "flex items-center p-3 hover:bg-base-200 rounded-lg" do %>
+                <iconify-icon icon="lucide:user" class="w-5 h-5 mr-3"></iconify-icon>
+                <div>
+                  <p class="font-medium">マイアカウント</p>
+                  <p class="text-xs text-base-content/60">アカウント情報に戻る</p>
+                </div>
+                <iconify-icon icon="lucide:chevron-right" class="w-5 h-5 ml-auto"></iconify-icon>
+              <% end %>
+            </li>
+
+            <li>
+              <%= link_to root_path, class: "flex items-center p-3 hover:bg-base-200 rounded-lg" do %>
+                <iconify-icon icon="lucide:home" class="w-5 h-5 mr-3"></iconify-icon>
+                <div>
+                  <p class="font-medium">ホーム</p>
+                  <p class="text-xs text-base-content/60">ダッシュボードに戻る</p>
+                </div>
+                <iconify-icon icon="lucide:chevron-right" class="w-5 h-5 ml-auto"></iconify-icon>
+              <% end %>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- アカウント削除 -->
+      <div class="card bg-base-100 shadow-lg">
+        <div class="card-body">
+          <h2 class="card-title flex items-center text-error">
+            <iconify-icon icon="lucide:trash-2" class="w-5 h-5 mr-2"></iconify-icon>
+            <%= t('.cancel_account') %>
+          </h2>
+
+          <div class="divider my-2"></div>
+
+          <div class="bg-error/10 text-error p-4 rounded-lg mb-4">
+            <div class="flex items-start">
+              <iconify-icon icon="lucide:alert-triangle" class="w-6 h-6 mr-3 mt-0.5"></iconify-icon>
+              <div>
+                <p class="font-medium mb-1">警告: この操作は取り消せません</p>
+                <p class="text-sm">アカウントを削除すると、すべてのデータが完全に削除され、復元できなくなります。</p>
               </div>
-              <%= f.password_field :current_password,
-                  autocomplete: "current-password",
-                  class: "input input-bordered w-full" %>
             </div>
           </div>
 
-          <div class="card-actions justify-end mt-6">
-            <%= f.submit t('.update'), class: "btn btn-primary" %>
-          </div>
-        <% end %>
-      </div>
-    </div>
-
-    <%# アカウント削除 %>
-    <div class="mt-8">
-      <div class="card bg-base-100 shadow-xl">
-        <div class="card-body">
-          <h2 class="card-title text-error"><%= t('.cancel_account') %></h2>
-          <p class="text-base-content/70"><%= t('.unhappy_message') %></p>
-          <div class="card-actions justify-end">
-            <%= button_to t('.cancel_account'),
+          <div class="flex items-center justify-center">
+            <%= button_to "アカウントを削除する",
                 registration_path(resource_name),
-                class: "btn btn-error",
-                data: {
-                  turbo_confirm: t('.are_you_sure'),
-                  confirm: t('.are_you_sure')
-                },
-                method: :delete %>
+                method: :delete,
+                class: "btn btn-error w-full",
+                form: { data: { turbo_confirm: t('.are_you_sure') } } %>
           </div>
         </div>
       </div>
-    </div>
-
-    <div class="mt-4 text-center">
-      <%= link_to "戻る", :back, fallback_location: root_path, class: "btn btn-outline" %>
     </div>
   </div>
 </div>

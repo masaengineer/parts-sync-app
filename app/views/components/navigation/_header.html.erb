@@ -56,7 +56,7 @@
         <ul tabindex="0" class="menu dropdown-content mt-4 w-64 rounded-box bg-base-100 p-2 shadow" role="menu">
           <% if user_signed_in? %>
             <li>
-              <%= link_to edit_user_registration_path, class: "flex items-center gap-2" do %>
+              <%= link_to user_path(current_user), class: "flex items-center gap-2" do %>
                 <iconify-icon icon="lucide:user" height="16"></iconify-icon>
                 <%= t("shared.header.menu.my_profile") %>
               <% end %>
