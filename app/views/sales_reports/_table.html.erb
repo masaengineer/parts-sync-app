@@ -3,13 +3,13 @@
   <div class="card-body p-0">
     <%= render 'search_form' %>
     <div class="overflow-x-auto max-h-[70vh]">
-      <table class="table rounded-box w-full" id="order_table">
+      <table class="table rounded-box w-full" data-controller="tour" id="order_table">
         <%= render 'table_header' %>
         <%= render 'table_body', orders_data: orders_data %>
       </table>
     </div>
     <div class="flex justify-end m-4">
-      <% 
+      <%
         # ページネーションパラメータを構築
         paginate_params = {}
         # ソート情報
