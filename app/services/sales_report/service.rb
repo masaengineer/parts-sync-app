@@ -23,7 +23,7 @@ module SalesReport
       # --- 調達コスト(円)とSKU合計数量 ---
       procurement_data = calculate_procurement_data(@order)
 
-      # --- USD売上の計算（order_gross_amount × to_usd_rate） ---
+      # --- USD売上の計算 ---
       usd_revenue = order_revenue_usd * exchange_rate
 
       # --- 手数料をUSDで計算 ---
@@ -36,9 +36,6 @@ module SalesReport
 
       # --- USD売上の計算（order_gross_amount × to_usd_rate） ---
       usd_revenue = order_revenue_usd * exchange_rate
-
-      # --- 手数料をUSDで計算 ---
-      payment_fees_in_usd = order_payment_fees_usd
 
       # --- USD売上から手数料を引いた純売上をJPYに変換 ---
       net_revenue_usd = usd_revenue - payment_fees_in_usd

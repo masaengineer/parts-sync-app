@@ -40,14 +40,55 @@ module MonthlyReport
       )
     end
 
-    # グラフ表示用のデータを生成
     def chart_data
-      Formatters::ChartFormatter.new(calculate_by_month).format
+      monthly_data = calculate_by_month
+
+      # 売上データを抽出
+      revenues = monthly_data.map { |data| data[:revenue] }
+
+      # 限界利益データを抽出
+      contribution_margins = monthly_data.map { |data| data[:contribution_margin] }
+
+      # 月ラベルを生成
+      labels = monthly_data.map { |data| "#{data[:year]}/#{data[:month]}" }
+
+      {
+        labels: labels,
+        datasets: [
+          {
+            label: I18n.t("monthly_reports.metrics.revenue"),
+            data: revenues
+          },
+          {
+            label: I18n.t("monthly_reports.metrics.contribution_margin"),
+            data: contribution_margins
+          }
+        ]
+      }
     end
 
-    # テーブル表示用のデータを生成
     def table_data
-      Formatters::TableFormatter.new(calculate_by_month, calculate_total).format
+      monthly_data = calculate_by_month
+      totals = calculate_total
+
+      # 月ごとのヘッダーを作成
+      headers = monthly_data.map { |data| "#{data[:year]}年#{data[:month]}月" }
+
+      # 各指標のデータを抽出
+      metrics = [
+        { key: :revenue, format: :currency, values: monthly_data.map { |data| data[:revenue] } },
+        { key: :total_cost, format: :currency, values: monthly_data.map { |data| data[:total_cost] } },
+        { key: :gross_profit, format: :currency, values: monthly_data.map { |data| data[:gross_profit] } },
+        { key: :expenses, format: :currency, values: monthly_data.map { |data| data[:expenses] } },
+        { key: :contribution_margin, format: :currency, values: monthly_data.map { |data| data[:contribution_margin] } },
+        { key: :contribution_margin_rate, format: :percentage, values: monthly_data.map { |data| data[:contribution_margin_rate] } }
+      ]
+
+      {
+        headers: headers,
+        metrics: metrics,
+        totals: totals
+      }
     end
 
     private
@@ -61,9 +102,13 @@ module MonthlyReport
         ExpenseCalculator.new(@start_date, @end_date, year, month)
       )
 
+      # 原価計算の結果をログに出力（デバッグ用）
+      cost_result = cost_calculator.calculate
+      # Rails.logger.debug "CostCalculator result for #{year}-#{month}: #{cost_result}"
+
       data = {
         revenue: revenue_calculator.calculate,
-        procurement_cost: cost_calculator.calculate
+        total_cost: cost_result # 原価の合計（仕入れコスト+国際送料+決済手数料）
       }
 
       if year && month

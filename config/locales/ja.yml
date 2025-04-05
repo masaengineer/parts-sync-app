@@ -105,7 +105,7 @@ ja:
     metrics:
       revenue: '売上'
       revenue_by_currency: '通貨別売上'
-      procurement_cost: '原価'
+      total_cost: '原価'
       gross_profit: '粗利益'
       expenses: '販管費'
       contribution_margin: '限界利益'
