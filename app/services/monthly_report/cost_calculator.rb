@@ -1,5 +1,7 @@
 module MonthlyReport
   class CostCalculator
+    include ExchangeRateConcern
+
     attr_reader :user, :date_range
 
     def initialize(user, date_range)
@@ -7,27 +9,91 @@ module MonthlyReport
       @date_range = date_range
     end
 
-    # 原価の計算
     def calculate
       orders = orders_for_period
 
+      Rails.logger.debug "==== 原価計算のデバッグ情報 ===="
+      Rails.logger.debug "対象期間: #{@date_range}"
+      Rails.logger.debug "注文数: #{orders.size}"
 
-      orders.sum do |order|
-        procurement_cost = order.procurement&.total_cost.to_f
-        shipping_cost = order.shipment&.customer_international_shipping.to_f
-        payment_fee_total = order.payment_fees&.sum(:fee_amount).to_f
-        procurement_cost + shipping_cost + payment_fee_total
+      total_cost = orders.sum do |order|
+        procurement_cost = calculate_procurement_cost_with_currency(order)
+        shipping_cost = calculate_shipping_cost_with_currency(order)
+        payment_fee_total = calculate_payment_fee_with_currency(order)
+
+        cost_total = procurement_cost + shipping_cost + payment_fee_total
+
+        Rails.logger.debug "注文ID: #{order.id}, 注文番号: #{order.order_number}, 通貨: #{order.currency&.code}"
+        Rails.logger.debug "  仕入れコスト（円換算）: #{procurement_cost}"
+        Rails.logger.debug "  送料（円換算）: #{shipping_cost}"
+        Rails.logger.debug "  決済手数料（円換算）: #{payment_fee_total}"
+        Rails.logger.debug "  原価合計: #{cost_total}"
+
+        cost_total
       end.round(0)
+
+      Rails.logger.debug "原価合計: #{total_cost}"
+      Rails.logger.debug "=============================="
+
+      total_cost
     end
 
     private
 
-    # 期間内の注文を取得
+    def calculate_procurement_cost_with_currency(order)
+      return 0 unless order.procurement&.total_cost
+
+      cost = order.procurement.total_cost.to_f
+
+      convert_to_jpy_by_currency(cost, order.currency&.code, order.sale)
+    end
+
+    def calculate_shipping_cost_with_currency(order)
+      return 0 unless order.shipment&.customer_international_shipping
+
+      cost = order.shipment.customer_international_shipping.to_f
+
+      currency_code = if order.shipment.currency
+                        order.shipment.currency.code
+                      else
+                        order.currency&.code
+                      end
+
+      convert_to_jpy_by_currency(cost, currency_code, order.sale)
+    end
+
+    def calculate_payment_fee_with_currency(order)
+      return 0 if order.payment_fees.empty?
+
+      fee_amount = order.payment_fees.sum(:fee_amount).to_f
+
+      convert_to_jpy_by_currency(fee_amount, order.currency&.code, order.sale)
+    end
+
+    def convert_to_jpy_by_currency(amount, currency_code, sale = nil)
+      case currency_code
+      when "JPY"
+        # 日本円はそのまま
+        amount
+      when "USD"
+        # USDは為替レートで円に変換
+        amount * USD_TO_JPY_RATE
+      else
+        # その他の通貨は、売上のto_usd_rateを参考にUSDに変換し、その後円に変換
+        if sale && sale.to_usd_rate
+          # 外貨→USD→JPYの変換
+          (amount * sale.to_usd_rate) * USD_TO_JPY_RATE
+        else
+          # レートがない場合はUSDと仮定して変換
+          amount * USD_TO_JPY_RATE
+        end
+      end.round(0)
+    end
+
     def orders_for_period
       user.orders
         .where(sale_date: @date_range)
-        # shipment と payment_fees も eager load する
-        .includes(:procurement, :shipment, :payment_fees)
+        .includes(:procurement, { shipment: :currency }, :payment_fees, :currency, :sale)
     end
   end
 end
