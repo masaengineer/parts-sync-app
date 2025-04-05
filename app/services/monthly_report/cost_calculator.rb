@@ -11,9 +11,12 @@ module MonthlyReport
     def calculate
       orders = orders_for_period
 
-      # 各注文の調達コストを合計
+
       orders.sum do |order|
-        order.procurement&.total_cost.to_f
+        procurement_cost = order.procurement&.total_cost.to_f
+        shipping_cost = order.shipment&.customer_international_shipping.to_f
+        payment_fee_total = order.payment_fees&.sum(:fee_amount).to_f
+        procurement_cost + shipping_cost + payment_fee_total
       end.round(0)
     end
 
@@ -23,7 +26,8 @@ module MonthlyReport
     def orders_for_period
       user.orders
         .where(sale_date: @date_range)
-        .includes(:procurement)
+        # shipment と payment_fees も eager load する
+        .includes(:procurement, :shipment, :payment_fees)
     end
   end
 end

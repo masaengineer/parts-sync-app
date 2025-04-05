@@ -77,7 +77,7 @@ module MonthlyReport
       # 各指標のデータを抽出
       metrics = [
         { key: :revenue, format: :currency, values: monthly_data.map { |data| data[:revenue] } },
-        { key: :procurement_cost, format: :currency, values: monthly_data.map { |data| data[:procurement_cost] } },
+        { key: :total_cost, format: :currency, values: monthly_data.map { |data| data[:total_cost] } },
         { key: :gross_profit, format: :currency, values: monthly_data.map { |data| data[:gross_profit] } },
         { key: :expenses, format: :currency, values: monthly_data.map { |data| data[:expenses] } },
         { key: :contribution_margin, format: :currency, values: monthly_data.map { |data| data[:contribution_margin] } },
@@ -108,7 +108,7 @@ module MonthlyReport
 
       data = {
         revenue: revenue_calculator.calculate,
-        procurement_cost: cost_result # cost_calculator.calculate の結果をそのまま使用
+        total_cost: cost_result # 原価の合計（仕入れコスト+国際送料+決済手数料）
       }
 
       if year && month
