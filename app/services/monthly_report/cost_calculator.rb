@@ -55,9 +55,9 @@ module MonthlyReport
 
       currency_code = if order.shipment.currency
                         order.shipment.currency.code
-                      else
+      else
                         order.currency&.code
-                      end
+      end
 
       convert_to_jpy_by_currency(cost, currency_code, order.sale)
     end

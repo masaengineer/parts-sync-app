@@ -56,11 +56,11 @@ module MonthlyReport
         labels: labels,
         datasets: [
           {
-            label: I18n.t('monthly_reports.metrics.revenue'),
+            label: I18n.t("monthly_reports.metrics.revenue"),
             data: revenues
           },
           {
-            label: I18n.t('monthly_reports.metrics.contribution_margin'),
+            label: I18n.t("monthly_reports.metrics.contribution_margin"),
             data: contribution_margins
           }
         ]
