@@ -161,5 +161,7 @@ Tour.jsのJavaScriptライブラリを利用することで、初めてログイ
 <br>
 
 ## ER 図
+![ER図](https://github.com/user-attachments/assets/334b6fdf-c923-4ef1-95d1-e3e0b94cc6df)
 
-[![Image from Gyazo](https://i.gyazo.com/219e7b0c7a3e8d4d4b58e573806667f9.png)](https://gyazo.com/219e7b0c7a3e8d4d4b58e573806667f9)
+[拡大画像はこちらからご覧いただけます](https://drive.google.com/file/d/1jV2wuRPjwQDTHUo5-jW0aZx39QOyl428/view?usp=sharing)
+
