@@ -32,7 +32,12 @@
           <span class="ml-2">Googleでログイン</span>
         <% end %>
 
-        <div class="divider text-sm my-5">または</div>
+        <div class="divider text-xs my-4">採用ご担当者様はこちら</div>
+        <div class="bg-base-200 p-3 rounded-box">
+          <p class="text-xs mb-1">デモアカウント</p>
+          <p class="text-sm font-medium">メール: demo@gmail.com</p>
+          <p class="text-sm font-medium">パスワード: demo123</p>
+        </div><br>
 
         <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
           <div class="form-control mb-4">
