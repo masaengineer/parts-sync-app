@@ -1,6 +1,6 @@
 <% content_for :title, t('devise.sessions.new.title') %>
 
-<div class="grid min-h-screen grid-cols-12 overflow-auto">
+<div class="grid h-screen grid-cols-12 overflow-hidden">
   <div class="relative hidden bg-[#FFE9D1] dark:bg-[#14181c] lg:col-span-7 lg:block xl:col-span-8 2xl:col-span-9">
     <div class="absolute inset-0 flex items-center justify-center">
       <%= image_tag "auth/auth-hero.png",
@@ -10,33 +10,33 @@
     </div>
   </div>
 
-  <div class="col-span-12 lg:col-span-5 xl:col-span-4 2xl:col-span-3 min-w-[400px]">
-    <div class="flex flex-col items-stretch p-6 md:p-8 lg:p-16">
+  <div class="col-span-12 lg:col-span-5 xl:col-span-4 2xl:col-span-3 min-w-[400px] overflow-y-auto h-screen">
+    <div class="flex flex-col items-stretch p-6 md:p-8 lg:p-12">
       <div class="flex items-center justify-between">
         <div class="inline">
-          <%= image_tag "logo/parts-sync-logo.svg", alt: "Parts Sync", loading: "lazy", class: "hidden dark:inline h-12" %>
-          <%= image_tag "logo/parts-sync-logo.svg", alt: "Parts Sync", loading: "lazy", class: "inline dark:hidden h-12" %>
+          <%= image_tag "logo/parts-sync-logo.svg", alt: "Parts Sync", loading: "lazy", class: "hidden dark:inline h-10" %>
+          <%= image_tag "logo/parts-sync-logo.svg", alt: "Parts Sync", loading: "lazy", class: "inline dark:hidden h-10" %>
         </div>
       </div>
 
-      <h3 class="mt-8 text-center text-lg font-semibold md:mt-12 lg:mt-24">
+      <h3 class="mt-8 md:mt-10 lg:mt-12 text-center text-xl font-semibold">
         <%= t('devise.sessions.new.sign_in') %>
       </h3>
-      <h3 class="mt-2 text-center text-xs text-base-content/70">
+      <h3 class="mt-2 text-center text-sm text-base-content/70 max-w-xs mx-auto">
         <%= t('devise.sessions.new.welcome_message') %>
       </h3>
 
-      <div class="mt-6 md:mt-10">
+      <div class="mt-6 md:mt-8">
         <%= link_to user_google_oauth2_omniauth_authorize_path, data: { turbo: false }, class: "btn btn-outline w-full text-sm" do %>
           <%= image_tag "brand-logo/google-mini.svg", alt: "Google", class: "size-5" %>
           <span class="ml-2">Googleでログイン</span>
         <% end %>
 
-        <div class="divider text-sm">または</div>
+        <div class="divider text-sm my-5">または</div>
 
         <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
-          <div class="form-control">
-            <%= f.label :email, t('activerecord.attributes.user.email'), class: "label text-sm" %>
+          <div class="form-control mb-4">
+            <%= f.label :email, t('activerecord.attributes.user.email'), class: "label text-sm mb-1 p-0" %>
             <div class="form-control flex flex-row items-center rounded-box border border-base-content/20 ps-3">
               <iconify-icon icon="lucide:mail" height="18" class="text-base-content/80"></iconify-icon>
               <%= f.email_field :email, autofocus: true, autocomplete: "email",
@@ -45,8 +45,8 @@
             </div>
           </div>
 
-          <div class="form-control mt-3">
-            <%= f.label :password, t('activerecord.attributes.user.password'), class: "label text-sm" %>
+          <div class="form-control mb-1">
+            <%= f.label :password, t('activerecord.attributes.user.password'), class: "label text-sm mb-1 p-0" %>
             <div class="form-control flex flex-row items-center rounded-box border border-base-content/20 pe-3 ps-3" data-component="password-field">
               <iconify-icon icon="lucide:key-round" height="18" class="text-base-content/80"></iconify-icon>
               <%= f.password_field :password, autocomplete: "current-password",
@@ -58,22 +58,22 @@
                 <iconify-icon icon="lucide:eye-off" height="16" class="inline text-base-content/80 group-data-[slot-value=hide]:hidden"></iconify-icon>
               </button>
             </div>
-            <label class="label">
+            <div class="flex justify-end mt-1">
               <%= link_to t('devise.shared.links.forgot_password'),
                   new_password_path(resource_name),
-                  class: "label-text text-xs text-base-content/80" %>
-            </label>
+                  class: "text-xs text-base-content/80 hover:text-primary" %>
+            </div>
           </div>
 
           <%= f.hidden_field :remember_me, value: '1' %>
 
-          <div class="mt-4 md:mt-6">
+          <div class="mt-6">
             <%= f.submit t('devise.sessions.new.sign_in'),
                 class: "btn btn-primary btn-block gap-2 text-sm" %>
           </div>
         <% end %>
 
-        <p class="mt-4 text-center text-xs text-base-content/80 md:mt-6">
+        <p class="mt-5 text-center text-xs text-base-content/80">
           <%= t('devise.sessions.new.no_account') %>
           <%= link_to t('devise.shared.links.sign_up'),
               new_registration_path(resource_name),
