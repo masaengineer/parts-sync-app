@@ -39,8 +39,7 @@
         <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post }) do |f| %>
           <div class="form-control">
             <%= f.label :email, t('activerecord.attributes.user.email'), class: "label" %>
-            <div class="form-control flex flex-row items-center rounded-box border border-base-content/20 ps-3">
-              <iconify-icon icon="lucide:mail" class="text-base-content/80 w-4 h-4"></iconify-icon>
+            <div class="form-control flex flex-row items-center rounded-box border border-base-content/20 px-3">
               <%= f.email_field :email,
                   placeholder: t('activerecord.attributes.user.email'),
                   class: "input input-sm w-full transition-all focus:border-transparent focus:outline-0 focus:outline-offset-0" %>

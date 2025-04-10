@@ -37,8 +37,7 @@
         <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
           <div class="form-control mb-4">
             <%= f.label :email, t('activerecord.attributes.user.email'), class: "label text-sm mb-1 p-0" %>
-            <div class="form-control flex flex-row items-center rounded-box border border-base-content/20 ps-3">
-              <iconify-icon icon="lucide:mail" height="18" class="text-base-content/80"></iconify-icon>
+            <div class="form-control flex flex-row items-center rounded-box border border-base-content/20 px-3">
               <%= f.email_field :email, autofocus: true, autocomplete: "email",
                   placeholder: t('activerecord.attributes.user.email'),
                   class: "input input-sm w-full text-sm transition-all focus:border-transparent focus:outline-0 focus:outline-offset-0" %>
@@ -47,8 +46,7 @@
 
           <div class="form-control mb-1">
             <%= f.label :password, t('activerecord.attributes.user.password'), class: "label text-sm mb-1 p-0" %>
-            <div class="form-control flex flex-row items-center rounded-box border border-base-content/20 pe-3 ps-3" data-component="password-field">
-              <iconify-icon icon="lucide:key-round" height="18" class="text-base-content/80"></iconify-icon>
+            <div class="form-control flex flex-row items-center rounded-box border border-base-content/20 px-3" data-component="password-field">
               <%= f.password_field :password, autocomplete: "current-password",
                   placeholder: t('activerecord.attributes.user.password'),
                   class: "input input-sm w-full text-sm transition-all focus:border-transparent focus:outline-0 focus:outline-offset-0" %>

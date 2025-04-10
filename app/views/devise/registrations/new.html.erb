@@ -20,7 +20,7 @@
         <!--  End: Logo -->
       </div>
 
-      <h3 class="mt-8 text-center text-lg font-semibold md:mt-12 lg:mt-24">
+      <h3 class="mt-8 text-center text-lg font-semibold md:mt-12">
         <%= t('devise.registrations.new.sign_up') %>
       </h3>
       <h3 class="mt-2 text-center text-xs text-base-content/70">
@@ -43,8 +43,7 @@
           <div class="grid grid-cols-2 gap-3">
             <div class="form-control">
               <%= f.label :last_name, t('activerecord.attributes.user.last_name'), class: "label text-sm" %>
-              <div class="form-control flex flex-row items-center rounded-box border border-base-content/20 ps-3">
-                <iconify-icon icon="lucide:user" class="text-base-content/80 w-4 h-4"></iconify-icon>
+              <div class="form-control flex flex-row items-center rounded-box border border-base-content/20 px-3">
                 <%= f.text_field :last_name,
                     placeholder: t('activerecord.attributes.user.last_name'),
                     class: "input input-sm w-full text-sm transition-all focus:border-transparent focus:outline-0 focus:outline-offset-0" %>
@@ -53,8 +52,7 @@
 
             <div class="form-control">
               <%= f.label :first_name, t('activerecord.attributes.user.first_name'), class: "label text-sm" %>
-              <div class="form-control flex flex-row items-center rounded-box border border-base-content/20 ps-3">
-                <iconify-icon icon="lucide:user" class="text-base-content/80 w-4 h-4"></iconify-icon>
+              <div class="form-control flex flex-row items-center rounded-box border border-base-content/20 px-3">
                 <%= f.text_field :first_name,
                     placeholder: t('activerecord.attributes.user.first_name'),
                     class: "input input-sm w-full text-sm transition-all focus:border-transparent focus:outline-0 focus:outline-offset-0" %>
@@ -64,8 +62,7 @@
 
           <div class="form-control mt-3">
             <%= f.label :email, t('activerecord.attributes.user.email'), class: "label text-sm" %>
-            <div class="form-control flex flex-row items-center rounded-box border border-base-content/20 ps-3">
-              <iconify-icon icon="lucide:mail" class="text-base-content/80 w-4 h-4"></iconify-icon>
+            <div class="form-control flex flex-row items-center rounded-box border border-base-content/20 px-3">
               <%= f.email_field :email,
                   placeholder: t('activerecord.attributes.user.email'),
                   class: "input input-sm w-full text-sm transition-all focus:border-transparent focus:outline-0 focus:outline-offset-0" %>
@@ -74,8 +71,7 @@
 
           <div class="form-control mt-3">
             <%= f.label :password, t('activerecord.attributes.user.password'), class: "label text-sm" %>
-            <div class="form-control flex flex-row items-center rounded-box border border-base-content/20 pe-3 ps-3" data-controller="password-field">
-              <iconify-icon icon="lucide:key-round" class="text-base-content/80 w-4 h-4"></iconify-icon>
+            <div class="form-control flex flex-row items-center rounded-box border border-base-content/20 px-3" data-controller="password-field">
               <%= f.password_field :password,
                   placeholder: t('activerecord.attributes.user.password'),
                   class: "input input-sm w-full text-sm transition-all focus:border-transparent focus:outline-0 focus:outline-offset-0",
@@ -93,8 +89,7 @@
 
           <div class="form-control mt-3">
             <%= f.label :password_confirmation, t('activerecord.attributes.user.password_confirmation'), class: "label text-sm" %>
-            <div class="form-control flex flex-row items-center rounded-box border border-base-content/20 pe-3 ps-3" data-controller="password-field">
-              <iconify-icon icon="lucide:key-round" class="text-base-content/80 w-4 h-4"></iconify-icon>
+            <div class="form-control flex flex-row items-center rounded-box border border-base-content/20 px-3" data-controller="password-field">
               <%= f.password_field :password_confirmation,
                   placeholder: t('activerecord.attributes.user.password_confirmation'),
                   class: "input input-sm w-full text-sm transition-all focus:border-transparent focus:outline-0 focus:outline-offset-0",

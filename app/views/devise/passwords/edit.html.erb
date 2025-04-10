@@ -16,7 +16,7 @@
         </div>
       </div>
 
-      <h3 class="mt-8 text-center text-xl font-semibold md:mt-12 lg:mt-24">Reset Password</h3>
+      <h3 class="mt-8 text-center text-xl font-semibold md:mt-12">Reset Password</h3>
       <h3 class="mt-2 text-center text-sm text-base-content/70">
         Seamless Access, Secure Connection: Your Gateway to a Personalized Experience.
       </h3>
@@ -30,8 +30,7 @@
             <%= f.label :password, "New password", class: "label" do %>
               <span class="label-text cursor-pointer">New Password</span>
             <% end %>
-            <div class="form-control flex flex-row items-center rounded-box border border-base-content/20 pe-3 ps-3" data-component="password-field">
-              <iconify-icon icon="lucide:key-round" height="18" class="text-base-content/80"></iconify-icon>
+            <div class="form-control flex flex-row items-center rounded-box border border-base-content/20 px-3" data-component="password-field">
               <%= f.password_field :password, autofocus: true, autocomplete: "new-password", placeholder: "Password",
                   class: "input input-sm w-full transition-all focus:border-transparent focus:outline-0 focus:outline-offset-0",
                   data: { slot: "input" } %>
@@ -54,8 +53,7 @@
             <%= f.label :password_confirmation, "Confirm new password", class: "label" do %>
               <span class="label-text cursor-pointer">Confirm Password</span>
             <% end %>
-            <div class="form-control flex flex-row items-center rounded-box border border-base-content/20 pe-3 ps-3" data-component="password-field">
-              <iconify-icon icon="lucide:key-round" height="18" class="text-base-content/80"></iconify-icon>
+            <div class="form-control flex flex-row items-center rounded-box border border-base-content/20 px-3" data-component="password-field">
               <%= f.password_field :password_confirmation, autocomplete: "new-password", placeholder: "Confirm Password",
                   class: "input input-sm w-full transition-all focus:border-transparent focus:outline-0 focus:outline-offset-0",
                   data: { slot: "input" } %>
