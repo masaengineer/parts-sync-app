@@ -1,6 +1,6 @@
 <% content_for :title, "Reset Password - Parts Sync" %>
 
-<div class="grid min-h-screen grid-cols-12 overflow-auto">
+<div class="grid h-screen grid-cols-12 overflow-hidden">
   <div class="relative hidden bg-[#FFE9D1] dark:bg-[#14181c] lg:col-span-7 lg:block xl:col-span-8 2xl:col-span-9">
     <div class="absolute inset-0 flex items-center justify-center">
       <%= image_tag "auth/auth-hero.png", alt: "Auth Image", loading: "lazy", class: "object-cover" %>
@@ -8,7 +8,7 @@
 
   </div>
 
-  <div class="col-span-12 lg:col-span-5 xl:col-span-4 2xl:col-span-3">
+  <div class="col-span-12 lg:col-span-5 xl:col-span-4 2xl:col-span-3 min-w-[400px] overflow-y-auto h-screen">
     <div class="flex flex-col items-stretch p-6 md:p-8 lg:p-16">
       <div class="flex items-center justify-between">
         <div class="inline">
@@ -16,7 +16,7 @@
         </div>
       </div>
 
-      <h3 class="mt-8 text-center text-xl font-semibold md:mt-12 lg:mt-24">Reset Password</h3>
+      <h3 class="mt-8 text-center text-xl font-semibold md:mt-12">Reset Password</h3>
       <h3 class="mt-2 text-center text-sm text-base-content/70">
         Seamless Access, Secure Connection: Your Gateway to a Personalized Experience.
       </h3>
@@ -30,8 +30,7 @@
             <%= f.label :password, "New password", class: "label" do %>
               <span class="label-text cursor-pointer">New Password</span>
             <% end %>
-            <div class="form-control flex flex-row items-center rounded-box border border-base-content/20 pe-3 ps-3" data-component="password-field">
-              <iconify-icon icon="lucide:key-round" height="18" class="text-base-content/80"></iconify-icon>
+            <div class="form-control flex flex-row items-center rounded-box border border-base-content/20 px-3" data-component="password-field">
               <%= f.password_field :password, autofocus: true, autocomplete: "new-password", placeholder: "Password",
                   class: "input input-sm w-full transition-all focus:border-transparent focus:outline-0 focus:outline-offset-0",
                   data: { slot: "input" } %>
@@ -54,8 +53,7 @@
             <%= f.label :password_confirmation, "Confirm new password", class: "label" do %>
               <span class="label-text cursor-pointer">Confirm Password</span>
             <% end %>
-            <div class="form-control flex flex-row items-center rounded-box border border-base-content/20 pe-3 ps-3" data-component="password-field">
-              <iconify-icon icon="lucide:key-round" height="18" class="text-base-content/80"></iconify-icon>
+            <div class="form-control flex flex-row items-center rounded-box border border-base-content/20 px-3" data-component="password-field">
               <%= f.password_field :password_confirmation, autocomplete: "new-password", placeholder: "Confirm Password",
                   class: "input input-sm w-full transition-all focus:border-transparent focus:outline-0 focus:outline-offset-0",
                   data: { slot: "input" } %>
