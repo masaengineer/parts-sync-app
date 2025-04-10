@@ -46,7 +46,7 @@ export default class extends Controller {
   }
 
   closeOnBackdropClick(event) {
-    // イベントの伝播を停止して、モーダル自体のクリックイベントを防ぐ
+    
     event.stopPropagation();
     this.close();
   }

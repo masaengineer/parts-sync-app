@@ -1,7 +1,7 @@
-<%# 年度選択とチャート %>
+
 <div class="card card-bordered bg-base-100 shadow-sm mt-5">
   <div class="card-body p-5">
-    <%# 年度選択フォーム %>
+    
     <div class="grid grid-cols-1 md:grid-cols-5 gap-5">
       <div class="form-control">
         <div class="dropdown">
@@ -19,7 +19,7 @@
       </div>
     </div>
 
-    <%# チャート %>
+    
     <div data-chart-data="<%= {
         series: @chart_data[:datasets].map { |ds| { name: ds[:label], data: ds[:data] } },
         categories: @chart_data[:labels]

@@ -7,7 +7,6 @@ module Common
       @end_date = end_date
     end
 
-    # 開始月から終了月までの月リストを取得
     def months_list
       start_month = @start_date.beginning_of_month.to_date
       end_month = @end_date.beginning_of_month.to_date
@@ -23,7 +22,6 @@ module Common
       months
     end
 
-    # 二つの日付の間の年月の配列を返す
     def months_between
       start_month = Date.new(@start_date.year, @start_date.month, 1)
       end_month = Date.new(@end_date.year, @end_date.month, 1)

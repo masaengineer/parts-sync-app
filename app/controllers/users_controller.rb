@@ -19,7 +19,6 @@ class UsersController < ApplicationController
     end
   end
 
-  # デモモードと本番モードを切り替えるアクション
   def toggle_demo_mode
     current_value = @user.is_demo
     if @user.update(is_demo: !current_value)

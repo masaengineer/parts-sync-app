@@ -1,6 +1,5 @@
 module Ebay
   module Transactions
-    # 返金取引処理クラス
     class RefundTransactionProcessor < BaseTransactionProcessor
       protected
 
@@ -14,15 +13,12 @@ module Ebay
 
       private
 
-      # 返金用のPaymentFeeレコードを作成
       def create_refund_payment_fee
-        # DEBIT以外のbookingEntryはスキップ
         unless transaction["bookingEntry"] == "DEBIT"
           Rails.logger.debug "Skipping non-DEBIT refund transaction: #{transaction['transactionId']}, bookingEntry: #{transaction['bookingEntry']}"
           return
         end
 
-        # 既に同じtransaction_idの返金処理が存在する場合はスキップ
         if duplicate_refund_fee?
           Rails.logger.debug "Skipping duplicate refund transaction: #{transaction['transactionId']}"
           return
@@ -38,9 +34,7 @@ module Ebay
         Rails.logger.debug "Refund fee amount: #{fee_amount}"
 
         begin
-          # トランザクション内で処理して一貫性を確保
           ActiveRecord::Base.transaction do
-            # 返金用のSaleレコードを新規に作成（通常のSaleデータとは別に保存）
             sale = Sale.create!(
               order: order,
               order_net_amount: -amount,
@@ -53,7 +47,7 @@ module Ebay
               transaction_type: :refund,
               transaction_id: transaction["transactionId"],
               fee_category: "undefined",
-              fee_amount: -fee_amount  # マイナス値として保存
+              fee_amount: -fee_amount
             )
             Rails.logger.debug "Created refund PaymentFee: #{payment_fee.id}"
           end
@@ -65,8 +59,6 @@ module Ebay
         end
       end
 
-      # 返金手数料が重複しているかチェック
-      # @return [Boolean] 重複しているかどうか
       def duplicate_refund_fee?
         record_exists?(
           order: order,

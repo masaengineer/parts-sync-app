@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus';
 
-// ツアー内容
+
 const steps = [
   {
     title: 'ご登録ありがとうございます🎉',

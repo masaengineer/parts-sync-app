@@ -44,25 +44,21 @@ class PriceAdjustmentsController < ApplicationController
         @message = t(".success")
         @item_id = @seller_sku.item_id
 
-        # 更新時に最新の調整情報を取得（日付とフォーマット用）
         @affected_orders = Order.joins(order_lines: :seller_sku)
                                .where(order_lines: { seller_skus: { item_id: @item_id } })
                                .where(user_id: current_user.id)
                                .distinct
 
-        # 更新が必要な注文IDの配列を保持
         @affected_order_ids = @affected_orders.pluck(:id)
       else
         @message = t(".error")
       end
     else
-      # アクセス権限がない場合
       @message = t("unauthorized")
     end
 
     respond_to do |format|
       format.html do
-        # HTMLリクエストの場合は従来通りリダイレクト
         flash[@success ? :success : :error] = @message
 
         if @order_id.present?

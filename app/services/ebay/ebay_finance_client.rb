@@ -13,7 +13,7 @@ module Ebay
       Rails.logger.debug "fetch_transactions called with filters: #{filters}"
       all_transactions = []
       offset = 0
-      limit = 1000  # eBay Finance APIの最大値を使用
+      limit = 1000
 
       loop do
         response = client.get do |req|
@@ -39,7 +39,6 @@ module Ebay
         offset += limit
 
         break if all_transactions.size >= result["total"].to_i
-        # totalは指定されたフィルタ条件に一致する取引の総数（公式ドキュメントより）
       end
 
       Rails.logger.info "Total transactions fetched: #{all_transactions.size}"

@@ -1,4 +1,4 @@
-<%# CSVインポートフォーム（モーダル用） %>
+
 <%= form_with url: import_data_imports_path, method: :post, multipart: true, id: "csv-import-form", data: { turbo_frame: "csv_import" } do |f| %>
   <div class="grid grid-cols-1 md:grid-cols-6 gap-5">
     <div class="form-control md:col-span-2">

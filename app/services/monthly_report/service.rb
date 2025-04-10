@@ -9,12 +9,10 @@ module MonthlyReport
       @end_date = end_date.is_a?(Date) ? end_date.end_of_day : end_date.to_date.end_of_day
     end
 
-    # 月別にデータを集計
     def calculate_by_month
       date_calculator = Common::DateRangeCalculator.new(@start_date, @end_date)
       months_list = date_calculator.months_list
 
-      # 各月のデータを計算
       months_list.map do |month_start|
         month_end = month_start.end_of_month
         period_range = month_start.beginning_of_day..month_end.end_of_day
@@ -23,7 +21,6 @@ module MonthlyReport
       end
     end
 
-    # 期間全体の集計を計算
     def calculate_total
       start_date = @start_date.to_date.beginning_of_day
       end_date = @end_date.to_date.end_of_day
@@ -43,13 +40,10 @@ module MonthlyReport
     def chart_data
       monthly_data = calculate_by_month
 
-      # 売上データを抽出
       revenues = monthly_data.map { |data| data[:revenue] }
 
-      # 限界利益データを抽出
       contribution_margins = monthly_data.map { |data| data[:contribution_margin] }
 
-      # 月ラベルを生成
       labels = monthly_data.map { |data| "#{data[:year]}/#{data[:month]}" }
 
       {
@@ -71,10 +65,8 @@ module MonthlyReport
       monthly_data = calculate_by_month
       totals = calculate_total
 
-      # 月ごとのヘッダーを作成
       headers = monthly_data.map { |data| "#{data[:year]}年#{data[:month]}月" }
 
-      # 各指標のデータを抽出
       metrics = [
         { key: :revenue, format: :currency, values: monthly_data.map { |data| data[:revenue] } },
         { key: :total_cost, format: :currency, values: monthly_data.map { |data| data[:total_cost] } },
@@ -102,13 +94,11 @@ module MonthlyReport
         ExpenseCalculator.new(@start_date, @end_date, year, month)
       )
 
-      # 原価計算の結果をログに出力（デバッグ用）
       cost_result = cost_calculator.calculate
-      # Rails.logger.debug "CostCalculator result for #{year}-#{month}: #{cost_result}"
 
       data = {
         revenue: revenue_calculator.calculate,
-        total_cost: cost_result # 原価の合計（仕入れコスト+国際送料+決済手数料）
+        total_cost: cost_result
       }
 
       if year && month

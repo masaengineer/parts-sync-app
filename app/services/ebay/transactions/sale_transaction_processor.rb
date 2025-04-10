@@ -1,6 +1,5 @@
 module Ebay
   module Transactions
-    # 販売取引処理クラス
     class SaleTransactionProcessor < BaseTransactionProcessor
       protected
 
@@ -15,12 +14,9 @@ module Ebay
 
       private
 
-      # マーケットプレイス手数料を処理
-      # @return [Boolean] 少なくとも1つの手数料が処理されたかどうか
       def process_marketplace_fees
         fee_processed = false
 
-        # orderLineItemsがnilの場合は処理をスキップ
         return fee_processed unless transaction["orderLineItems"].is_a?(Array)
 
         transaction["orderLineItems"].each_with_index do |item, idx|
@@ -41,11 +37,7 @@ module Ebay
         fee_processed
       end
 
-      # 単一の手数料を処理
-      # @param fee [Hash] 手数料データ
-      # @param item_idx [Integer] アイテムのインデックス (ログ用)
-      # @param fee_idx [Integer] 手数料のインデックス (ログ用)
-      # @return [Boolean] 手数料の処理に成功したかどうか
+
       def process_single_fee(fee, item_idx, fee_idx)
         Rails.logger.debug "Processing fee #{fee_idx} of item #{item_idx}: #{fee.inspect}"
 
@@ -76,16 +68,10 @@ module Ebay
         end
       end
 
-      # 手数料カテゴリを判定
-      # @param fee [Hash] 手数料データ
-      # @return [String] 手数料カテゴリ
       def determine_fee_category(fee)
         PaymentFee.fee_categories.values.include?(fee["feeType"]) ? fee["feeType"] : "undefined"
       end
 
-      # 手数料が重複しているかチェック
-      # @param fee_category [String] 手数料カテゴリ
-      # @return [Boolean] 重複しているかどうか
       def duplicate_fee?(fee_category)
         record_exists?(
           transaction_id: transaction["transactionId"],
@@ -94,20 +80,14 @@ module Ebay
         )
       end
 
-      # marketplaceFeesが有効かチェック
-      # @param item [Hash] オーダーラインアイテム
-      # @return [Boolean] 有効かどうか
       def valid_marketplace_fees?(item)
         item["marketplaceFees"].is_a?(Array) && !item["marketplaceFees"].nil?
       end
 
-      # Saleレコードを作成
       def create_sale_record
-        # 同じオーダーIDですでにSALEタイプ（正の金額）のレコードが存在するかチェック
         return if Sale.where(order_id: order.id).where("order_net_amount > 0").exists?
 
         begin
-          # USD以外の通貨の場合、amount内にexchangeRateが含まれる
           exchange_rate_value = transaction.dig("amount", "exchangeRate")
           exchange_rate = exchange_rate_value.nil? ? 1.0 : exchange_rate_value.to_d
           Rails.logger.debug "Exchange rate from API: #{exchange_rate}"

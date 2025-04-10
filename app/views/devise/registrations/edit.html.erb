@@ -1,7 +1,7 @@
 <% content_for :title, t('.title') %>
 
 <div class="container mx-auto px-4 py-12 max-w-5xl">
-  <!-- ヘッダーセクション -->
+  
   <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
     <div>
       <h1 class="text-3xl font-bold">アカウント設定</h1>
@@ -16,14 +16,14 @@
     </div>
   </div>
 
-  <!-- エラーメッセージ -->
+  
   <%= render "devise/shared/error_messages", resource: resource %>
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <!-- 左カラム：プロフィール情報編集 -->
+    
     <div class="lg:col-span-2 space-y-6">
       <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f| %>
-        <!-- プロフィール情報編集 -->
+        
         <div class="card bg-base-100 shadow-lg">
           <div class="card-body">
             <h2 class="card-title flex items-center">
@@ -33,7 +33,7 @@
 
             <div class="divider my-2"></div>
 
-            <!-- プロフィール画像 -->
+            
             <div class="form-control mb-6">
               <label class="label">
                 <span class="label-text font-medium">プロフィール画像</span>
@@ -58,7 +58,7 @@
               </div>
             </div>
 
-            <!-- ユーザー情報フィールド -->
+            
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <div class="form-control">
                 <%= f.label :last_name, class: "label font-medium" %>
@@ -85,7 +85,7 @@
           </div>
         </div>
 
-        <!-- パスワード変更セクション -->
+        
         <div class="card bg-base-100 shadow-lg" id="password">
           <div class="card-body">
             <h2 class="card-title flex items-center">
@@ -117,7 +117,7 @@
           </div>
         </div>
 
-        <!-- 現在のパスワード確認 -->
+        
         <div class="card bg-base-100 shadow-lg">
           <div class="card-body">
             <h2 class="card-title flex items-center">
@@ -137,7 +137,7 @@
               </label>
             </div>
 
-            <!-- 更新ボタン -->
+            
             <div class="flex justify-end">
               <%= f.submit t('.update'), class: "btn btn-primary" %>
             </div>
@@ -146,9 +146,9 @@
       <% end %>
     </div>
 
-    <!-- 右カラム：アカウント管理とその他のオプション -->
+    
     <div class="space-y-6">
-      <!-- 戻るボタン -->
+      
       <div class="card bg-base-100 shadow-lg">
         <div class="card-body">
           <h2 class="card-title flex items-center">
@@ -184,7 +184,7 @@
         </div>
       </div>
 
-      <!-- アカウント削除 -->
+      
       <div class="card bg-base-100 shadow-lg">
         <div class="card-body">
           <h2 class="card-title flex items-center text-error">

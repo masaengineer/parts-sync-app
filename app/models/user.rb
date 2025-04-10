@@ -17,15 +17,12 @@ class User < ApplicationRecord
   scope :production_users, -> { where(is_demo: false) }
 
   def self.from_omniauth(auth)
-    # email から既存ユーザーを検索してみる
     user = User.find_by(email: auth.info.email)
 
     if user
-      # 既に同じ email のユーザーがいれば、provider, uid を更新して保存
       user.update(provider: auth.provider, uid: auth.uid) unless user.provider && user.uid
       user
     else
-      # 存在しないなら新規作成
       create do |new_user|
         new_user.email = auth.info.email
         new_user.password = Devise.friendly_token[0, 20]
@@ -38,7 +35,6 @@ class User < ApplicationRecord
     end
   end
 
-  # フルネームを返すメソッド
   def full_name
     "#{last_name} #{first_name}"
   end

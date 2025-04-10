@@ -25,17 +25,14 @@ class Order < ApplicationRecord
     %w[user sale order_lines skus procurement shipment payment_fees]
   end
 
-  # 注文に関連する仕入れコストの合計を計算
   def total_procurement_cost
     procurement&.total_cost || 0
   end
 
-  # 注文に関連する仕入れコストの合計を計算
   def total_cost
     order_lines.sum(&:cost_price)
   end
 
-  # eBayの注文詳細ページのURLを返す
   def ebay_order_url
     "https://www.ebay.com/mesh/ord/details?orderid=#{order_number}"
   end
