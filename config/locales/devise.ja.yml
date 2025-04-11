@@ -75,7 +75,6 @@ ja:
       new:
         title: 'アカウント登録 - Parts Sync'
         sign_up: 'アカウント登録'
-        welcome_message: '新規アカウントを作成して、サービスをご利用ください'
         terms_html: '利用規約とプライバシーポリシーに同意する'
         have_account: 'すでにアカウントをお持ちの方は'
       edit:
@@ -112,7 +111,6 @@ ja:
       new:
         title: 'ログイン - Parts Sync'
         sign_in: 'ログイン'
-        welcome_message: '安全なアクセスで、あなただけの経験を'
         no_account: 'アカウントをお持ちでない方は'
         banner_message: '最高の管理画面を体験してください'
     shared:

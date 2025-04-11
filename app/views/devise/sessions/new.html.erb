@@ -22,9 +22,6 @@
       <h3 class="mt-8 md:mt-10 lg:mt-12 text-center text-xl font-semibold">
         <%= t('devise.sessions.new.sign_in') %>
       </h3>
-      <h3 class="mt-2 text-center text-sm text-base-content/70 max-w-xs mx-auto">
-        <%= t('devise.sessions.new.welcome_message') %>
-      </h3>
 
       <div class="mt-6 md:mt-8">
         <%= link_to user_google_oauth2_omniauth_authorize_path, data: { turbo: false }, class: "btn btn-outline w-full text-sm" do %>
@@ -32,7 +29,12 @@
           <span class="ml-2">Googleでログイン</span>
         <% end %>
 
-        <div class="divider text-sm my-5">または</div>
+        <div class="divider text-xs my-4">採用ご担当者様はこちら</div>
+        <div class="bg-base-200 p-3 rounded-box">
+          <p class="text-xs mb-1">デモアカウント</p>
+          <p class="text-sm font-medium">メール: demo@gmail.com</p>
+          <p class="text-sm font-medium">パスワード: demo123</p>
+        </div><br>
 
         <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
           <div class="form-control mb-4">
