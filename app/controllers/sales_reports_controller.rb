@@ -25,10 +25,10 @@ class SalesReportsController < ApplicationController
       end
     end
 
-    respond_to do |format|
-      format.html
-      format.turbo_stream
-    end
+    # respond_to do |format|
+    #   format.html
+    #   format.turbo_stream
+    # end
 
     @per_page = (params[:per_page] || 30).to_i
 
