@@ -3,7 +3,6 @@ class ApplicationController < ActionController::Base
   before_action :configure_permitted_parameters, if: :devise_controller?
   before_action :authenticate_user!
 
-  # 為替レート定数
   JPY_RATE = 150
 
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
@@ -12,9 +11,7 @@ class ApplicationController < ActionController::Base
   protected
 
   def configure_permitted_parameters
-    # サインアップ時のパラメータ許可
     devise_parameter_sanitizer.permit(:sign_up, keys: [ :last_name, :first_name, :email, :password, :password_confirmation, :agreement ])
-    # アカウント更新時のパラメータ許可
     devise_parameter_sanitizer.permit(:account_update, keys: [ :last_name, :first_name, :email, :password, :password_confirmation, :agreement ])
   end
 
@@ -32,7 +29,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  # ヘルスチェック用エンドポイント（CI/CDのデプロイ検証に使用）
   def health
     ActiveRecord::Base.connection.execute("SELECT 1")
     Redis.new(url: ENV.fetch("REDIS_URL", "redis://localhost:6379/0")).ping

@@ -7,7 +7,7 @@
     <%= render 'table', orders_data: @orders_data %>
   <% end %>
 
-  <!-- CSV Import Modal -->
+  
   <dialog id="csvImportModal" class="modal" data-controller="form-submit">
     <div class="modal-backdrop absolute inset-0 bg-black bg-opacity-50" onclick="document.getElementById('csvImportModal').close()"></div>
     <div class="modal-box max-w-4xl bg-base-100 shadow-lg relative z-10">
@@ -32,7 +32,7 @@
     </div>
   </dialog>
 
-  <!-- Demo Data Modal -->
+  
   <dialog id="demoDataModal" class="modal">
     <div class="modal-backdrop absolute inset-0 bg-black bg-opacity-50" onclick="document.getElementById('demoDataModal').close()"></div>
     <div class="modal-box bg-base-100 shadow-lg relative z-10">

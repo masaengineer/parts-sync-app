@@ -1,15 +1,15 @@
-<%# ナビゲーションバー全体のコンテナ %>
+
 <header class="fixed top-0 left-0 right-0 z-50 bg-base-100 border-b border-base-200">
   <div class="navbar px-3">
-    <%# 左側のコンテンツ %>
+    
     <div class="navbar-start gap-3">
-      <%# Logo %>
+      
       <%= link_to root_path, class: "flex items-center" do %>
         <%= image_tag "logo/parts-sync-logo.svg", alt: "Parts Sync", class: "h-8 w-auto" %>
       <% end %>
     </div>
 
-    <%# 中央のコンテンツ - タブナビゲーション %>
+    
     <div class="navbar-center" id = "report_change">
       <div role="tablist" class="tabs-boxed tabs font-bold">
         <%= link_to t("shared.header.navigation.sales_reports"), sales_reports_path, role: "tab", class: "tab #{params[:controller] == 'sales_reports' ? 'tab-active' : ''}" %>
@@ -17,10 +17,10 @@
       </div>
     </div>
 
-    <%# 右側のコンテンツ %>
+    
     <div class="navbar-end gap-4">
 
-      <%# Theme Toggle - テーマ切り替え %>
+      
       <div data-controller="theme" id = "dark_change">
         <label class="flex cursor-pointer gap-2">
           <iconify-icon icon="lucide:sun" width="20" height="20"></iconify-icon>
@@ -29,7 +29,7 @@
         </label>
       </div>
 
-      <%# Profile With Action Item - プロフィールドロップダウン %>
+      
       <div class="dropdown dropdown-end dropdown-bottom">
         <label tabindex="0" class="btn btn-ghost rounded-btn px-1.5 hover:bg-base-content/20">
           <div class="flex items-center gap-2">
@@ -62,7 +62,7 @@
               <% end %>
             </li>
             <hr class="-mx-2 my-1 border-base-content/10" />
-            <%# 静的ページへのリンク %>
+            
             <li>
               <%= link_to terms_of_service_path, class: "flex items-center gap-2" do %>
                 <iconify-icon icon="lucide:file-text" height="16"></iconify-icon>
@@ -96,7 +96,7 @@
               <% end %>
             </li>
             <hr class="-mx-2 my-1 border-base-content/10" />
-            <%# 静的ページへのリンク（非ログインユーザー用） %>
+            
             <li>
               <%= link_to privacy_policy_path, class: "flex items-center gap-2" do %>
                 <iconify-icon icon="lucide:shield" height="16"></iconify-icon>

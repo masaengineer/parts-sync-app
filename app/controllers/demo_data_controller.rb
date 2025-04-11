@@ -1,7 +1,6 @@
 class DemoDataController < ApplicationController
   def create
-    # デモデータを作成
-    source_user_id = 1 # コピー元のユーザーID
+    source_user_id = 1
 
     demo_creator = DemoDataCreator.new(current_user)
     result = demo_creator.create_demo_data

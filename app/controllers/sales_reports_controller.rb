@@ -1,6 +1,5 @@
 class SalesReportsController < ApplicationController
   def index
-    # 日付範囲のプリセットを処理
     process_date_preset if params[:date_preset].present?
 
     @q = current_user.orders.ransack(params[:q])
@@ -54,26 +53,20 @@ class SalesReportsController < ApplicationController
       all_orders_data.sort_by! do |data|
         value = case session[:sort_by]
         when "sale_date"
-                  # 販売日
                   data[:sale_date] || Time.current
         when "revenue"
-                  # USD基準の売上
                   data[:revenue].to_f
         when "profit"
-                  # 円建ての利益
                   data[:profit].to_f
         when "profit_rate"
-                  # 利益率
                   data[:profit_rate].to_f
         else
                   0
         end
 
         if session[:sort_by] == "sale_date"
-          # 日付は特別な処理（昇順/降順）
           sort_direction == -1 ? value.to_time.to_i * -1 : value.to_time.to_i
         else
-          # 数値は乗算でソート
           value * sort_direction
         end
       end
@@ -103,10 +96,8 @@ class SalesReportsController < ApplicationController
   private
 
   def process_date_preset
-    # カスタム以外の場合は日付範囲を計算してパラメータに設定
     return if params[:date_preset] == "custom"
 
-    # DateRangeCalculatorを使用して日付範囲を計算
     today = Date.current
     start_date, end_date = case params[:date_preset]
     when "last_90_days"
@@ -135,7 +126,6 @@ class SalesReportsController < ApplicationController
       return
     end
 
-    # パラメータに計算した日付範囲を設定
     params[:q] ||= {}
     params[:q][:sale_date_gteq] = start_date.to_s
     params[:q][:sale_date_lteq] = end_date.to_s

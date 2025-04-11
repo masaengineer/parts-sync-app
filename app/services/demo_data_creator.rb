@@ -1,16 +1,14 @@
 class DemoDataCreator
   def initialize(target_user)
     @target_user = target_user
-    @source_user_id = 1 # コピー元のユーザーID
+    @source_user_id = 1
   end
 
   def create_demo_data
-    # 元のユーザーのデータがあるか確認
     source_user = User.find_by(id: @source_user_id)
     return false unless source_user
 
     ActiveRecord::Base.transaction do
-      # Orders のコピー
       copy_orders(source_user)
     end
 
@@ -25,28 +23,21 @@ class DemoDataCreator
 
   def copy_orders(source_user)
     source_user.orders.find_each do |source_order|
-      # オーダーをコピー
       new_order = copy_order(source_order)
 
-      # オーダーラインとセラーSKUをコピー
       copy_order_lines(source_order, new_order)
 
-      # 調達情報をコピー
       copy_procurement(source_order, new_order)
 
-      # 売上情報をコピー
       copy_sales(source_order, new_order)
 
-      # 配送情報をコピー
       copy_shipment(source_order, new_order)
 
-      # 支払い手数料をコピー
       copy_payment_fees(source_order, new_order)
     end
   end
 
   def copy_order(source_order)
-    # 注文番号を一意にするため、接頭辞をつける
     demo_order_number = "DEMO-#{Time.current.to_i}-#{source_order.order_number}"
 
     Order.create!(
@@ -59,19 +50,14 @@ class DemoDataCreator
 
   def copy_order_lines(source_order, new_order)
     source_order.order_lines.each do |source_line|
-      # 元のセラーSKUを取得または作成
       original_seller_sku = source_line.seller_sku
 
-      # 新しいセラーSKUの作成（タイトルを変更）
       new_seller_sku = find_or_create_seller_sku(original_seller_sku)
 
-      # 対応するManufacturerSKUのマッピングも作成
       copy_sku_mappings(original_seller_sku, new_seller_sku)
 
-      # 価格調整もコピー
       copy_price_adjustments(original_seller_sku, new_seller_sku)
 
-      # 注文ラインを作成
       OrderLine.create!(
         order: new_order,
         seller_sku: new_seller_sku,
@@ -86,11 +72,9 @@ class DemoDataCreator
   def find_or_create_seller_sku(original_sku)
     demo_sku_code = "DEMO-#{original_sku.sku_code}"
 
-    # 既存のデモSKUがあれば再利用
     existing_sku = SellerSku.find_by(sku_code: demo_sku_code)
     return existing_sku if existing_sku
 
-    # 新しいSKUを作成
     SellerSku.create!(
       sku_code: demo_sku_code,
       quantity: original_sku.quantity,

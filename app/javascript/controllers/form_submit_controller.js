@@ -4,7 +4,7 @@ export default class extends Controller {
   static targets = ['buttonText', 'spinner', 'submitButton'];
 
   connect() {
-    // Turboフレームのイベントを監視
+    
     document.addEventListener(
       'turbo:submit-start',
       this.handleSubmitStart.bind(this)
@@ -28,7 +28,7 @@ export default class extends Controller {
   }
 
   disconnect() {
-    // イベントリスナーを削除
+    
     document.removeEventListener('turbo:submit-start', this.handleSubmitStart);
     document.removeEventListener('turbo:submit-end', this.handleSubmitEnd);
     document.removeEventListener(
@@ -43,10 +43,10 @@ export default class extends Controller {
   }
 
   submit(event) {
-    // 送信ボタンがクリックされたとき
+    
     this.showLoadingState();
 
-    // フォームを取得してsubmitを呼び出す
+    
     const formId = event.currentTarget.getAttribute('form');
     if (formId) {
       const form = document.getElementById(formId);
@@ -57,7 +57,7 @@ export default class extends Controller {
   }
 
   showLoadingState() {
-    // ローディング状態の表示
+    
     if (this.hasButtonTextTarget && this.hasSpinnerTarget) {
       this.buttonTextTarget.classList.add('hidden');
       this.spinnerTarget.classList.remove('hidden');
@@ -69,7 +69,7 @@ export default class extends Controller {
   }
 
   resetLoadingState() {
-    // ローディング状態の解除
+    
     if (this.hasButtonTextTarget && this.hasSpinnerTarget) {
       this.buttonTextTarget.classList.remove('hidden');
       this.spinnerTarget.classList.add('hidden');
@@ -81,21 +81,21 @@ export default class extends Controller {
   }
 
   handleSubmitStart(event) {
-    // フォーム送信開始時の処理
+    
     if (event.target && event.target.id === 'csv-import-form') {
       this.showLoadingState();
     }
   }
 
   handleSubmitEnd(event) {
-    // フォーム送信完了時の処理
+    
     if (event.target && event.target.id === 'csv-import-form') {
       this.resetLoadingState();
     }
   }
 
   handleFrameLoad(event) {
-    // フレームロード完了時の処理
+    
     const frame = event.target;
     if (frame && frame.id === 'csv_import') {
       this.resetLoadingState();
@@ -103,7 +103,7 @@ export default class extends Controller {
   }
 
   handleBeforeFetch(event) {
-    // フェッチ開始前の処理
+    
     const frame = event.target;
     if (frame && frame.id === 'csv_import') {
       this.showLoadingState();
@@ -111,9 +111,9 @@ export default class extends Controller {
   }
 
   handleBeforeFetchResponse(event) {
-    // レスポンス取得後の処理
-    // ここでは特に何もしない
-    // turbo:submit-endで処理する
+    
+    
+    
   }
 
   disableSubmit() {

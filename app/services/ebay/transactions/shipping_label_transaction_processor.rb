@@ -1,6 +1,5 @@
 module Ebay
   module Transactions
-    # 配送ラベル取引処理クラス
     class ShippingLabelTransactionProcessor < BaseTransactionProcessor
       protected
 
@@ -14,9 +13,7 @@ module Ebay
 
       private
 
-      # 配送ラベル用のPaymentFeeレコードを作成
       def create_shipping_label_payment_fee
-        # 既に同じtransaction_idの配送ラベル処理が存在する場合はスキップ
         if duplicate_shipping_label_fee?
           Rails.logger.debug "Skipping duplicate shipping label transaction: #{transaction['transactionId']}"
           return
@@ -42,8 +39,6 @@ module Ebay
         end
       end
 
-      # 配送ラベル手数料が重複しているかチェック
-      # @return [Boolean] 重複しているかどうか
       def duplicate_shipping_label_fee?
         record_exists?(
           order: order,

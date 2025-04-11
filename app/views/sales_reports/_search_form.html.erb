@@ -3,9 +3,9 @@
     <%= search_form_for @q, url: sales_reports_path, html: { id: "search_form", data: { controller: "form-submit date-range-selector", turbo_frame: "sales_report_table", form_target: "form" } } do |f| %>
       <%= hidden_field_tag :sort_by, session[:sort_by] if session[:sort_by].present? %>
 
-      <!-- すべての検索フィールド（日付範囲セレクターを含む） -->
+      
       <div class="grid grid-cols-5 gap-3 items-end">
-        <!-- 日付範囲セレクター -->
+        
         <div class="col-span-1">
           <div class="form-control">
             <label class="label font-medium text-sm"></label>
@@ -39,7 +39,7 @@
           </div>
         <% end %>
 
-        <!-- ボタン -->
+        
         <div class="flex gap-3 w-full justify-between">
           <%= link_to t("sales_reports.search.reset"), sales_reports_path,
                         class: "btn btn-ghost hover:btn-error flex-1 btn-sm",
@@ -52,7 +52,7 @@
         </div>
       </div>
 
-      <!-- カスタム日付範囲フィールド（カスタム選択時のみ表示） -->
+      
       <div class="grid grid-cols-5 gap-3 mt-3" data-date-range-selector-target="customRange">
         <div class="col-span-1">
           <div class="form-control w-full">
@@ -80,13 +80,13 @@
             </div>
           </div>
         </div>
-        <div class="col-span-3"><!-- スペースを確保 --></div>
+        <div class="col-span-3"></div>
       </div>
     <% end %>
 
     <div class="flex justify-end mt-4 pt-4 border-t">
       <div class="flex items-center gap-3">
-        <!-- 表示件数セレクター -->
+        
         <div class="flex items-center gap-2">
           <label class="text-sm text-gray-600"><%= t("sales_reports.index.display_count") %></label>
           <%= select_tag :per_page,
@@ -95,12 +95,12 @@
               form: "search_form" %>
         </div>
 
-        <!-- CSVインポートボタン -->
+        
         <button id="csv_import_button" class="btn btn-sm btn-outline" onclick="document.getElementById('csvImportModal').showModal()">
           <iconify-icon icon="lucide:file-input" class="w-4 h-4 mr-1"></iconify-icon><%= t("sales_reports.csv_import.button") %>
         </button>
 
-        <!-- デモデータ作成ボタン (注文データがない場合のみ表示) -->
+        
         <% if current_user.orders.none? %>
           <button type="button" class="btn btn-sm btn-accent" onclick="document.getElementById('demoDataModal').showModal()">
             <iconify-icon icon="lucide:layers" class="w-4 h-4 mr-1"></iconify-icon>デモデータを作成

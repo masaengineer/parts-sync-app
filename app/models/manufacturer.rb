@@ -5,7 +5,7 @@ class Manufacturer < ApplicationRecord
     nissan: "Nissan",
     mitsubishi: "Mitsubishi",
     subaru: "Subaru",
-    mazda: "Mazda", # "Matsuda" ではなく "Mazda"
+    mazda: "Mazda",
     suzuki: "Suzuki",
     lexus: "Lexus",
     daihatsu: "Daihatsu",

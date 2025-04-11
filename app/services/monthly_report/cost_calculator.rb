@@ -73,18 +73,13 @@ module MonthlyReport
     def convert_to_jpy_by_currency(amount, currency_code, sale = nil)
       case currency_code
       when "JPY"
-        # 日本円はそのまま
         amount
       when "USD"
-        # USDは為替レートで円に変換
         amount * USD_TO_JPY_RATE
       else
-        # その他の通貨は、売上のto_usd_rateを参考にUSDに変換し、その後円に変換
         if sale && sale.to_usd_rate
-          # 外貨→USD→JPYの変換
           (amount * sale.to_usd_rate) * USD_TO_JPY_RATE
         else
-          # レートがない場合はUSDと仮定して変換
           amount * USD_TO_JPY_RATE
         end
       end.round(0)

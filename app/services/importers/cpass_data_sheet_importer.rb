@@ -1,10 +1,5 @@
 require "csv"
 
-# CpassDataSheetImporter
-# - CSVからtracking_numberをキーにShipmentを探す
-# - 送料と還元金額をチェックしてshipping_costを設定
-# - F列の還元金額が負の値の場合は、最終的な請求金額はA列の金額。還元金額が0の場合は、最終的な請求金額はD列。
-
 module Importers
   class CpassDataSheetImporter
     class PositiveDiscountError < StandardError; end
@@ -14,7 +9,6 @@ module Importers
       @user = user
     end
 
-    # CSV読み込み後、行ごとにimport_rowを呼ぶ
     def import
       Rails.logger.info "[CpassDataSheetImporter] Starting import from #{@csv_path}"
 
@@ -34,7 +28,6 @@ module Importers
 
     private
 
-    # 1行単位の処理
     def import_row(row)
       tracking_number = row["注文番号"]&.strip
       if tracking_number.blank?
@@ -89,7 +82,6 @@ module Importers
       Rails.logger.info "[CpassDataSheetImporter] Shipment updated successfully: shipment_id=#{shipment.id}, shipping_cost=#{shipping_cost}"
     end
 
-    # 文字列をBigDecimalに変換
     def to_decimal(value)
       return nil if value.nil? || value.strip.empty?
       cleaned = value.gsub(/["',]/, "")

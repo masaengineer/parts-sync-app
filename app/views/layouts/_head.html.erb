@@ -4,20 +4,20 @@
 <%= csrf_meta_tags %>
 <%= csp_meta_tag %>
 
-<%# SVGファビコン - モダンブラウザ向け %>
+
 <%= favicon_link_tag 'logo/favicon.svg', type: 'image/svg+xml' %>
-<%# PNGファビコン - レガシーブラウザのフォールバック用 %>
+
 <%= favicon_link_tag 'logo/favicon.png', type: 'image/png' %>
 
 
-<%# スタイルシートとJavaScript %>
+
 <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
 <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
 
-<%# ツアーガイド用スクリプト %>
+
 <script src="https://unpkg.com/@sjmc11/tourguidejs/dist/tour.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <link rel="stylesheet" href="https://unpkg.com/@sjmc11/tourguidejs/dist/css/tour.min.css">
 
-<!-- <meta name="turbo-cache-control" content="no-cache"> -->
+
 
 <%= display_meta_tags(default_meta_tags) %>

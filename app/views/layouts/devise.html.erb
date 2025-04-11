@@ -6,9 +6,9 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    <%# SVGファビコン - モダンブラウザ向け %>
+    
     <%= favicon_link_tag 'logo/favicon.svg', type: 'image/svg+xml' %>
-    <%# PNGファビコン - レガシーブラウザのフォールバック用 %>
+    
     <%= favicon_link_tag 'logo/favicon.png', type: 'image/png' %>
 
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
@@ -18,7 +18,7 @@
   </head>
 
   <body>
-    <%# フラッシュメッセージ %>
+    
     <% if notice %>
       <div class="alert alert-info shadow-lg fixed top-4 left-1/2 -translate-x-1/2 z-50 w-auto min-w-[320px] max-w-[90%]">
         <div>

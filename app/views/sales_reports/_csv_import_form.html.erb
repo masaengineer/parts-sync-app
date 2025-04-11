@@ -1,4 +1,4 @@
-<%# CSVインポートフォーム %>
+
 <div class="card card-bordered bg-base-100 shadow-sm mb-6" id="csv_import">
   <div class="card-body p-5">
     <%= form_with url: import_data_imports_path, method: :post, multipart: true, id: "csv-import-form", data: { controller: "form-submit", turbo_frame: "csv_import" } do |f| %>

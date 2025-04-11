@@ -1,7 +1,6 @@
 class OrderLine < ApplicationRecord
   belongs_to :seller_sku
   belongs_to :order
-  # currency_idカラムを削除したため、orderから通貨を委譲
   delegate :currency, to: :order
 
   validates :quantity, presence: true, numericality: { greater_than: 0 }
@@ -12,6 +11,6 @@ class OrderLine < ApplicationRecord
   end
 
   def self.ransackable_associations(auth_object = nil)
-    %w[order seller_sku] # currencyを削除して関連付けを制限
+    %w[order seller_sku]
   end
 end
