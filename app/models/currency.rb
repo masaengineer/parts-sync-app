@@ -6,7 +6,7 @@ class Currency < ApplicationRecord
     gbp: "GBP",
     cad: "CAD",
     aud: "AUD"
-  }, prefix: true, suffix: :code
+  }, prefix: true
 
   has_many :orders
 
