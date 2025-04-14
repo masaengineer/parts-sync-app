@@ -86,7 +86,7 @@ CSV 形式のインポートでは委託先から入手した外注費を DB へ
 
 <details>
 <summary>詳細（クリックして表示）</summary>
-Ransack を利用した検索機能です。販売データを日付、注文番号、追跡番号、SKU コードでマルチ検索することができます。<br>アイコンやプレースホルダーを利用することで、情報量を最小限にしつつ、直感的な UI を実現しています。
+Ransack を利用した検索機能です。販売データを日付、注文番号、追跡番号、SKU コードでマルチ検索することができます。<br>工夫した点としては、検索結果を表示する際に、N+1 問題を避けるため .includes(:order_lines, :seller_skus) のように関連データを Eager Loading しています。<br>また、 .result(distinct: true) を使用し、関連テーブルを結合した際に発生する可能性のある重複レコードを除去しています。<br>アイコンやプレースホルダーを利用することで、情報量を最小限にしつつ、直感的な UI を実現しています。
 </details>
 
 [![Image from Gyazo](https://i.gyazo.com/c39aaff5e467c1b1c1f93d1f86959412.gif)](https://gyazo.com/c39aaff5e467c1b1c1f93d1f86959412)
