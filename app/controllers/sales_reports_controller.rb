@@ -23,30 +23,7 @@ class SalesReportsController < ApplicationController
       SalesReport::Service.new(order).calculate
     end
 
-    if session[:sort_by].present?
-      sort_direction = session[:sort_direction] == "desc" ? -1 : 1
-
-      all_orders_data.sort_by! do |data|
-        value = case session[:sort_by]
-        when "sale_date"
-                  data[:sale_date] || Time.current
-        when "revenue"
-                  data[:revenue].to_f
-        when "profit"
-                  data[:profit].to_f
-        when "profit_rate"
-                  data[:profit_rate].to_f
-        else
-                  0
-        end
-
-        if session[:sort_by] == "sale_date"
-          sort_direction == -1 ? value.to_time.to_i * -1 : value.to_time.to_i
-        else
-          value * sort_direction
-        end
-      end
-    end
+    all_orders_data = sort_orders_data(all_orders_data) if session[:sort_by].present?
 
     @orders_data_paginated = Kaminari.paginate_array(all_orders_data)
                                     .page(params[:page])
@@ -124,6 +101,31 @@ class SalesReportsController < ApplicationController
       when "desc"
         session[:sort_by] = nil # desc -> nil (ソート解除)
         session[:sort_direction] = nil
+      end
+    end
+  end
+
+  def sort_orders_data(data_array)
+    sort_direction = session[:sort_direction] == "desc" ? -1 : 1
+
+    data_array.sort_by do |data|
+      value = case session[:sort_by]
+      when "sale_date"
+                data[:sale_date] || Time.current
+      when "revenue"
+                data[:revenue].to_f
+      when "profit"
+                data[:profit].to_f
+      when "profit_rate"
+                data[:profit_rate].to_f
+      else
+                0
+      end
+
+      if session[:sort_by] == "sale_date"
+        sort_direction == -1 ? value.to_time.to_i * -1 : value.to_time.to_i
+      else
+        value * sort_direction
       end
     end
   end
