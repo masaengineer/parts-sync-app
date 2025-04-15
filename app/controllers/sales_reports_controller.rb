@@ -4,31 +4,7 @@ class SalesReportsController < ApplicationController
 
     @q = current_user.orders.ransack(params[:q])
 
-    if params[:sort_by].present?
-      current_sort_column = session[:sort_by]
-      current_sort_direction = session[:sort_direction]
-
-      if current_sort_column == params[:sort_by]
-        if current_sort_direction.nil?
-          session[:sort_by] = params[:sort_by]
-          session[:sort_direction] = "asc"
-        elsif current_sort_direction == "asc"
-          session[:sort_by] = params[:sort_by]
-          session[:sort_direction] = "desc"
-        else
-          session[:sort_by] = nil
-          session[:sort_direction] = nil
-        end
-      else
-        session[:sort_by] = params[:sort_by]
-        session[:sort_direction] = "asc"
-      end
-    end
-
-    # respond_to do |format|
-    #   format.html
-    #   format.turbo_stream
-    # end
+    update_sort_session if params[:sort_by].present?
 
     @per_page = (params[:per_page] || 30).to_i
 
@@ -129,5 +105,26 @@ class SalesReportsController < ApplicationController
     params[:q] ||= {}
     params[:q][:sale_date_gteq] = start_date.to_s
     params[:q][:sale_date_lteq] = end_date.to_s
+  end
+
+  def update_sort_session
+    new_sort_column = params[:sort_by]
+
+    if session[:sort_by] != new_sort_column
+      # 違う列がクリックされた場合、昇順でソート
+      session[:sort_by] = new_sort_column
+      session[:sort_direction] = "asc"
+    else
+      # 同じ列がクリックされた場合、ソート方向を切り替え
+      case session[:sort_direction]
+      when nil
+        session[:sort_direction] = "asc" # nil -> asc
+      when "asc"
+        session[:sort_direction] = "desc" # asc -> desc
+      when "desc"
+        session[:sort_by] = nil # desc -> nil (ソート解除)
+        session[:sort_direction] = nil
+      end
+    end
   end
 end
