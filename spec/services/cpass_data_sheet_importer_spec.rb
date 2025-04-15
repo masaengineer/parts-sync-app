@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe CpassDataSheetImporter do
+RSpec.describe CsvImporters::CpassDataSheetImporter do
   let(:user) { create(:user) }
   let(:csv_path) { Rails.root.join('spec/fixtures/files/cpass_sample.csv') }
   let(:importer) { described_class.new(csv_path, user) }
@@ -61,7 +61,7 @@ RSpec.describe CpassDataSheetImporter do
 
       it 'PositiveDiscountErrorをスローすること' do
         invalid_importer = described_class.new(Rails.root.join('spec/fixtures/files/cpass_invalid.csv'), user)
-        expect { invalid_importer.import }.to raise_error(CpassDataSheetImporter::PositiveDiscountError)
+        expect { invalid_importer.import }.to raise_error(CsvImporters::CpassDataSheetImporter::PositiveDiscountError)
       end
     end
 

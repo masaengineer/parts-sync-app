@@ -35,7 +35,7 @@ RSpec.describe "DataImports", type: :request do
     context "with valid Wisewill file" do
       it "imports data and redirects with success message" do
         # モックを使用してインポート処理をスキップ
-        allow_any_instance_of(WisewillDataSheetImporter).to receive(:import).and_return(true)
+        allow_any_instance_of(CsvImporters::WisewillDataSheetImporter).to receive(:import).and_return(true)
 
         file = fixture_file_upload(Rails.root.join('spec/fixtures/files/valid_wisewill_sheet.xlsx'), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
@@ -49,7 +49,7 @@ RSpec.describe "DataImports", type: :request do
     context "with valid CPass file" do
       it "imports data and redirects with success message" do
         # モックを使用してインポート処理をスキップ
-        allow_any_instance_of(CpassDataSheetImporter).to receive(:import).and_return(true)
+        allow_any_instance_of(CsvImporters::CpassDataSheetImporter).to receive(:import).and_return(true)
 
         file = fixture_file_upload(Rails.root.join('spec/fixtures/files/valid_cpass_sheet.xlsx'), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
@@ -63,8 +63,8 @@ RSpec.describe "DataImports", type: :request do
     context "with missing SKUs in Wisewill file" do
       it "handles the error and shows a specific error message" do
         # モックを使用してMissingOrderNumbersErrorを発生させる
-        allow_any_instance_of(WisewillDataSheetImporter).to receive(:import).and_raise(
-          WisewillDataSheetImporter::MissingOrderNumbersError.new("未登録のSKUが含まれています")
+        allow_any_instance_of(CsvImporters::WisewillDataSheetImporter).to receive(:import).and_raise(
+          CsvImporters::WisewillDataSheetImporter::MissingOrderNumbersError.new("未登録のSKUが含まれています")
         )
 
         file = fixture_file_upload(Rails.root.join('spec/fixtures/files/valid_wisewill_sheet.xlsx'), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
@@ -79,8 +79,8 @@ RSpec.describe "DataImports", type: :request do
     context "with positive discount in CPass file" do
       it "handles the error and shows a specific error message" do
         # モックを使用してPositiveDiscountErrorを発生させる
-        allow_any_instance_of(CpassDataSheetImporter).to receive(:import).and_raise(
-          CpassDataSheetImporter::PositiveDiscountError.new("割引がマイナス値ではありません")
+        allow_any_instance_of(CsvImporters::CpassDataSheetImporter).to receive(:import).and_raise(
+          CsvImporters::CpassDataSheetImporter::PositiveDiscountError.new("割引がマイナス値ではありません")
         )
 
         file = fixture_file_upload(Rails.root.join('spec/fixtures/files/valid_cpass_sheet.xlsx'), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
@@ -95,8 +95,8 @@ RSpec.describe "DataImports", type: :request do
     context "with malformed CSV file" do
       it "handles the error and shows a user-friendly error message" do
         # モックを使用して一般エラーを発生させる
-        allow_any_instance_of(WisewillDataSheetImporter).to receive(:import).and_raise(
-          NoMethodError.new("undefined method `[]' for nil:NilClass")
+        allow_any_instance_of(CsvImporters::WisewillDataSheetImporter).to receive(:import).and_raise(
+          NoMethodError.new("undefined method `[]\' for nil:NilClass")
         )
 
         file = fixture_file_upload(Rails.root.join('spec/fixtures/files/valid_wisewill_sheet.xlsx'), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
