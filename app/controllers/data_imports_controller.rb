@@ -34,21 +34,21 @@ class DataImportsController < ApplicationController
     begin
       case import_type
       when "wisewill_data_sheet"
-        WisewillDataSheetImporter.new(file.path, current_user).import
+        CsvImporters::WisewillDataSheetImporter.new(file.path, current_user).import
         flash_message = "Wisewill委託分シートのインポートが完了しました。"
         flash_type = :notice
       when "cpass_data_sheet"
-        CpassDataSheetImporter.new(file.path, current_user).import
+        CsvImporters::CpassDataSheetImporter.new(file.path, current_user).import
         flash_message = "CPaSS委託分シートのインポートが完了しました。"
         flash_type = :notice
       else
         flash_message = "不明なインポートタイプです。"
         flash_type = :alert
       end
-    rescue WisewillDataSheetImporter::MissingOrderNumbersError => e
+    rescue CsvImporters::WisewillDataSheetImporter::MissingOrderNumbersError => e
       flash_message = "インポートエラー: #{e.message}"
       flash_type = :alert
-    rescue CpassDataSheetImporter::PositiveDiscountError => e
+    rescue CsvImporters::CpassDataSheetImporter::PositiveDiscountError => e
       flash_message = "インポートエラー: #{e.message}"
       flash_type = :alert
     rescue StandardError => e

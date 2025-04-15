@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe WisewillDataSheetImporter do
+RSpec.describe CsvImporters::WisewillDataSheetImporter do
   let(:user) { create(:user) }
   let(:csv_path) { Rails.root.join('spec/fixtures/files/wisewill_sample.csv') }
   let(:importer) { described_class.new(csv_path, user) }
@@ -71,7 +71,7 @@ RSpec.describe WisewillDataSheetImporter do
 
       it 'MissingPurchasePriceErrorをスローすること' do
         invalid_importer = described_class.new(Rails.root.join('spec/fixtures/files/wisewill_invalid.csv'), user)
-        expect { invalid_importer.import }.to raise_error(WisewillDataSheetImporter::MissingPurchasePriceError)
+        expect { invalid_importer.import }.to raise_error(CsvImporters::WisewillDataSheetImporter::MissingPurchasePriceError)
       end
     end
 
@@ -86,7 +86,7 @@ RSpec.describe WisewillDataSheetImporter do
       end
 
       it '存在しないオーダー番号に対して調達レコードを作成しないこと' do
-        expect { importer.import }.to raise_error(WisewillDataSheetImporter::OrderNotFoundError)
+        expect { importer.import }.to raise_error(CsvImporters::WisewillDataSheetImporter::OrderNotFoundError)
       end
     end
 
@@ -106,7 +106,7 @@ RSpec.describe WisewillDataSheetImporter do
 
       it 'MissingOrderNumbersErrorをスローすること' do
         invalid_importer = described_class.new(Rails.root.join('spec/fixtures/files/wisewill_invalid.csv'), user)
-        expect { invalid_importer.import }.to raise_error(WisewillDataSheetImporter::MissingOrderNumbersError)
+        expect { invalid_importer.import }.to raise_error(CsvImporters::WisewillDataSheetImporter::MissingOrderNumbersError)
       end
     end
 
