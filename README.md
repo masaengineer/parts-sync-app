@@ -66,7 +66,9 @@
 
 ### 売上レポート関連機能デモ
 
-##### 📥 受注情報自動連携 & CSV インポート機能
+#### 📥 受注情報自動連携 & CSV インポート機能
+
+[![Image from Gyazo](https://i.gyazo.com/5fb5078493a916a67b9e1dcd23478287.gif)](https://gyazo.com/5fb5078493a916a67b9e1dcd23478287)
 
 <details>
 <summary>こだわったポイント（クリックして表示）</summary>
@@ -92,12 +94,13 @@ eBayAPI 連携機能のソースコードは[こちら](https://github.com/masae
 CSV インポート機能のソースコードは[こちら](https://github.com/masaengineer/parts-sync-app/tree/main/app/services/csv_importers)
 
 </details>
-
-[![Image from Gyazo](https://i.gyazo.com/86e1fcede5b99059502eb51146b6caf3.gif)](https://gyazo.com/86e1fcede5b99059502eb51146b6caf3)
+<br>
 
 ---
 
-##### 🔍 フィルタリング機能
+#### 🔍 フィルタリング機能
+
+[![Image from Gyazo](https://i.gyazo.com/c39aaff5e467c1b1c1f93d1f86959412.gif)](https://gyazo.com/c39aaff5e467c1b1c1f93d1f86959412)
 
 <details>
 <summary>こだわったポイント（クリックして表示）</summary>
@@ -113,12 +116,13 @@ CSV インポート機能のソースコードは[こちら](https://github.com/
 関連コードへのリンクは[こちら](https://github.com/masaengineer/parts-sync-app/blob/main/app/controllers/orders_controller.rb)
 
 </details>
-
-[![Image from Gyazo](https://i.gyazo.com/c39aaff5e467c1b1c1f93d1f86959412.gif)](https://gyazo.com/c39aaff5e467c1b1c1f93d1f86959412)
+<br>
 
 ---
 
-##### 📝 オーダー詳細 & 価格調整メモ機能
+#### 📝 オーダー詳細 & 価格調整メモ機能
+
+[![Image from Gyazo](https://i.gyazo.com/86e1fcede5b99059502eb51146b6caf3.gif)](https://gyazo.com/86e1fcede5b99059502eb51146b6caf3)
 
 <details>
 <summary>こだわったポイント（クリックして表示）</summary>
@@ -136,14 +140,15 @@ CSV インポート機能のソースコードは[こちら](https://github.com/
 関連コードへのリンクは[こちら](https://github.com/masaengineer/parts-sync-app/blob/main/app/controllers/price_adjustments_controller.rb)
 
 </details>
-
-[![Image from Gyazo](https://i.gyazo.com/86e1fcede5b99059502eb51146b6caf3.gif)](https://gyazo.com/86e1fcede5b99059502eb51146b6caf3)
+<br>
 
 ---
 
 ### 月次レポート関連機能デモ
 
-##### 💰 月次レポート & 経費入力機能
+#### 💰 月次レポート & 経費入力機能
+
+[![Image from Gyazo](https://i.gyazo.com/e428dcbca255851103774bf2cc259800.gif)](https://gyazo.com/e428dcbca255851103774bf2cc259800)
 
 <details>
 <summary>こだわったポイント（クリックして表示）</summary>
@@ -162,14 +167,15 @@ CSV インポート機能のソースコードは[こちら](https://github.com/
 関連コードへのリンクは[こちら](https://github.com/masaengineer/parts-sync-app/blob/main/app/javascript/controllers/chart_controller.js) （グラフ描画）
 
 </details>
-
-[![Image from Gyazo](https://i.gyazo.com/e428dcbca255851103774bf2cc259800.gif)](https://gyazo.com/e428dcbca255851103774bf2cc259800)
+<br>
 
 ---
 
 ### 共通機能デモ
 
-##### 🎯 オンラインツアーガイド機能
+#### 🎯 オンラインツアーガイド機能
+
+[![Image from Gyazo](https://i.gyazo.com/a2b15bd487d7a6200caee2719c018a15.gif)](https://gyazo.com/a2b15bd487d7a6200caee2719c018a15)
 
 <details>
 <summary>こだわったポイント（クリックして表示）</summary>
@@ -187,9 +193,7 @@ CSV インポート機能のソースコードは[こちら](https://github.com/
 関連コードへのリンクは[こちら](https://github.com/masaengineer/parts-sync-app/blob/main/app/javascript/controllers/tour_controller.js)
 
 </details>
-
-[![Image from Gyazo](https://i.gyazo.com/a2b15bd487d7a6200caee2719c018a15.gif)](https://gyazo.com/a2b15bd487d7a6200caee2719c018a15)
-
+<br>
 <br>
 
 ## 使用技術
