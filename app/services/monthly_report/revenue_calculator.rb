@@ -20,9 +20,9 @@ module MonthlyReport
       currencies = if currency_codes
                     codes = Array(currency_codes).map(&:upcase)
                     Currency.where(code: codes)
-      else
+                  else
                     Currency.all
-      end
+                  end
 
       currencies.each do |currency|
         currency_orders = orders.joins(:currency).where(currencies: { code: currency.code })
@@ -34,8 +34,8 @@ module MonthlyReport
           when "JPY"
             revenue_data[code_key] = calculate_currency_revenue(currency_orders)
           when "USD"
-            usd_amount = calculate_currency_revenue(currency_orders)
-            revenue_data[code_key] = (usd_amount * USD_TO_JPY_RATE).round(0)
+            usd_orders_jpy_amount = calculate_foreign_currency_revenue(currency_orders)
+            revenue_data[code_key] = usd_orders_jpy_amount
           else
             revenue_data[code_key] = calculate_foreign_currency_revenue(currency_orders)
           end
@@ -54,20 +54,39 @@ module MonthlyReport
     end
 
     def calculate_currency_revenue(orders)
-      orders.sum { |order| order.sales.sum(&:order_net_amount).to_f }.round(0)
+      # 対象は既にJPY通貨の注文データ
+      total = 0
+
+      orders.each do |order|
+        order_amount = order.sales.sum { |sale| sale.order_net_amount.to_f }
+        total += order_amount
+      end
+
+      total.round(0)
     end
 
     def calculate_foreign_currency_revenue(orders)
+      # 対象は外貨建て注文データ
       jpy_total = 0
 
       orders.each do |order|
+        currency_code = order.currency&.code || "USD"
+
         order.sales.each do |sale|
           next unless sale.order_net_amount
 
-          net_amount = sale.order_net_amount.to_f
-          to_usd_rate = sale.to_usd_rate || 1.0
+          amount = sale.order_net_amount.to_f
 
-          jpy_amount = (net_amount * to_usd_rate) * USD_TO_JPY_RATE
+          jpy_amount = case currency_code
+          when "JPY"
+            amount
+          when "USD"
+            amount * USD_TO_JPY_RATE
+          else
+            rate = sale.to_usd_rate || 1.0
+            (amount * rate) * USD_TO_JPY_RATE
+          end
+
           jpy_total += jpy_amount
         end
       end

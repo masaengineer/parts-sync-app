@@ -12,30 +12,17 @@ module MonthlyReport
     def calculate
       orders = orders_for_period
 
-      Rails.logger.debug "==== 原価計算のデバッグ情報 ===="
-      Rails.logger.debug "対象期間: #{@date_range}"
-      Rails.logger.debug "注文数: #{orders.size}"
+      costs_by_order = {}
 
-      total_cost = orders.sum do |order|
+      orders.each do |order|
         procurement_cost = calculate_procurement_cost_with_currency(order)
         shipping_cost = calculate_shipping_cost_with_currency(order)
         payment_fee_total = calculate_payment_fee_with_currency(order)
 
-        cost_total = procurement_cost + shipping_cost + payment_fee_total
+        costs_by_order[order.id] = procurement_cost + shipping_cost + payment_fee_total
+      end
 
-        Rails.logger.debug "注文ID: #{order.id}, 注文番号: #{order.order_number}, 通貨: #{order.currency&.code}"
-        Rails.logger.debug "  仕入れコスト（円換算）: #{procurement_cost}"
-        Rails.logger.debug "  送料（円換算）: #{shipping_cost}"
-        Rails.logger.debug "  決済手数料（円換算）: #{payment_fee_total}"
-        Rails.logger.debug "  原価合計: #{cost_total}"
-
-        cost_total
-      end.round(0)
-
-      Rails.logger.debug "原価合計: #{total_cost}"
-      Rails.logger.debug "=============================="
-
-      total_cost
+      costs_by_order.values.sum.round(0)
     end
 
     private
@@ -45,7 +32,14 @@ module MonthlyReport
 
       cost = order.procurement.total_cost.to_f
 
-      convert_to_jpy_by_currency(cost, order.currency&.code, order.sale)
+      order_currency = order.currency&.code || "JPY"
+      procurement_currency = "JPY"
+
+      if procurement_currency == order_currency
+        cost
+      else
+        convert_to_jpy_by_currency(cost, procurement_currency, order.sale)
+      end
     end
 
     def calculate_shipping_cost_with_currency(order)
@@ -55,19 +49,28 @@ module MonthlyReport
 
       currency_code = if order.shipment.currency
                         order.shipment.currency.code
+                      else
+                        "JPY"
+                      end
+      if currency_code == "JPY"
+        cost
       else
-                        order.currency&.code
+        convert_to_jpy_by_currency(cost, currency_code, order.sale)
       end
-
-      convert_to_jpy_by_currency(cost, currency_code, order.sale)
     end
 
     def calculate_payment_fee_with_currency(order)
       return 0 if order.payment_fees.empty?
 
-      fee_amount = order.payment_fees.sum(:fee_amount).to_f
+      fee_amount = order.payment_fees.to_a.sum { |fee| fee.fee_amount.to_f || 0 }
 
-      convert_to_jpy_by_currency(fee_amount, order.currency&.code, order.sale)
+      order_currency = order.currency&.code
+
+      if order_currency == "JPY" || order_currency.nil?
+        fee_amount
+      else
+        convert_to_jpy_by_currency(fee_amount, order_currency, order.sale)
+      end
     end
 
     def convert_to_jpy_by_currency(amount, currency_code, sale = nil)
@@ -88,7 +91,13 @@ module MonthlyReport
     def orders_for_period
       user.orders
         .where(sale_date: @date_range)
-        .includes(:procurement, { shipment: :currency }, :payment_fees, :currency, :sale)
+        .includes(
+          :procurement,
+          { shipment: :currency },
+          { payment_fees: [] },
+          :currency,
+          :sale
+        )
     end
   end
 end

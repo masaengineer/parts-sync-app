@@ -15,14 +15,19 @@ module MonthlyReport
     end
 
     def calculate_total_expenses
+      start_year = @start_date.year
+      start_month = @start_date.month
+      end_year = @end_date.year
+      end_month = @end_date.month
+
       date_calculator = Common::DateRangeCalculator.new(@start_date, @end_date)
       period_months = date_calculator.months_between
 
-      expenses = Expense.where(
-        "(year > ? OR (year = ? AND month >= ?)) AND (year < ? OR (year = ? AND month <= ?))",
-        @start_date.year, @start_date.year, @start_date.month,
-        @end_date.year, @end_date.year, @end_date.month
-      )
+      month_conditions = period_months.map do |year, month|
+        { year: year, month: month }
+      end
+
+      expenses = Expense.where(month_conditions)
 
       expenses.sum(:amount).round(0)
     end
