@@ -98,7 +98,6 @@ module MonthlyReport
     private
 
     def calculate_period_data(period_range, year = nil, month = nil)
-      # 必要なすべての計算クラスを初期化
       revenue_calculator = RevenueCalculator.new(@user, period_range)
       cost_calculator = CostCalculator.new(@user, period_range)
       expense_calculator = ExpenseCalculator.new(@start_date, @end_date, year, month)
@@ -108,17 +107,14 @@ module MonthlyReport
         expense_calculator
       )
 
-      # 基本データを先に計算
       revenue = revenue_calculator.calculate
       total_cost = cost_calculator.calculate
       expenses = year && month ? expense_calculator.calculate_expenses : 0
 
-      # 算出データを計算
       gross_profit = revenue - total_cost
       contribution_margin = gross_profit - expenses
       contribution_margin_rate = revenue.zero? ? 0 : ((contribution_margin.to_f / revenue) * 100).round
 
-      # 結果をまとめる
       data = {
         revenue: revenue,
         total_cost: total_cost,
