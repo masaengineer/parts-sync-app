@@ -49,9 +49,9 @@ module MonthlyReport
 
       currency_code = if order.shipment.currency
                         order.shipment.currency.code
-                      else
+      else
                         "JPY"
-                      end
+      end
       if currency_code == "JPY"
         cost
       else

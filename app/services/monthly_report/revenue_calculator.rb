@@ -20,9 +20,9 @@ module MonthlyReport
       currencies = if currency_codes
                     codes = Array(currency_codes).map(&:upcase)
                     Currency.where(code: codes)
-                  else
+      else
                     Currency.all
-                  end
+      end
 
       currencies.each do |currency|
         currency_orders = orders.joins(:currency).where(currencies: { code: currency.code })

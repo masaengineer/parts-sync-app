@@ -13,7 +13,7 @@ module MonthlyReport
       @monthly_data_cache ||= begin
         date_calculator = Common::DateRangeCalculator.new(@start_date, @end_date)
         months_list = date_calculator.months_list
-        
+
         # 事前に1年分の月ごとの日付範囲を作成
         period_ranges = months_list.map do |month_start|
           month_end = month_start.end_of_month
@@ -23,7 +23,7 @@ module MonthlyReport
             range: month_start.beginning_of_day..month_end.end_of_day
           }
         end
-        
+
         # 各期間のデータを一括で計算
         period_ranges.map do |period|
           calculate_period_data(period[:range], period[:year], period[:month])
@@ -112,12 +112,12 @@ module MonthlyReport
       revenue = revenue_calculator.calculate
       total_cost = cost_calculator.calculate
       expenses = year && month ? expense_calculator.calculate_expenses : 0
-      
+
       # 算出データを計算
       gross_profit = revenue - total_cost
       contribution_margin = gross_profit - expenses
       contribution_margin_rate = revenue.zero? ? 0 : ((contribution_margin.to_f / revenue) * 100).round
-      
+
       # 結果をまとめる
       data = {
         revenue: revenue,
@@ -126,14 +126,14 @@ module MonthlyReport
         contribution_margin: contribution_margin,
         contribution_margin_rate: contribution_margin_rate
       }
-      
+
       # 月別データの場合は追加情報を含める
       if year && month
         data[:year] = year
         data[:month] = month
         data[:expenses] = expenses
       end
-      
+
       data
     end
   end
