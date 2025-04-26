@@ -10,31 +10,43 @@ module MonthlyReport
     end
 
     def calculate_by_month
-      date_calculator = Common::DateRangeCalculator.new(@start_date, @end_date)
-      months_list = date_calculator.months_list
+      @monthly_data_cache ||= begin
+        date_calculator = Common::DateRangeCalculator.new(@start_date, @end_date)
+        months_list = date_calculator.months_list
 
-      months_list.map do |month_start|
-        month_end = month_start.end_of_month
-        period_range = month_start.beginning_of_day..month_end.end_of_day
+        # 事前に1年分の月ごとの日付範囲を作成
+        period_ranges = months_list.map do |month_start|
+          month_end = month_start.end_of_month
+          {
+            year: month_start.year,
+            month: month_start.month,
+            range: month_start.beginning_of_day..month_end.end_of_day
+          }
+        end
 
-        calculate_period_data(period_range, month_start.year, month_start.month)
+        # 各期間のデータを一括で計算
+        period_ranges.map do |period|
+          calculate_period_data(period[:range], period[:year], period[:month])
+        end
       end
     end
 
     def calculate_total
-      start_date = @start_date.to_date.beginning_of_day
-      end_date = @end_date.to_date.end_of_day
-      period_range = start_date..end_date
+      @total_data_cache ||= begin
+        start_date = @start_date.to_date.beginning_of_day
+        end_date = @end_date.to_date.end_of_day
+        period_range = start_date..end_date
 
-      expense_calculator = ExpenseCalculator.new(@start_date, @end_date)
+        expense_calculator = ExpenseCalculator.new(@start_date, @end_date)
 
-      data = calculate_period_data(period_range)
-      data.merge!(
-        start_date: start_date.to_date,
-        end_date: end_date.to_date,
-        label: "#{start_date.to_date} 〜 #{end_date.to_date}",
-        expenses: expense_calculator.calculate_total_expenses
-      )
+        data = calculate_period_data(period_range)
+        data.merge!(
+          start_date: start_date.to_date,
+          end_date: end_date.to_date,
+          label: "#{start_date.to_date} 〜 #{end_date.to_date}",
+          expenses: expense_calculator.calculate_total_expenses
+        )
+      end
     end
 
     def chart_data
@@ -88,30 +100,37 @@ module MonthlyReport
     def calculate_period_data(period_range, year = nil, month = nil)
       revenue_calculator = RevenueCalculator.new(@user, period_range)
       cost_calculator = CostCalculator.new(@user, period_range)
+      expense_calculator = ExpenseCalculator.new(@start_date, @end_date, year, month)
       profit_calculator = ProfitCalculator.new(
         revenue_calculator,
         cost_calculator,
-        ExpenseCalculator.new(@start_date, @end_date, year, month)
+        expense_calculator
       )
 
-      cost_result = cost_calculator.calculate
+      revenue = revenue_calculator.calculate
+      total_cost = cost_calculator.calculate
+      expenses = year && month ? expense_calculator.calculate_expenses : 0
+
+      gross_profit = revenue - total_cost
+      contribution_margin = gross_profit - expenses
+      contribution_margin_rate = revenue.zero? ? 0 : ((contribution_margin.to_f / revenue) * 100).round
 
       data = {
-        revenue: revenue_calculator.calculate,
-        total_cost: cost_result
+        revenue: revenue,
+        total_cost: total_cost,
+        gross_profit: gross_profit,
+        contribution_margin: contribution_margin,
+        contribution_margin_rate: contribution_margin_rate
       }
 
+      # 月別データの場合は追加情報を含める
       if year && month
         data[:year] = year
         data[:month] = month
-        data[:expenses] = profit_calculator.calculate_expenses
+        data[:expenses] = expenses
       end
 
-      data.merge!(
-        gross_profit: profit_calculator.calculate_gross_profit,
-        contribution_margin: profit_calculator.calculate_contribution_margin,
-        contribution_margin_rate: profit_calculator.calculate_contribution_margin_rate
-      )
+      data
     end
   end
 end
