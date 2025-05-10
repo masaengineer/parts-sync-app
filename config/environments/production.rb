@@ -105,7 +105,7 @@ Rails.application.configure do
     "www.parts-sync.site", # wwwサブドメイン
     /.*\.parts-sync\.site/, # その他のサブドメイン
     "parts-sync-new.onrender.com",  # Renderのデフォルトドメイン
-    "parts-sync-app.link", # aws用カスタムドメイン
+    "parts-sync-app.link" # aws用カスタムドメイン
   ]
 
   # Allow health check requests to /up to bypass host authorization
