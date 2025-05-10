@@ -53,7 +53,7 @@ Rails.application.configure do
   # config.assume_ssl = true
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
-  config.force_ssl = true
+  # config.force_ssl = true
 
   # Skip http-to-https redirect for the default health check endpoint.
   # config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/up" } } }
@@ -100,12 +100,12 @@ Rails.application.configure do
   # config.active_record.attributes_for_inspect = [ :id ]
 
   # Enable DNS rebinding protection and other `Host` header attacks.
-  config.hosts = [
-    "parts-sync.site",     # メインドメイン
-    "www.parts-sync.site", # wwwサブドメイン
-    /.*\.parts-sync\.site/, # その他のサブドメイン
-    "parts-sync-new.onrender.com"  # Renderのデフォルトドメイン
-  ]
+  # config.hosts = [
+  #   "parts-sync.site",     # メインドメイン
+  #   "www.parts-sync.site", # wwwサブドメイン
+  #   /.*\.parts-sync\.site/, # その他のサブドメイン
+  #   "parts-sync-new.onrender.com"  # Renderのデフォルトドメイン
+  # ]
 
   # Assume all access to the app is happening through a SSL-terminating reverse proxy.
   config.assume_ssl = true
