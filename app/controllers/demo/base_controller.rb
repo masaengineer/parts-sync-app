@@ -8,7 +8,7 @@ module Demo
 
     def set_demo_user
       @demo_user = fetch_demo_user
-      redirect_to root_path, alert: 'デモモードは現在利用できません' unless @demo_user
+      redirect_to root_path, alert: "デモモードは現在利用できません" unless @demo_user
     end
 
     def fetch_demo_user

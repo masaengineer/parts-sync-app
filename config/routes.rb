@@ -39,10 +39,10 @@ Rails.application.routes.draw do
 
   # デモモード用のルート
   namespace :demo do
-    get '/', to: 'demo#index'
-    get 'sales_reports', to: 'demo#sales_reports'
-    get 'monthly_reports', to: 'demo#monthly_reports'
-    get 'profile', to: 'demo#user_profile'
+    get "/", to: "demo#index"
+    get "sales_reports", to: "demo#sales_reports"
+    get "monthly_reports", to: "demo#monthly_reports"
+    get "profile", to: "demo#user_profile"
   end
 
   # 静的ページのルーティング

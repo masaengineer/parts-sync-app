@@ -43,8 +43,8 @@ module Demo
       @orders = @orders_data_paginated
 
       # prefixesオプションを指定してsales_reportsコントローラーのパーシャルを探すようにする
-      lookup_context.prefixes.prepend('sales_reports')
-      render 'sales_reports/index'
+      lookup_context.prefixes.prepend("sales_reports")
+      render "sales_reports/index"
     end
 
     def monthly_reports
@@ -71,13 +71,13 @@ module Demo
 
       @totals = calculator.calculate_total
 
-      lookup_context.prefixes.prepend('monthly_reports')
-      render 'monthly_reports/index'
+      lookup_context.prefixes.prepend("monthly_reports")
+      render "monthly_reports/index"
     end
 
     def user_profile
-      lookup_context.prefixes.prepend('users')
-      render 'users/show'
+      lookup_context.prefixes.prepend("users")
+      render "users/show"
     end
 
     private
