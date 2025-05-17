@@ -1,26 +1,39 @@
-
 <header class="fixed top-0 left-0 right-0 z-50 bg-base-100 border-b border-base-200">
   <div class="navbar px-3">
-    
+
     <div class="navbar-start gap-3">
-      
+
       <%= link_to root_path, class: "flex items-center" do %>
         <%= image_tag "logo/parts-sync-logo.svg", alt: "Parts Sync", class: "h-8 w-auto" %>
       <% end %>
+
+      <% unless user_signed_in? || demo_mode? %>
+        <%= link_to demo_sales_reports_path, class: "link link-hover text-sm hidden md:block" do %>
+          <span class="flex items-center gap-1 text-primary font-medium">
+            <iconify-icon icon="lucide:eye" width="16" height="16"></iconify-icon>
+            デモを見る
+          </span>
+        <% end %>
+      <% end %>
     </div>
 
-    
+
     <div class="navbar-center" id = "report_change">
       <div role="tablist" class="tabs-boxed tabs font-bold">
-        <%= link_to t("shared.header.navigation.sales_reports"), sales_reports_path, role: "tab", class: "tab #{params[:controller] == 'sales_reports' ? 'tab-active' : ''}" %>
-        <%= link_to t("shared.header.navigation.monthly_reports"), monthly_reports_path, role: "tab", class: "tab #{params[:controller] == 'monthly_reports' || params[:controller].start_with?('monthly_reports/') ? 'tab-active' : ''}" %>
+        <% if demo_mode? %>
+          <%= link_to t("shared.header.navigation.sales_reports"), demo_sales_reports_path, role: "tab", class: "tab #{params[:action] == 'sales_reports' ? 'tab-active' : ''}" %>
+          <%= link_to t("shared.header.navigation.monthly_reports"), demo_monthly_reports_path, role: "tab", class: "tab #{params[:action] == 'monthly_reports' ? 'tab-active' : ''}" %>
+        <% else %>
+          <%= link_to t("shared.header.navigation.sales_reports"), sales_reports_path, role: "tab", class: "tab #{params[:controller] == 'sales_reports' ? 'tab-active' : ''}" %>
+          <%= link_to t("shared.header.navigation.monthly_reports"), monthly_reports_path, role: "tab", class: "tab #{params[:controller] == 'monthly_reports' || params[:controller].start_with?('monthly_reports/') ? 'tab-active' : ''}" %>
+        <% end %>
       </div>
     </div>
 
-    
+
     <div class="navbar-end gap-4">
 
-      
+
       <div data-controller="theme" id = "dark_change">
         <label class="flex cursor-pointer gap-2">
           <iconify-icon icon="lucide:sun" width="20" height="20"></iconify-icon>
@@ -29,7 +42,7 @@
         </label>
       </div>
 
-      
+
       <div class="dropdown dropdown-end dropdown-bottom">
         <label tabindex="0" class="btn btn-ghost rounded-btn px-1.5 hover:bg-base-content/20">
           <div class="flex items-center gap-2">
@@ -43,7 +56,10 @@
               </div>
             </div>
             <div class="flex flex-col items-start">
-              <% if user_signed_in? %>
+              <% if demo_mode? %>
+                <p class="text-sm/none">デモユーザー</p>
+                <p class="mt-1 text-xs/none text-primary">ログインして利用する</p>
+              <% elsif user_signed_in? %>
                 <p class="text-sm/none"><%= current_user.full_name %></p>
                 <p class="mt-1 text-xs/none text-primary"><%= t("shared.header.profile.edit") %></p>
               <% else %>
@@ -54,32 +70,24 @@
           </div>
         </label>
         <ul tabindex="0" class="menu dropdown-content mt-4 w-64 rounded-box bg-base-100 p-2 shadow" role="menu">
-          <% if user_signed_in? %>
+          <% if demo_mode? %>
+            <li>
+              <%= link_to new_user_session_path, class: "flex items-center gap-2" do %>
+                <iconify-icon icon="lucide:log-in" height="16"></iconify-icon>
+                ログイン
+              <% end %>
+            </li>
+            <li>
+              <%= link_to new_user_registration_path, class: "flex items-center gap-2" do %>
+                <iconify-icon icon="lucide:user-plus" height="16"></iconify-icon>
+                新規登録
+              <% end %>
+            </li>
+          <% elsif user_signed_in? %>
             <li>
               <%= link_to user_path(current_user), class: "flex items-center gap-2" do %>
                 <iconify-icon icon="lucide:user" height="16"></iconify-icon>
                 <%= t("shared.header.menu.my_profile") %>
-              <% end %>
-            </li>
-            <hr class="-mx-2 my-1 border-base-content/10" />
-            
-            <li>
-              <%= link_to terms_of_service_path, class: "flex items-center gap-2" do %>
-                <iconify-icon icon="lucide:file-text" height="16"></iconify-icon>
-                <%= t("shared.header.menu.terms_of_service") %>
-              <% end %>
-            </li>
-            <li>
-              <%= link_to privacy_policy_path, class: "flex items-center gap-2" do %>
-                <iconify-icon icon="lucide:shield" height="16"></iconify-icon>
-                <%= t("shared.header.menu.privacy_policy") %>
-              <% end %>
-            </li>
-            <hr class="-mx-2 my-1 border-base-content/10" />
-            <li>
-              <%= button_to destroy_user_session_path, method: :delete, class: "flex items-center gap-2 text-error" do %>
-                <iconify-icon icon="lucide:log-out" height="16"></iconify-icon>
-                <%= t("shared.header.menu.logout") %>
               <% end %>
             </li>
           <% else %>
@@ -95,18 +103,39 @@
                 <%= t("shared.header.menu.sign_up") %>
               <% end %>
             </li>
-            <hr class="-mx-2 my-1 border-base-content/10" />
-            
+          <% end %>
+
+          <% unless user_signed_in? %>
             <li>
-              <%= link_to privacy_policy_path, class: "flex items-center gap-2" do %>
-                <iconify-icon icon="lucide:shield" height="16"></iconify-icon>
-                <%= t("shared.header.menu.privacy_policy") %>
+              <%= link_to demo_sales_reports_path, class: "flex items-center gap-2" do %>
+                <iconify-icon icon="lucide:eye" height="16"></iconify-icon>
+                デモを見る
               <% end %>
             </li>
+          <% end %>
+
+          <hr class="-mx-2 my-1 border-base-content/10" />
+
+          <%# 共通リンク - すべてのユーザータイプで表示 %>
+          <li>
+            <%= link_to privacy_policy_path, class: "flex items-center gap-2" do %>
+              <iconify-icon icon="lucide:shield" height="16"></iconify-icon>
+              <%= t("shared.header.menu.privacy_policy") %>
+            <% end %>
+          </li>
+          <li>
+            <%= link_to terms_of_service_path, class: "flex items-center gap-2" do %>
+              <iconify-icon icon="lucide:file-text" height="16"></iconify-icon>
+              <%= t("shared.header.menu.terms_of_service") %>
+            <% end %>
+          </li>
+
+          <% if user_signed_in? %>
+            <hr class="-mx-2 my-1 border-base-content/10" />
             <li>
-              <%= link_to terms_of_service_path, class: "flex items-center gap-2" do %>
-                <iconify-icon icon="lucide:file-text" height="16"></iconify-icon>
-                <%= t("shared.header.menu.terms_of_service") %>
+              <%= button_to destroy_user_session_path, method: :delete, class: "flex items-center gap-2 text-error" do %>
+                <iconify-icon icon="lucide:log-out" height="16"></iconify-icon>
+                <%= t("shared.header.menu.logout") %>
               <% end %>
             </li>
           <% end %>

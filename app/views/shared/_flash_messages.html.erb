@@ -1,4 +1,3 @@
-
 <div id="flash">
   <% flash_data = local_assigns[:flash] || flash %>
   <% flash_data.each do |type, message| %>
@@ -6,7 +5,7 @@
       when :success then "alert-success"
       when :error then "alert-error"
       when :alert then "alert-warning"
-      when :notice then "alert-info"
+      when :notice, :info then "alert-info"
       else "alert-info"
       end %>
 
@@ -16,11 +15,11 @@
           when :success then "lucide:check-circle"
           when :error then "lucide:x-circle"
           when :alert then "lucide:alert-triangle"
-          when :notice then "lucide:info"
+          when :notice, :info then "lucide:info"
           else "lucide:info"
           end %>
         <iconify-icon icon="<%= icon_name %>" class="w-6 h-6"></iconify-icon>
-        <span><%= message %></span>
+        <span><%= message.html_safe %></span>
       </div>
     </div>
   <% end %>

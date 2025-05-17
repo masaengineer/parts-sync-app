@@ -37,10 +37,19 @@ Rails.application.routes.draw do
     end
   end
 
+  # デモモード用のルート
+  namespace :demo do
+    get '/', to: 'demo#index'
+    get 'sales_reports', to: 'demo#sales_reports'
+    get 'monthly_reports', to: 'demo#monthly_reports'
+    get 'profile', to: 'demo#user_profile'
+  end
+
   # 静的ページのルーティング
   get "privacy_policy", to: "static_pages#privacy_policy"
   get "terms_of_service", to: "static_pages#terms_of_service"
   get "scta", to: "static_pages#scta"
+  get "landing", to: "static_pages#landing"
 
   # Rails標準のヘルスチェックエンドポイント
   get "up" => "rails/health#show", as: :rails_health_check

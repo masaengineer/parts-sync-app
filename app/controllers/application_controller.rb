@@ -19,6 +19,10 @@ class ApplicationController < ActionController::Base
     new_user_session_path
   end
 
+  def set_demo_mode_notice
+    flash.now[:info] = "デモモード：これはデモアカウントのデータです。<a href='#{new_user_session_path}' class='font-bold underline'>ログイン</a> または <a href='#{new_user_registration_path}' class='font-bold underline'>新規登録</a> して独自のデータで利用開始しましょう。".html_safe
+  end
+
   private
 
   def layout_by_resource

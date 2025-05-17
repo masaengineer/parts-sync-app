@@ -37,4 +37,8 @@ module ApplicationHelper
       }
     }
   end
+
+  def demo_mode?
+    controller.class.name.start_with?('Demo::')
+  end
 end

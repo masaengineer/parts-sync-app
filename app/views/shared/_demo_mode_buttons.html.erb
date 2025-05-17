@@ -1,0 +1,7 @@
+<% if !demo_mode? %>
+  <%= yield %>
+<% elsif defined?(show_disabled) && show_disabled %>
+  <div class="opacity-50 cursor-not-allowed tooltip tooltip-warning" data-tip="デモモードでは利用できません">
+    <%= yield %>
+  </div>
+<% end %>
