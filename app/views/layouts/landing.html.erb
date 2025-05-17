@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="<%= I18n.locale %>" data-theme="light" data-controller="theme">
+  <head>
+    <%= render 'layouts/head' %>
+    <% if content_for?(:meta_tags) %>
+      <%= yield :meta_tags %>
+    <% end %>
+  </head>
+
+  <body class="flex flex-col min-h-screen bg-[--main-content-background]">
+    <header class="fixed top-0 left-0 right-0 z-50 bg-base-100 border-b border-base-200">
+      <div class="navbar px-3">
+        <div class="navbar-start">
+          <%= link_to root_path, class: "flex items-center" do %>
+            <%= image_tag "logo/parts-sync-logo.svg", alt: "Parts Sync", class: "h-8 w-auto" %>
+          <% end %>
+        </div>
+
+        <div class="navbar-end gap-4">
+          <div data-controller="theme" id="dark_change">
+            <label class="flex cursor-pointer gap-2">
+              <iconify-icon icon="lucide:sun" width="20" height="20"></iconify-icon>
+              <input type="checkbox" data-theme-target="toggle" class="toggle theme-controller"/>
+              <iconify-icon icon="lucide:moon" width="20" height="20"></iconify-icon>
+            </label>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-grow pt-16">
+      <%= render 'shared/flash_messages' %>
+      <%= yield %>
+    </main>
+  </body>
+</html>

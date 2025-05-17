@@ -1,0 +1,12 @@
+<% if demo_mode? %>
+  <div class="bg-yellow-100 border-yellow-400 border text-yellow-700 p-3 rounded relative mb-4" role="alert">
+    <div class="flex items-center">
+      <iconify-icon icon="lucide:info" class="h-5 w-5 mr-2"></iconify-icon>
+      <div>
+        <strong>デモモード</strong>：これはデモアカウントのデータです。
+        <%= link_to "ログイン", new_user_session_path, class: "font-bold underline" %> または
+        <%= link_to "新規登録", new_user_registration_path, class: "font-bold underline" %> して独自のデータで利用開始しましょう。
+      </div>
+    </div>
+  </div>
+<% end %>
