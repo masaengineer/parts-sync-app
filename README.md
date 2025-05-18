@@ -253,3 +253,9 @@ CSV インポート機能のソースコードは[こちら](https://github.com/
 | payment_fees      | 決済手数料情報を管理                       |        ✅        |        ✅        |
 | currencies        | 通貨情報を管理（USD、EUR、GBP など）       |        ✅        |        ✅        |
 | expenses          | 月次経費情報を管理                         |                  |        ✅        |
+
+
+## インフラ構成図　　
+
+![test](https://github.com/user-attachments/assets/0d807e16-13eb-4327-8ab3-36a881aed102)
+
