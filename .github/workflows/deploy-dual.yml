@@ -35,7 +35,7 @@ jobs:
           --health-retries 5
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -72,7 +72,7 @@ jobs:
     outputs:
       image_tag: ${{ steps.set_image_tag.outputs.image_tag }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set image tag
         id: set_image_tag
@@ -99,7 +99,7 @@ jobs:
           docker save parts-sync-app:${{ steps.set_image_tag.outputs.image_tag }} > /tmp/parts-sync-app.tar
 
       - name: Upload Docker image as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: docker-image
           path: /tmp/parts-sync-app.tar
@@ -158,10 +158,10 @@ jobs:
       name: aws-production
       url: https://parts-sync-app.link/
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Download Docker image
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: docker-image
           path: /tmp
@@ -192,7 +192,7 @@ jobs:
           docker tag parts-sync-app:${IMAGE_TAG} ${ECR_REGISTRY}/${ECR_REPOSITORY}:latest
           docker push ${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}
           docker push ${ECR_REGISTRY}/${ECR_REPOSITORY}:latest
-          echo "::set-output name=image::${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
+          echo "image=${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}" >> $GITHUB_OUTPUT
 
       - name: Update ECS task definition
         id: task-def
