@@ -32,6 +32,14 @@ class SalesReportsController < ApplicationController
     @orders_data = @orders_data_paginated
 
     @orders = @orders_data_paginated
+
+    respond_to do |format|
+      format.html
+      format.csv do
+        csv_data = generate_csv(all_orders_data)
+        send_data csv_data, filename: "sales_report_#{Date.current}.csv", type: 'text/csv'
+      end
+    end
   end
 
   def show
@@ -128,5 +136,78 @@ class SalesReportsController < ApplicationController
         value * sort_direction
       end
     end
+  end
+
+  def generate_csv(orders_data)
+    require 'csv'
+    headers = [
+      '注文ID',
+      '注文番号',
+      '販売日',
+      'SKUコード',
+      '商品名',
+      '売上(元通貨)',
+      '売上(円換算)',
+      '通貨コード',
+      '決済手数料(元通貨)',
+      '粗利益(元通貨)',
+      '粗利益(円換算)',
+      '配送料(円)',
+      '仕入コスト(円)',
+      'その他コスト(円)',
+      '数量',
+      '純粗利(円)',
+      '利益率(%)',
+      'トラッキング番号',
+      '為替レート(元通貨→USD)',
+      '為替レート(USD→JPY)',
+      '転送手数料(円)',
+      '取扱手数料(円)'
+    ]
+
+    csv_data = CSV.generate(headers: true) do |csv|
+      csv << headers
+      orders_data.each do |data|
+        order = data[:order]
+
+        # 円換算のデータを計算
+        usd_to_jpy_rate = 150.0
+        revenue_jpy = data[:revenue] * usd_to_jpy_rate
+        net_revenue_usd = data[:revenue] - data[:payment_fees]
+        net_revenue_jpy = net_revenue_usd * usd_to_jpy_rate
+
+        # 調達関連の詳細情報
+        procurement = order.procurement
+        forwarding_fee = procurement ? procurement.forwarding_fee.to_f : 0
+        handling_fee = procurement ? procurement.handling_fee.to_f : 0
+
+        csv << [
+          order.id,
+          order.order_number,
+          data[:sale_date],
+          data[:sku_codes],
+          data[:product_names],
+          data[:revenue],
+          revenue_jpy,
+          order.currency&.code || 'USD',
+          data[:payment_fees],
+          net_revenue_usd,
+          net_revenue_jpy,
+          data[:shipping_cost],
+          data[:procurement_cost],
+          data[:other_costs],
+          data[:quantity],
+          data[:profit],
+          data[:profit_rate],
+          data[:tracking_number],
+          data[:exchange_rate],
+          usd_to_jpy_rate,
+          forwarding_fee,
+          handling_fee
+        ]
+      end
+    end
+
+    csv_data.encode(Encoding::SHIFT_JIS, invalid: :replace, undef: :replace)
   end
 end
