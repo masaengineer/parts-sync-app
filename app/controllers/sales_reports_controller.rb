@@ -37,7 +37,7 @@ class SalesReportsController < ApplicationController
       format.html
       format.csv do
         csv_data = generate_csv(all_orders_data)
-        send_data csv_data, filename: "sales_report_#{Date.current}.csv", type: 'text/csv'
+        send_data csv_data, filename: "sales_report_#{Date.current}.csv", type: "text/csv"
       end
     end
   end
@@ -139,30 +139,30 @@ class SalesReportsController < ApplicationController
   end
 
   def generate_csv(orders_data)
-    require 'csv'
+    require "csv"
     headers = [
-      '注文ID',
-      '注文番号',
-      '販売日',
-      'SKUコード',
-      '商品名',
-      '売上(元通貨)',
-      '売上(円換算)',
-      '通貨コード',
-      '決済手数料(元通貨)',
-      '粗利益(元通貨)',
-      '粗利益(円換算)',
-      '配送料(円)',
-      '仕入コスト(円)',
-      'その他コスト(円)',
-      '数量',
-      '純粗利(円)',
-      '利益率(%)',
-      'トラッキング番号',
-      '為替レート(元通貨→USD)',
-      '為替レート(USD→JPY)',
-      '転送手数料(円)',
-      '取扱手数料(円)'
+      "注文ID",
+      "注文番号",
+      "販売日",
+      "SKUコード",
+      "商品名",
+      "売上(元通貨)",
+      "売上(円換算)",
+      "通貨コード",
+      "決済手数料(元通貨)",
+      "粗利益(元通貨)",
+      "粗利益(円換算)",
+      "配送料(円)",
+      "仕入コスト(円)",
+      "その他コスト(円)",
+      "数量",
+      "純粗利(円)",
+      "利益率(%)",
+      "トラッキング番号",
+      "為替レート(元通貨→USD)",
+      "為替レート(USD→JPY)",
+      "転送手数料(円)",
+      "取扱手数料(円)"
     ]
 
     csv_data = CSV.generate(headers: true) do |csv|
@@ -189,7 +189,7 @@ class SalesReportsController < ApplicationController
           data[:product_names],
           data[:revenue],
           revenue_jpy,
-          order.currency&.code || 'USD',
+          order.currency&.code || "USD",
           data[:payment_fees],
           net_revenue_usd,
           net_revenue_jpy,
