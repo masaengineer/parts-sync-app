@@ -15,12 +15,12 @@ ja:
         shipping_cost: 送料
         procurement_cost: 原価合計
         quantity: 販売個数
-        profit: 利益
+        profit: 純粗利
         profit_rate: 利益率(%)
         actions: 操作
       totals:
         total_revenue: 総売上
-        total_profit: 総利益
+        total_profit: 総純粗利
         average_profit_rate: 平均利益率
     pl:
       title: PLレポート
