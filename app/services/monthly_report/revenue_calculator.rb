@@ -58,7 +58,7 @@ module MonthlyReport
       total = 0
 
       orders.each do |order|
-        order_amount = order.sales.sum { |sale| sale.order_net_amount.to_f }
+        order_amount = order.sales.sum { |sale| sale.order_gross_amount.to_f }
         total += order_amount
       end
 
@@ -73,9 +73,9 @@ module MonthlyReport
         currency_code = order.currency&.code || "USD"
 
         order.sales.each do |sale|
-          next unless sale.order_net_amount
+          next unless sale.order_gross_amount
 
-          amount = sale.order_net_amount.to_f
+          amount = sale.order_gross_amount.to_f
 
           jpy_amount = case currency_code
           when "JPY"
