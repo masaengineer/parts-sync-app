@@ -40,6 +40,6 @@ ja:
           net_revenue: '純売上（手数料差引後）'
           exchange_rate: '為替レート'
           jpy_revenue: '円換算売上'
-          total_costs: '総コスト'
-          profit: '利益'
+          total_costs: '注文連動費'
+          profit: '純粗利'
           profit_rate: '利益率'
