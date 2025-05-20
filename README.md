@@ -255,7 +255,7 @@ CSV インポート機能のソースコードは[こちら](https://github.com/
 
 ## インフラ構成図　　
 
-![test](https://github.com/user-attachments/assets/0d807e16-13eb-4327-8ab3-36a881aed102)
+[![Image from Gyazo](https://i.gyazo.com/fa7d7509b80e8f8fdae2b86a3360e9c7.png)](https://gyazo.com/fa7d7509b80e8f8fdae2b86a3360e9c7)
 
 ### インフラ構成の設計思想
 
