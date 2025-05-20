@@ -255,8 +255,6 @@ CSV インポート機能のソースコードは[こちら](https://github.com/
 
 ## インフラ構成図　　
 
-※ 2025 年 5 月に Render.com から AWS へインフラ環境を移行しました。
-
 ![test](https://github.com/user-attachments/assets/0d807e16-13eb-4327-8ab3-36a881aed102)
 
 ### インフラ構成の設計思想
