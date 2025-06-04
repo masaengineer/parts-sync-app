@@ -4,7 +4,7 @@ class ExchangeRate < ApplicationRecord
   validates :year, presence: true, numericality: { only_integer: true, greater_than: 2020 }
   validates :month, presence: true, inclusion: { in: 1..12 }
   validates :usd_to_jpy_rate, presence: true, numericality: { greater_than: 0 }
-  validates :year, uniqueness: { scope: [:user_id, :month] }
+  validates :year, uniqueness: { scope: [ :user_id, :month ] }
 
   scope :for_period, ->(year, month) { where(year: year, month: month) }
 

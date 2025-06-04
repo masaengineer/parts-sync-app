@@ -8,13 +8,13 @@ module ExchangeRateConcern
   # USD → JPYの変換メソッド（月別レート対応）
   def convert_usd_to_jpy(usd_amount, user: nil, year: nil, month: nil)
     return 0 if usd_amount.nil?
-    
+
     rate = if user && year && month
       ExchangeRate.rate_for(user, year, month)
     else
       USD_TO_JPY_RATE
     end
-    
+
     (usd_amount.abs * rate).round(0)
   end
 end

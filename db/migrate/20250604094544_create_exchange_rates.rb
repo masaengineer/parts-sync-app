@@ -9,6 +9,6 @@ class CreateExchangeRates < ActiveRecord::Migration[7.2]
       t.timestamps
     end
 
-    add_index :exchange_rates, [:user_id, :year, :month], unique: true
+    add_index :exchange_rates, [ :user_id, :year, :month ], unique: true
   end
 end
