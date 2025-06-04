@@ -20,6 +20,8 @@ Rails.application.routes.draw do
     resources :expenses
   end
 
+  resources :exchange_rates
+
   resources :sales_reports, only: [ :index, :show ]
   resources :price_adjustments, only: [ :new, :create ]
 

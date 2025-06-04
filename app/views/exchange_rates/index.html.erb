@@ -1,0 +1,47 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold">為替レート設定</h1>
+    <%= link_to "新規登録", new_exchange_rate_path, class: "btn btn-primary" %>
+  </div>
+
+  <% if @exchange_rates.any? %>
+    <% @grouped_rates.each do |year, rates| %>
+      <div class="mb-8">
+        <h2 class="text-xl font-semibold mb-4"><%= year %>年</h2>
+        <div class="overflow-x-auto">
+          <table class="table table-zebra">
+            <thead>
+              <tr>
+                <th>月</th>
+                <th>USD → JPY レート</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% rates.each do |rate| %>
+                <tr>
+                  <td><%= rate.month %>月</td>
+                  <td>¥<%= number_with_precision(rate.usd_to_jpy_rate, precision: 2) %></td>
+                  <td>
+                    <%= link_to "編集", edit_exchange_rate_path(rate), class: "btn btn-sm btn-outline" %>
+                    <%= link_to "削除", exchange_rate_path(rate), method: :delete,
+                        data: { 
+                          turbo_method: :delete,
+                          turbo_confirm: "削除してもよろしいですか？"
+                        }, 
+                        class: "btn btn-sm btn-error btn-outline" %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="alert alert-info">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+      <span>為替レートが登録されていません。新規登録から始めてください。</span>
+    </div>
+  <% end %>
+</div>

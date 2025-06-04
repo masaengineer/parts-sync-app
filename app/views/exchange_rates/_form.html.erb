@@ -1,0 +1,39 @@
+<%= form_with(model: exchange_rate) do |form| %>
+  <% if exchange_rate.errors.any? %>
+    <div class="alert alert-error mb-4">
+      <h2 class="font-bold">エラーが発生しました:</h2>
+      <ul class="list-disc list-inside">
+        <% exchange_rate.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-control mb-4">
+    <%= form.label :year, "年", class: "label" %>
+    <%= form.select :year, options_for_select((2021..Date.current.year + 1).to_a.reverse, exchange_rate.year), 
+        { prompt: "年を選択" }, 
+        class: "select select-bordered w-full" %>
+  </div>
+
+  <div class="form-control mb-4">
+    <%= form.label :month, "月", class: "label" %>
+    <%= form.select :month, options_for_select((1..12).map { |m| ["#{m}月", m] }, exchange_rate.month), 
+        { prompt: "月を選択" }, 
+        class: "select select-bordered w-full" %>
+  </div>
+
+  <div class="form-control mb-6">
+    <%= form.label :usd_to_jpy_rate, "USD → JPY レート", class: "label" %>
+    <%= form.number_field :usd_to_jpy_rate, step: 0.01, placeholder: "例: 150.00", class: "input input-bordered w-full" %>
+    <label class="label">
+      <span class="label-text-alt">1ドル = ◯◯円</span>
+    </label>
+  </div>
+
+  <div class="flex gap-4">
+    <%= form.submit class: "btn btn-primary" %>
+    <%= link_to "キャンセル", exchange_rates_path, class: "btn btn-outline" %>
+  </div>
+<% end %>

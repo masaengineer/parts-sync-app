@@ -90,6 +90,12 @@
                 <%= t("shared.header.menu.my_profile") %>
               <% end %>
             </li>
+            <li>
+              <%= link_to exchange_rates_path, class: "flex items-center gap-2" do %>
+                <iconify-icon icon="lucide:currency" height="16"></iconify-icon>
+                為替レート設定
+              <% end %>
+            </li>
           <% else %>
             <li>
               <%= link_to new_user_session_path, class: "flex items-center gap-2" do %>
