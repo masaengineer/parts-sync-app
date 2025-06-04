@@ -76,15 +76,17 @@ module MonthlyReport
           next unless sale.order_gross_amount
 
           amount = sale.order_gross_amount.to_f
+          sale_date = order.sale_date
 
           jpy_amount = case currency_code
           when "JPY"
             amount
           when "USD"
-            amount * USD_TO_JPY_RATE
+            convert_usd_to_jpy(amount, user: @user, year: sale_date.year, month: sale_date.month)
           else
             rate = sale.to_usd_rate || 1.0
-            (amount * rate) * USD_TO_JPY_RATE
+            usd_amount = amount * rate
+            convert_usd_to_jpy(usd_amount, user: @user, year: sale_date.year, month: sale_date.month)
           end
 
           jpy_total += jpy_amount

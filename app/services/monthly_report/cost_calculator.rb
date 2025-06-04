@@ -78,12 +78,16 @@ module MonthlyReport
       when "JPY"
         amount
       when "USD"
-        amount * USD_TO_JPY_RATE
+        sale_date = sale&.order&.sale_date || Date.current
+        convert_usd_to_jpy(amount, user: @user, year: sale_date.year, month: sale_date.month)
       else
         if sale && sale.to_usd_rate
-          (amount * sale.to_usd_rate) * USD_TO_JPY_RATE
+          usd_amount = amount * sale.to_usd_rate
+          sale_date = sale.order.sale_date
+          convert_usd_to_jpy(usd_amount, user: @user, year: sale_date.year, month: sale_date.month)
         else
-          amount * USD_TO_JPY_RATE
+          sale_date = Date.current
+          convert_usd_to_jpy(amount, user: @user, year: sale_date.year, month: sale_date.month)
         end
       end.round(0)
     end
