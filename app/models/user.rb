@@ -6,6 +6,7 @@ class User < ApplicationRecord
           :omniauthable, omniauth_providers: [ :google_oauth2 ]
 
   has_many :orders, dependent: :destroy
+  has_many :exchange_rates, dependent: :destroy
   attr_accessor :agreement
 
   validates :email, presence: true, uniqueness: true

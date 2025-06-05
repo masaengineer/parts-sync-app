@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_03_23_152706) do
+ActiveRecord::Schema[7.2].define(version: 2025_06_04_094544) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -22,6 +22,17 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_23_152706) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["code"], name: "index_currencies_on_code", unique: true
+  end
+
+  create_table "exchange_rates", force: :cascade do |t|
+    t.integer "year", null: false
+    t.integer "month", null: false
+    t.decimal "usd_to_jpy_rate", precision: 10, scale: 2, null: false
+    t.bigint "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "year", "month"], name: "index_exchange_rates_on_user_id_and_year_and_month", unique: true
+    t.index ["user_id"], name: "index_exchange_rates_on_user_id"
   end
 
   create_table "expenses", force: :cascade do |t|
@@ -175,6 +186,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_23_152706) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "exchange_rates", "users"
   add_foreign_key "expenses", "orders"
   add_foreign_key "manufacturer_skus", "manufacturers"
   add_foreign_key "order_lines", "orders"
