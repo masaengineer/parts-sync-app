@@ -16,17 +16,17 @@ services:
       timeout: 5s
       retries: 5
 
-  redis:
-    image: redis:7
-    ports:
-      - 6379:6379
-    volumes:
-      - redis_data:/data
-    healthcheck:
-      test: ['CMD', 'redis-cli', 'ping']
-      interval: 10s
-      timeout: 5s
-      retries: 5
+  # redis:
+  #   image: redis:7
+  #   ports:
+  #     - 6379:6379
+  #   volumes:
+  #     - redis_data:/data
+  #   healthcheck:
+  #     test: ['CMD', 'redis-cli', 'ping']
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
 
   web:
     working_dir: /app
@@ -46,7 +46,7 @@ services:
       POSTGRES_HOST: db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
-      REDIS_URL: redis://redis:6379/0
+      # REDIS_URL: redis://redis:6379/0
       RAILS_LIVE_RELOAD_ENABLED: 'true'
       RAILS_LIVE_RELOAD_HOST: '0.0.0.0'
       RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
@@ -59,40 +59,40 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      redis:
-        condition: service_healthy
+      # redis:
+      #   condition: service_healthy
 
-  sidekiq:
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-    command: bundle exec sidekiq -C config/sidekiq.yml
-    volumes:
-      - .:/app
-      - bundle_data:/usr/local/bundle:cached
-      - node_modules:/app/node_modules
-      - tmp-data:/app/tmp:cached
-    environment:
-      TZ: Asia/Tokyo
-      POSTGRES_HOST: db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      REDIS_URL: redis://redis:6379/0
-      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
-      RAILS_ENV: development
-    env_file:
-      - .env
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      web:
-        condition: service_started
+  # sidekiq:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.dev
+  #   command: bundle exec sidekiq -C config/sidekiq.yml
+  #   volumes:
+  #     - .:/app
+  #     - bundle_data:/usr/local/bundle:cached
+  #     - node_modules:/app/node_modules
+  #     - tmp-data:/app/tmp:cached
+  #   environment:
+  #     TZ: Asia/Tokyo
+  #     POSTGRES_HOST: db
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: password
+  #     REDIS_URL: redis://redis:6379/0
+  #     RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
+  #     RAILS_ENV: development
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
+  #     web:
+  #       condition: service_started
 
 volumes:
   bundle_data:
   postgresql_data:
   node_modules:
   tmp-data:
-  redis_data:
+  # redis_data:
