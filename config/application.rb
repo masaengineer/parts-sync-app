@@ -40,6 +40,7 @@ module PartsSyncNew
       g.fixture_replacement :factory_bot, dir: "spec/factories"
     end
 
-    config.active_job.queue_adapter = :sidekiq
+    # Cronジョブ方式に変更したため、ActiveJobはinlineで実行
+    config.active_job.queue_adapter = :inline
   end
 end
