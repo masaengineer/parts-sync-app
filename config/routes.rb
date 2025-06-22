@@ -41,7 +41,7 @@ Rails.application.routes.draw do
 
   # 管理機能
   namespace :admin do
-    resource :sync, only: [:show, :create]
+    resource :sync, only: [ :show, :create ]
   end
 
   # デモモード用のルート
