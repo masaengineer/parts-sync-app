@@ -39,6 +39,7 @@ Rails.application.routes.draw do
     end
   end
 
+
   # デモモード用のルート
   namespace :demo do
     get "/", to: "demo#index"

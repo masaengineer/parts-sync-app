@@ -1,0 +1,29 @@
+# CodeRabbit設定ファイル
+# https://docs.coderabbit.ai/guides/configure-coderabbit
+
+# 言語設定
+language: 'ja'
+
+# レビュー設定
+reviews:
+  # レビューの詳細度
+  review_status: true
+  high_level_summary: true
+  poem: false
+
+  # 自動レビュー設定
+  auto_review:
+    enabled: true
+    drafts: false
+
+  # パス設定
+  # パス設定
+  path_filters:
+    - '!**/*.lock'
+    - '!**/node_modules/**'
+    - '!**/vendor/**'
+    - '!**/*.log'
+    - '!**/tmp/**'
+    - '!**/coverage/**'
+    - '!**/*.backup'
+  auto_reply: true
