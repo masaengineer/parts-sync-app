@@ -2,7 +2,7 @@
 # https://docs.coderabbit.ai/guides/configure-coderabbit
 
 # 言語設定
-language: "ja"
+language: 'ja'
 
 # レビュー設定
 reviews:
@@ -10,25 +10,20 @@ reviews:
   review_status: true
   high_level_summary: true
   poem: false
-  review_summary_concurrency_limit: 3
-  
+
   # 自動レビュー設定
   auto_review:
     enabled: true
     drafts: false
 
-# パス設定
-path_filters:
-  # 除外するパス
-  excluded:
-    - "**/*.lock"
-    - "**/node_modules/**"
-    - "**/vendor/**"
-    - "**/*.log"
-    - "**/tmp/**"
-    - "**/coverage/**"
-    - "**/*.backup"
-
-# チャット設定
-chat:
+  # パス設定
+  # パス設定
+  path_filters:
+    - '!**/*.lock'
+    - '!**/node_modules/**'
+    - '!**/vendor/**'
+    - '!**/*.log'
+    - '!**/tmp/**'
+    - '!**/coverage/**'
+    - '!**/*.backup'
   auto_reply: true
