@@ -17,17 +17,6 @@ services:
       timeout: 5s
       retries: 5
 
-  redis:
-    image: redis:7
-    ports:
-      - 6380:6379
-    volumes:
-      - redis_test_data:/data
-    healthcheck:
-      test: ['CMD', 'redis-cli', 'ping']
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   test:
     build:
@@ -49,14 +38,11 @@ services:
       POSTGRES_HOST: db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
-      REDIS_URL: redis://redis:6379/0
       DOCKER_SYSTEM_SPEC: 'true'
       CHROME_BIN: /usr/bin/chromium
       CHROME_PATH: /usr/lib/chromium
     depends_on:
       db:
-        condition: service_healthy
-      redis:
         condition: service_healthy
 
 volumes:
@@ -64,4 +50,3 @@ volumes:
   postgresql_test_data:
   node_modules_test:
   tmp-test-data:
-  redis_test_data:

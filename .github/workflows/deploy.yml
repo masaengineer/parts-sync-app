@@ -1,0 +1,53 @@
+name: Deploy to Render
+
+on:
+  workflow_run:
+    workflows: ['CI']
+    branches: [main]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://parts-sync.site
+    steps:
+      - name: Deploy to Render
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
+        run: |
+          curl -X POST "https://api.render.com/v1/services/$RENDER_SERVICE_ID/deploys" \
+            -H "accept: application/json" \
+            -H "authorization: Bearer $RENDER_API_KEY"
+
+      - name: Notify Slack on Deploy
+        if: success()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          fields: workflow,job,commit,repo,ref,author,took
+          custom_payload: |
+            {
+              "attachments": [{
+                "color": "good",
+                "text": "本番環境へのデプロイが完了しました :rocket:\nURL: https://parts-sync.site",
+                "fields": [
+                  {
+                    "title": "コミット",
+                    "value": "${{ github.sha }}",
+                    "short": true
+                  },
+                  {
+                    "title": "ブランチ",
+                    "value": "${{ github.ref_name }}",
+                    "short": true
+                  }
+                ],
+              }]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
