@@ -53,6 +53,4 @@ test:
 #
 production:
   <<: *default
-  database: parts_sync_production
-  username: parts_sync
-  password: <%= ENV["PARTS_SYNC_NEW_DATABASE_PASSWORD"] %>
+  url: <%= ENV["DATABASE_URL"] %>
