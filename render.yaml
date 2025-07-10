@@ -3,8 +3,8 @@ services:
   - type: web
     name: parts-sync-app
     runtime: ruby
-    buildCommand: "./bin/render-build.sh"
-    startCommand: "bundle exec puma -C config/puma.rb"
+    buildCommand: './bin/render-build.sh'
+    startCommand: 'bundle exec puma -C config/puma.rb'
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -17,9 +17,8 @@ services:
   - type: cron
     name: ebay-sync-morning
     runtime: ruby
-    schedule: "0 21 * * *"   # 21:00 UTC = 06:00 JST
-    buildCommand: "./bin/render-build.sh"
-    startCommand: "bundle exec rake ebay:sync_all"
+    schedule: '0 21 * * *' # 21:00 UTC = 06:00 JST
+    startCommand: 'bundle exec rake ebay:sync_all'
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -32,9 +31,8 @@ services:
   - type: cron
     name: ebay-sync-afternoon
     runtime: ruby
-    schedule: "0 5 * * *"    # 05:00 UTC = 14:00 JST
-    buildCommand: "./bin/render-build.sh"
-    startCommand: "bundle exec rake ebay:sync_all"
+    schedule: '0 5 * * *' # 05:00 UTC = 14:00 JST
+    startCommand: 'bundle exec rake ebay:sync_all'
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -47,9 +45,8 @@ services:
   - type: cron
     name: ebay-sync-evening
     runtime: ruby
-    schedule: "0 11 * * *"   # 11:00 UTC = 20:00 JST
-    buildCommand: "./bin/render-build.sh"
-    startCommand: "bundle exec rake ebay:sync_all"
+    schedule: '0 11 * * *' # 11:00 UTC = 20:00 JST
+    startCommand: 'bundle exec rake ebay:sync_all'
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -57,7 +54,6 @@ services:
           property: connectionString
       - key: RAILS_MASTER_KEY
         sync: false
-
 databases:
   - name: parts-sync-app-db2
     databaseName: parts_sync_production
