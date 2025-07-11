@@ -20,8 +20,8 @@ services:
     runtime: ruby
     plan: standard
     schedule: '0 21 * * *' # 21:00 UTC = 06:00 JST
-    buildCommand: 'bundle install'
-    startCommand: 'bundle exec rake ebay:sync_all'
+    buildCommand: './bin/cron-build.sh'
+    startCommand: '/bin/bash -l -c "bundle exec rake ebay:sync_all"'
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -36,8 +36,8 @@ services:
     runtime: ruby
     plan: standard
     schedule: '0 5 * * *' # 05:00 UTC = 14:00 JST
-    buildCommand: 'bundle install'
-    startCommand: 'bundle exec rake ebay:sync_all'
+    buildCommand: './bin/cron-build.sh'
+    startCommand: '/bin/bash -l -c "bundle exec rake ebay:sync_all"'
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -52,8 +52,8 @@ services:
     runtime: ruby
     plan: standard
     schedule: '0 11 * * *' # 11:00 UTC = 20:00 JST
-    buildCommand: 'bundle install'
-    startCommand: 'bundle exec rake ebay:sync_all'
+    buildCommand: './bin/cron-build.sh'
+    startCommand: '/bin/bash -l -c "bundle exec rake ebay:sync_all"'
     envVars:
       - key: DATABASE_URL
         fromDatabase:
