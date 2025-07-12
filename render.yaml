@@ -10,7 +10,7 @@ services:
       - key: DATABASE_URL
         fromDatabase:
           name: parts-sync-app-db2
-          property: connectionString
+          property: databaseUrl
       - key: RAILS_MASTER_KEY
         sync: false
 
@@ -26,7 +26,7 @@ services:
       - key: DATABASE_URL
         fromDatabase:
           name: parts-sync-app-db2
-          property: connectionString
+          property: databaseUrl
       - key: RAILS_MASTER_KEY
         sync: false
 
@@ -42,7 +42,7 @@ services:
       - key: DATABASE_URL
         fromDatabase:
           name: parts-sync-app-db2
-          property: connectionString
+          property: databaseUrl
       - key: RAILS_MASTER_KEY
         sync: false
 
@@ -58,6 +58,6 @@ services:
       - key: DATABASE_URL
         fromDatabase:
           name: parts-sync-app-db2
-          property: connectionString
+          property: databaseUrl
       - key: RAILS_MASTER_KEY
         sync: false
