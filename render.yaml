@@ -7,10 +7,6 @@ services:
     buildCommand: './bin/render-build.sh'
     startCommand: 'bundle exec puma -C config/puma.rb'
     envVars:
-      - key: DATABASE_URL
-        fromDatabase:
-          name: parts-sync-app-db2
-          property: databaseUrl
       - key: RAILS_MASTER_KEY
         sync: false
 
@@ -23,10 +19,6 @@ services:
     buildCommand: './bin/cron-build.sh'
     startCommand: 'bundle exec rake ebay:sync_all'
     envVars:
-      - key: DATABASE_URL
-        fromDatabase:
-          name: parts-sync-app-db2
-          property: databaseUrl
       - key: RAILS_MASTER_KEY
         sync: false
 
@@ -39,10 +31,6 @@ services:
     buildCommand: './bin/cron-build.sh'
     startCommand: 'bundle exec rake ebay:sync_all'
     envVars:
-      - key: DATABASE_URL
-        fromDatabase:
-          name: parts-sync-app-db2
-          property: databaseUrl
       - key: RAILS_MASTER_KEY
         sync: false
 
@@ -59,5 +47,6 @@ services:
         fromDatabase:
           name: parts-sync-app-db2
           property: databaseUrl
+
       - key: RAILS_MASTER_KEY
         sync: false
