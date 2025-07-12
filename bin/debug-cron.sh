@@ -11,14 +11,11 @@ echo "DATABASE_URL exists: $(if [ -n "$DATABASE_URL" ]; then echo "YES"; else ec
 echo "=== DEBUG: Checking bundle ==="
 bundle check || bundle install
 
-echo "=== DEBUG: Running rake with timeout ==="
-timeout 300 bundle exec rake ebay:sync_all --trace
+echo "=== DEBUG: Running rake without timeout ==="
+bundle exec rake ebay:sync_all --trace
 
 exit_code=$?
 echo "=== DEBUG: Exit code: $exit_code ==="
 
-if [ $exit_code -eq 124 ]; then
-  echo "=== DEBUG: Command timed out after 5 minutes ==="
-fi
 
 exit $exit_code
