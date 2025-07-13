@@ -64,6 +64,7 @@ ja:
       types:
         wisewill_data_sheet: 'Wisewill委託分シート'
         cpass_data_sheet: 'CPaSS委託分シート'
+        postal_data_sheet: '国際郵便シート'
     search:
       reset: 'リセット'
       submit: '検索'
