@@ -14,7 +14,7 @@ services:
   - type: cron
     name: ebay-sync-morning
     runtime: ruby
-    plan: standard
+    plan: pro plus
     schedule: '0 21 * * *' # 21:00 UTC = 06:00 JST
     buildCommand: './bin/cron-build.sh'
     startCommand: 'bundle exec rake ebay:sync_all'
@@ -22,24 +22,12 @@ services:
       - key: RAILS_MASTER_KEY
         sync: false
 
-  # Cron : 昼 14 時 JST
-  - type: cron
-    name: ebay-sync-afternoon
-    runtime: ruby
-    plan: standard
-    schedule: '0 5 * * *' # 05:00 UTC = 14:00 JST
-    buildCommand: './bin/cron-build.sh'
-    startCommand: 'bundle exec rake ebay:sync_all'
-    envVars:
-      - key: RAILS_MASTER_KEY
-        sync: false
-
-  # Cron : 夜 20 時 JST
+  # Cron : 夕方 18 時 JST
   - type: cron
     name: ebay-sync-evening
     runtime: ruby
-    plan: standard
-    schedule: '0 11 * * *' # 11:00 UTC = 20:00 JST
+    plan: pro plus
+    schedule: '0 9 * * *' # 09:00 UTC = 18:00 JST
     buildCommand: './bin/cron-build.sh'
     startCommand: 'bundle exec rake ebay:sync_all'
     envVars:
