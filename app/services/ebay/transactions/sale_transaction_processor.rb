@@ -19,6 +19,8 @@ module Ebay
 
         return fee_processed unless transaction["orderLineItems"].is_a?(Array)
 
+        Rails.logger.info "🔄 処理開始 - orderLineItems: #{transaction['orderLineItems'].size}件"
+
         transaction["orderLineItems"].each_with_index do |item, idx|
           Rails.logger.debug "Processing orderLineItem #{idx}: #{item.keys.inspect}"
 
@@ -27,13 +29,19 @@ module Ebay
             next
           end
 
+          Rails.logger.info "💰 手数料処理 - item #{idx}: #{item['marketplaceFees'].size}件"
+
           item["marketplaceFees"].each_with_index do |fee, fee_idx|
+            Rails.logger.debug "Processing fee #{fee_idx}/#{item['marketplaceFees'].size} of item #{idx}"
             if process_single_fee(fee, idx, fee_idx)
               fee_processed = true
             end
           end
+
+          Rails.logger.info "✅ item #{idx} 完了"
         end
 
+        Rails.logger.info "🎯 marketplace_fees処理完了 - 処理済み: #{fee_processed}"
         fee_processed
       end
 
