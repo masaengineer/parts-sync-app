@@ -41,6 +41,10 @@ class DataImportsController < ApplicationController
         CsvImporters::CpassDataSheetImporter.new(file.path, current_user).import
         flash_message = "CPaSS委託分シートのインポートが完了しました。"
         flash_type = :notice
+      when "postal_data_sheet"
+        CsvImporters::PostalDataSheetImporter.new(file.path, current_user).import
+        flash_message = "国際郵便シートのインポートが完了しました。"
+        flash_type = :notice
       else
         flash_message = "不明なインポートタイプです。"
         flash_type = :alert
