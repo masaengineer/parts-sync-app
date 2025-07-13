@@ -82,6 +82,7 @@ module Ebay
 
       def duplicate_fee?(fee_category)
         record_exists?(
+          order: order,
           transaction_id: transaction["transactionId"],
           transaction_type: PaymentFee.transaction_types[:sale],
           fee_category: fee_category
