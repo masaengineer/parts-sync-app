@@ -55,7 +55,7 @@ module Ebay
 
       import_order_lines(order, order_data["lineItems"])
       import_shipment(order, order_data)
-      
+
       Rails.logger.info "[eBay Sync] Completed import for order #{order_data['orderId']}"
     rescue => e
       Rails.logger.error "[eBay Sync] Failed to import order #{order_data['orderId']}: #{e.message}"
@@ -108,11 +108,11 @@ module Ebay
 
       shipment = Shipment.find_or_initialize_by(order_id: order.id)
       was_new_record = shipment.new_record?
-      
+
       shipment.update!(
         tracking_number: tracking_number
       )
-      
+
       if was_new_record
         Rails.logger.info "[eBay Sync] Created new shipment (ID: #{shipment.id}) for order #{order_data['orderId']} with tracking #{tracking_number}"
       else
