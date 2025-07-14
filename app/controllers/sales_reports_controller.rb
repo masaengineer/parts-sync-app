@@ -8,36 +8,12 @@ class SalesReportsController < ApplicationController
 
     @per_page = (params[:per_page] || 30).to_i
 
-    all_orders = @q.result
-                .includes(
-                  :sales,
-                  :shipment,
-                  :payment_fees,
-                  :procurement,
-                  order_lines: {
-                    seller_sku: [ :manufacturer_skus, :price_adjustments ]
-                  }
-                )
-
-    all_orders_data = all_orders.map do |order|
-      SalesReport::Service.new(order).calculate
-    end
-
-    all_orders_data = sort_orders_data(all_orders_data) if session[:sort_by].present?
-
-    @orders_data_paginated = Kaminari.paginate_array(all_orders_data)
-                                    .page(params[:page])
-                                    .per(@per_page)
-
-    @orders_data = @orders_data_paginated
-
-    @orders = @orders_data_paginated
-
     respond_to do |format|
-      format.html
+      format.html do
+        render_paginated_data
+      end
       format.csv do
-        csv_data = generate_csv(all_orders_data)
-        send_data csv_data, filename: "sales_report_#{Date.current}.csv", type: "text/csv"
+        render_csv_stream
       end
     end
   end
@@ -138,76 +114,99 @@ class SalesReportsController < ApplicationController
     end
   end
 
-  def generate_csv(orders_data)
-    require "csv"
-    headers = [
-      "注文ID",
-      "注文番号",
-      "販売日",
-      "SKUコード",
-      "商品名",
-      "売上(元通貨)",
-      "売上(円換算)",
-      "通貨コード",
-      "決済手数料(元通貨)",
-      "粗利益(元通貨)",
-      "粗利益(円換算)",
-      "配送料(円)",
-      "仕入コスト(円)",
-      "その他コスト(円)",
-      "数量",
-      "純粗利(円)",
-      "利益率(%)",
-      "トラッキング番号",
-      "為替レート(元通貨→USD)",
-      "為替レート(USD→JPY)",
-      "転送手数料(円)",
-      "取扱手数料(円)"
-    ]
+  def render_paginated_data
+    # カウントクエリを最適化（関連なしでカウント）
+    total_count = @q.result.select(:id).count
 
-    csv_data = CSV.generate(headers: true) do |csv|
-      csv << headers
-      orders_data.each do |data|
-        order = data[:order]
+    # ページネーション計算
+    page = params[:page].to_i
+    page = 1 if page < 1
+    offset = (page - 1) * @per_page
 
-        # 円換算のデータを計算
-        usd_to_jpy_rate = 150.0
-        revenue_jpy = data[:revenue] * usd_to_jpy_rate
-        net_revenue_usd = data[:revenue] - data[:payment_fees]
-        net_revenue_jpy = net_revenue_usd * usd_to_jpy_rate
+    # 必要なページのデータのみ取得・処理
+    current_page_orders = @q.result
+                            .includes(
+                              :sales,
+                              :shipment,
+                              :payment_fees,
+                              :procurement,
+                              order_lines: {
+                                seller_sku: [ :manufacturer_skus, :price_adjustments ]
+                              }
+                            )
+                            .offset(offset)
+                            .limit(@per_page)
 
-        # 調達関連の詳細情報
-        procurement = order.procurement
-        forwarding_fee = procurement ? procurement.forwarding_fee.to_f : 0
-        handling_fee = procurement ? procurement.handling_fee.to_f : 0
-
-        csv << [
-          order.id,
-          order.order_number,
-          data[:sale_date],
-          data[:sku_codes],
-          data[:product_names],
-          data[:revenue],
-          revenue_jpy,
-          order.currency&.code || "USD",
-          data[:payment_fees],
-          net_revenue_usd,
-          net_revenue_jpy,
-          data[:shipping_cost],
-          data[:procurement_cost],
-          data[:other_costs],
-          data[:quantity],
-          data[:profit],
-          data[:profit_rate],
-          data[:tracking_number],
-          data[:exchange_rate],
-          usd_to_jpy_rate,
-          forwarding_fee,
-          handling_fee
-        ]
-      end
+    # 現在のページのデータのみ処理
+    orders_data = current_page_orders.map do |order|
+      SalesReport::Service.new(order).calculate
     end
 
-    csv_data.encode(Encoding::SHIFT_JIS, invalid: :replace, undef: :replace)
+    # ソート処理（必要な場合のみ）
+    orders_data = sort_orders_data(orders_data) if session[:sort_by].present?
+
+    # Kaminariオブジェクトを手動作成
+    @orders_data_paginated = Kaminari.paginate_array(orders_data, total_count: total_count)
+                                    .page(params[:page])
+                                    .per(@per_page)
+
+    @orders_data = @orders_data_paginated
+    @orders = @orders_data_paginated
+  end
+
+  def render_csv_stream
+    headers["Content-Type"] = "text/csv; charset=shift_jis"
+    headers["Content-Disposition"] = "attachment; filename=\"sales_report_#{Date.current}.csv\""
+
+    # ストリーミングレスポンス
+    self.response_body = csv_enumerator
+  end
+
+  def csv_enumerator
+    Enumerator.new do |yielder|
+      # ヘッダー出力
+      csv_headers = [
+        "注文ID", "注文番号", "販売日", "SKUコード", "商品名",
+        "売上(元通貨)", "売上(円換算)", "通貨コード", "決済手数料(元通貨)",
+        "粗利益(元通貨)", "粗利益(円換算)", "配送料(円)", "仕入コスト(円)",
+        "その他コスト(円)", "数量", "純粗利(円)", "利益率(%)",
+        "トラッキング番号", "為替レート(元通貨→USD)", "為替レート(USD→JPY)",
+        "転送手数料(円)", "取扱手数料(円)"
+      ]
+
+      yielder << CSV.generate_line(csv_headers).encode(Encoding::SHIFT_JIS, invalid: :replace, undef: :replace)
+
+      # データをバッチ処理でストリーミング（バッチサイズを大幅に増加）
+      @q.result.includes(
+        :sales, :shipment, :payment_fees, :procurement,
+        order_lines: { seller_sku: [ :manufacturer_skus, :price_adjustments ] }
+      ).find_each(batch_size: 500) do |order|
+        data = SalesReport::Service.new(order).calculate
+        csv_row = format_csv_row(data)
+        yielder << CSV.generate_line(csv_row).encode(Encoding::SHIFT_JIS, invalid: :replace, undef: :replace)
+      end
+    end
+  end
+
+  def format_csv_row(data)
+    order = data[:order]
+    usd_to_jpy_rate = 150.0
+    revenue_jpy = data[:revenue] * usd_to_jpy_rate
+    net_revenue_usd = data[:revenue] - data[:payment_fees]
+    net_revenue_jpy = net_revenue_usd * usd_to_jpy_rate
+
+    procurement = order.procurement
+    forwarding_fee = procurement ? procurement.forwarding_fee.to_f : 0
+    handling_fee = procurement ? procurement.handling_fee.to_f : 0
+
+    [
+      order.id, order.order_number, data[:sale_date], data[:sku_codes],
+      data[:product_names], data[:revenue], revenue_jpy,
+      order.currency&.code || "USD", data[:payment_fees],
+      net_revenue_usd, net_revenue_jpy, data[:shipping_cost],
+      data[:procurement_cost], data[:other_costs], data[:quantity],
+      data[:profit], data[:profit_rate], data[:tracking_number],
+      data[:exchange_rate], usd_to_jpy_rate, forwarding_fee, handling_fee
+    ]
   end
 end
