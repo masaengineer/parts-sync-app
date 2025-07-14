@@ -5,9 +5,11 @@ module SalesReport
     end
 
     def calculate
-      order_revenue_usd = @order.sales.sum(&:order_gross_amount).to_f
+      # salesデータを一度だけ取得して再利用
+      sales = @order.sales
+      order_revenue_usd = sales.sum(&:order_gross_amount).to_f
 
-      exchange_rate = @order.sales.map(&:to_usd_rate).first.to_f
+      exchange_rate = sales.first&.to_usd_rate.to_f
       exchange_rate = 1.0 if exchange_rate.zero?
 
       order_payment_fees_usd = @order.payment_fees.sum(&:fee_amount).to_f
@@ -36,8 +38,9 @@ module SalesReport
       jpy_revenue = usd_revenue * usd_to_jpy_rate
       profit_rate = jpy_revenue.zero? ? 0 : (profit_jpy / jpy_revenue) * 100
 
+      # order_linesを一度だけ取得して再利用
       order_lines = @order.order_lines
-      sku_codes = order_lines.map { |line| line.seller_sku.sku_code }.compact.join(", ")
+      sku_codes = order_lines.map { |line| line.seller_sku&.sku_code }.compact.join(", ")
       product_names = order_lines.map(&:line_item_name).compact.join(", ")
 
       {
@@ -76,6 +79,7 @@ module SalesReport
         ].sum
       end
 
+      # order_linesは既にメモリに読み込まれているので、再アクセスを避ける
       order.order_lines.each do |line|
         result[:total_quantity] += line.quantity.to_i
       end
