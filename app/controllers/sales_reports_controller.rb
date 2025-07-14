@@ -155,8 +155,8 @@ class SalesReportsController < ApplicationController
   end
 
   def render_csv_stream
-    headers['Content-Type'] = 'text/csv; charset=shift_jis'
-    headers['Content-Disposition'] = "attachment; filename=\"sales_report_#{Date.current}.csv\""
+    headers["Content-Type"] = "text/csv; charset=shift_jis"
+    headers["Content-Disposition"] = "attachment; filename=\"sales_report_#{Date.current}.csv\""
 
     # ストリーミングレスポンス
     self.response_body = csv_enumerator
