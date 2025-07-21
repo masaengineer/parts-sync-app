@@ -10,7 +10,20 @@
           <tr class="hover:bg-base-200/30">
             <td><%= t('.international_shipping') %></td>
             <td class="text-right text-error">
-              <%= format_jpy_currency(order.shipment.customer_international_shipping) %>
+              <% if order.shipment.currency&.code == "JPY" %>
+                <%= format_jpy_currency(order.shipment.customer_international_shipping) %>
+              <% elsif order.shipment.currency&.code == "USD" %>
+                <% # USDの場合は為替レートで変換 %>
+                <% service = SalesReport::Service.new(order) %>
+                <% usd_to_jpy_rate = service.send(:fetch_exchange_rate) %>
+                <%= format_jpy_currency(order.shipment.customer_international_shipping * usd_to_jpy_rate) %>
+                <div class="text-xs text-base-content/60">
+                  <%= format_usd(order.shipment.customer_international_shipping) %>
+                </div>
+              <% else %>
+                <% # その他の通貨または通貨が設定されていない場合は、JPYとして扱う %>
+                <%= format_jpy_currency(order.shipment.customer_international_shipping) %>
+              <% end %>
             </td>
           </tr>
         </tbody>
