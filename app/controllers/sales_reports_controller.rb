@@ -190,7 +190,7 @@ class SalesReportsController < ApplicationController
 
   def format_csv_row(data)
     order = data[:order]
-    usd_to_jpy_rate = 150.0
+    usd_to_jpy_rate = data[:usd_to_jpy_rate]
     revenue_jpy = data[:revenue] * usd_to_jpy_rate
     net_revenue_usd = data[:revenue] - data[:payment_fees]
     net_revenue_jpy = net_revenue_usd * usd_to_jpy_rate
