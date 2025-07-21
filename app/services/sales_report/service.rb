@@ -72,7 +72,18 @@ module SalesReport
     end
 
     def fetch_shipping_cost
-      safe_decimal_conversion(@order.shipment&.customer_international_shipping)
+      return 0 unless @order.shipment&.customer_international_shipping
+      
+      amount = safe_decimal_conversion(@order.shipment.customer_international_shipping)
+      currency_code = @order.shipment.currency&.code
+      
+      # 通貨がUSDの場合は円に変換
+      if currency_code == "USD"
+        amount * fetch_exchange_rate
+      else
+        # JPYまたは通貨が未設定の場合はそのまま返す
+        amount
+      end
     end
 
     def calculate_usd_revenue(sales_data)
