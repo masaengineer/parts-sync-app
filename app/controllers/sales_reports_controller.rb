@@ -164,14 +164,13 @@ class SalesReportsController < ApplicationController
 
   def csv_enumerator
     Enumerator.new do |yielder|
-      # ヘッダー出力
-      csv_headers = [
+            # ヘッダー出力
+            csv_headers = [
         "注文ID", "注文番号", "販売日", "SKUコード", "商品名",
         "売上(元通貨)", "売上(円換算)", "通貨コード", "決済手数料(元通貨)",
         "粗利益(元通貨)", "粗利益(円換算)", "配送料(円)", "仕入コスト(円)",
         "その他コスト(円)", "数量", "純粗利(円)", "利益率(%)",
-        "トラッキング番号", "為替レート(元通貨→USD)", "為替レート(USD→JPY)",
-        "転送手数料(円)", "取扱手数料(円)"
+        "トラッキング番号", "為替レート(元通貨→USD)", "為替レート(USD→JPY)"
       ]
 
       yielder << CSV.generate_line(csv_headers).encode(Encoding::SHIFT_JIS, invalid: :replace, undef: :replace)
@@ -188,24 +187,30 @@ class SalesReportsController < ApplicationController
     end
   end
 
-  def format_csv_row(data)
+      def format_csv_row(data)
     order = data[:order]
     usd_to_jpy_rate = data[:usd_to_jpy_rate]
-    net_revenue_usd = data[:revenue] - data[:payment_fees]
+
+    # 粗利益計算：元通貨とUSD・円換算
+    net_revenue_original_currency = data[:revenue_original_currency] - data[:payment_fees]
+    payment_fees_usd = data[:payment_fees] * data[:exchange_rate]
+    net_revenue_usd = data[:revenue] - payment_fees_usd
     net_revenue_jpy = net_revenue_usd * usd_to_jpy_rate
 
-    procurement = order.procurement
-    forwarding_fee = procurement ? procurement.forwarding_fee.to_f : 0
-    handling_fee = procurement ? procurement.handling_fee.to_f : 0
+    # 純粗利計算：粗利益から全てのコストを引く（その他コストに転送・取扱手数料が含まれている）
+    net_profit_jpy = net_revenue_jpy - data[:shipping_cost] - data[:procurement_cost] - data[:other_costs]
+
+    # 利益率計算：純粗利ベース
+    net_profit_rate = data[:revenue_jpy].zero? ? 0 : (net_profit_jpy / data[:revenue_jpy]) * 100
 
     [
       order.id, order.order_number, data[:sale_date], data[:sku_codes],
       data[:product_names], data[:revenue_original_currency], data[:revenue_jpy],
       order.currency&.code || "USD", data[:payment_fees],
-      net_revenue_usd, net_revenue_jpy, data[:shipping_cost],
+      net_revenue_original_currency, net_revenue_jpy, data[:shipping_cost],
       data[:procurement_cost], data[:other_costs], data[:quantity],
-      data[:profit], data[:profit_rate], data[:tracking_number],
-      data[:exchange_rate], usd_to_jpy_rate, forwarding_fee, handling_fee
+      net_profit_jpy, net_profit_rate, data[:tracking_number],
+      data[:exchange_rate], usd_to_jpy_rate
     ]
   end
 end

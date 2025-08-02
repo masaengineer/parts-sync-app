@@ -16,7 +16,7 @@ module SalesReport
       revenue_conversions = calculate_revenue_conversions(sales_data)
 
       # 利益計算
-      profit_data = calculate_profit(revenue_conversions, fees_data[:total_fees], shipping_cost, procurement_data)
+      profit_data = calculate_profit(sales_data, revenue_conversions, fees_data[:total_fees], shipping_cost, procurement_data)
 
       # 商品情報の取得s
       product_info = fetch_product_info
@@ -48,8 +48,10 @@ module SalesReport
       }
     end
 
-    def calculate_profit(revenue_conversions, total_fees, shipping_cost, procurement_data)
-      net_revenue_usd = revenue_conversions[:usd] - total_fees
+    def calculate_profit(sales_data, revenue_conversions, total_fees, shipping_cost, procurement_data)
+      # 手数料を元通貨からUSDに変換
+      fees_usd = total_fees * sales_data[:exchange_rate]
+      net_revenue_usd = revenue_conversions[:usd] - fees_usd
       net_revenue_jpy = net_revenue_usd * revenue_conversions[:usd_to_jpy_rate]
       total_costs_jpy = calculate_total_costs(shipping_cost, procurement_data)
       profit_jpy = net_revenue_jpy - total_costs_jpy
