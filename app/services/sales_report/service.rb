@@ -7,46 +7,60 @@ module SalesReport
     end
 
     def calculate
-      # Step 1: 基本データの取得
       sales_data = fetch_sales_data
       fees_data = fetch_fees_data
       shipping_cost = fetch_shipping_cost
       procurement_data = calculate_procurement_data(@order)
 
-      # Step 2: USD計算
-      usd_revenue = calculate_usd_revenue(sales_data)
-      net_revenue_usd = usd_revenue - fees_data[:total_fees]
+      # USD・JPY変換を実行
+      revenue_conversions = calculate_revenue_conversions(sales_data)
 
-      # Step 3: 為替レート取得とJPY変換
-      usd_to_jpy_rate = fetch_exchange_rate
-      revenue_jpy = usd_revenue * usd_to_jpy_rate
-      net_revenue_jpy = net_revenue_usd * usd_to_jpy_rate
+      # 利益計算
+      profit_data = calculate_profit(revenue_conversions, fees_data[:total_fees], shipping_cost, procurement_data)
 
-      # Step 4: コスト計算
-      total_costs_jpy = calculate_total_costs(shipping_cost, procurement_data)
-
-      # Step 5: 利益計算
-      profit_jpy = net_revenue_jpy - total_costs_jpy
-      profit_rate = calculate_profit_rate(profit_jpy, revenue_jpy)
-
-      # Step 6: 商品情報の取得
+      # 商品情報の取得s
       product_info = fetch_product_info
 
-      # Step 7: 結果の構築
       build_result(
         sales_data: sales_data,
-        usd_revenue: usd_revenue,
+        revenue_conversions: revenue_conversions,
         fees_data: fees_data,
         shipping_cost: shipping_cost,
         procurement_data: procurement_data,
-        profit_jpy: profit_jpy,
-        profit_rate: profit_rate,
-        product_info: product_info,
-        usd_to_jpy_rate: usd_to_jpy_rate
+        profit_data: profit_data,
+        product_info: product_info
       )
     end
 
     private
+
+    def calculate_revenue_conversions(sales_data)
+      revenue_original_currency = sales_data[:order_gross_amount]
+      revenue_usd = convert_to_usd(sales_data)
+      usd_to_jpy_rate = fetch_exchange_rate
+      revenue_jpy = revenue_usd * usd_to_jpy_rate
+
+      {
+        original_currency: revenue_original_currency,
+        usd: revenue_usd,
+        jpy: revenue_jpy,
+        usd_to_jpy_rate: usd_to_jpy_rate
+      }
+    end
+
+    def calculate_profit(revenue_conversions, total_fees, shipping_cost, procurement_data)
+      net_revenue_usd = revenue_conversions[:usd] - total_fees
+      net_revenue_jpy = net_revenue_usd * revenue_conversions[:usd_to_jpy_rate]
+      total_costs_jpy = calculate_total_costs(shipping_cost, procurement_data)
+      profit_jpy = net_revenue_jpy - total_costs_jpy
+      profit_rate = calculate_profit_rate(profit_jpy, revenue_conversions[:jpy])
+
+      {
+        jpy: profit_jpy,
+        rate: profit_rate,
+        net_revenue_jpy: net_revenue_jpy
+      }
+    end
 
     def fetch_sales_data
       sales = @order.sales
@@ -62,6 +76,7 @@ module SalesReport
     end
 
     def fetch_fees_data
+      binding.pry
       payment_fees = @order.payment_fees
       total_fees = payment_fees.sum(&:fee_amount).to_f
 
@@ -77,16 +92,16 @@ module SalesReport
       amount = safe_decimal_conversion(@order.shipment.customer_international_shipping)
       currency_code = @order.shipment.currency&.code
 
-      # 通貨がUSDの場合は円に変換
+      # USDの場合は円に変換
       if currency_code == "USD"
         amount * fetch_exchange_rate
       else
-        # JPYまたは通貨が未設定の場合はそのまま返す
-        amount
+        amount # JPYまたは通貨未設定の場合はそのまま
       end
     end
 
-    def calculate_usd_revenue(sales_data)
+    def convert_to_usd(sales_data)
+      # 元通貨の売上額をUSDに変換
       sales_data[:order_gross_amount] * sales_data[:exchange_rate]
     end
 
@@ -120,23 +135,26 @@ module SalesReport
       }
     end
 
-    def build_result(sales_data:, usd_revenue:, fees_data:, shipping_cost:, procurement_data:, profit_jpy:, profit_rate:, product_info:, usd_to_jpy_rate:)
+    def build_result(sales_data:, revenue_conversions:, fees_data:, shipping_cost:, procurement_data:, profit_data:, product_info:)
       {
         order: @order,
-        revenue: usd_revenue,
+        revenue: revenue_conversions[:usd], # 後方互換性のため
+        revenue_original_currency: revenue_conversions[:original_currency],
+        revenue_usd: revenue_conversions[:usd],
+        revenue_jpy: revenue_conversions[:jpy],
         payment_fees: fees_data[:total_fees],
         shipping_cost: shipping_cost,
         procurement_cost: procurement_data[:procurement_cost],
         other_costs: procurement_data[:other_costs],
         quantity: procurement_data[:total_quantity],
-        profit: profit_jpy,
-        profit_rate: profit_rate,
+        profit: profit_data[:jpy],
+        profit_rate: profit_data[:rate],
         tracking_number: @order.shipment&.tracking_number,
         sale_date: @order.sale_date,
         sku_codes: product_info[:sku_codes],
         product_names: product_info[:product_names],
         exchange_rate: sales_data[:exchange_rate],
-        usd_to_jpy_rate: usd_to_jpy_rate
+        usd_to_jpy_rate: revenue_conversions[:usd_to_jpy_rate]
       }
     end
 
