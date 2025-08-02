@@ -76,7 +76,6 @@ module SalesReport
     end
 
     def fetch_fees_data
-      binding.pry
       payment_fees = @order.payment_fees
       total_fees = payment_fees.sum(&:fee_amount).to_f
 
